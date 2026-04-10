@@ -4802,7 +4802,7 @@ function renderAll(){
   const now=new Date();
   const todayStr=localToday();
   const pending=reminders.filter(r=>!r.sent).length;
-  const overdue=reminders.filter(r=>!r.sent&&r.due&&r.due.slice(0,10)<todayStr).length;
+  const overdue=reminders.filter(r=>isOverdue(r)).length;
   const sent=reminders.filter(r=>r.sent).length;
 
   document.getElementById('stat-notes').textContent=notes.length;
@@ -4885,7 +4885,7 @@ function renderNoteCard(n){
 function renderReminderCard(r){
   const now=new Date();
   let sc='pending',sl='🔔 Pending';
-  try{const todayStr=localToday();const dueDate=(r.due||'').slice(0,10);if(r.sent){sc='sent';sl='✅ Done';}else if(dueDate&&dueDate<todayStr){sc='overdue';sl='🔴 Overdue';}}catch{}
+  try{if(r.sent){sc='sent';sl='✅ Done';}else if(isOverdue(r)){sc='overdue';sl='🔴 Overdue';}}catch{}
   const tags=(r.tags||[]).map(t=>`<span class="ctag">#${esc(t)}</span>`).join('');
   const rep=r.repeat&&r.repeat!=='none'?`<span class="ctag">🔁 ${r.repeat}</span>`:'';
   const prio=r.priority||'medium';
@@ -4935,7 +4935,7 @@ function renderNoteRow(n){
 function renderReminderRow(r){
   const now=new Date();
   let sc='pending';
-  try{const todayStr=localToday();const dueDate=(r.due||'').slice(0,10);if(r.sent){sc='sent';}else if(dueDate&&dueDate<todayStr){sc='overdue';}}catch{}
+  try{if(r.sent){sc='sent';}else if(isOverdue(r)){sc='overdue';}}catch{}
   const tags=(r.tags||[]).slice(0,2).map(t=>`<span class="ctag">#${esc(t)}</span>`).join('');
   const rep=r.repeat&&r.repeat!=='none'?`<span class="ctag">🔁 ${r.repeat}</span>`:'';
   const doneBtn = !r.sent
@@ -5289,6 +5289,15 @@ function localToday(){
   const d=new Date();
   const pad=n=>String(n).padStart(2,'0');
   return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+}
+
+/* Returns true if a reminder is past its due date+time (including today's past-time items) */
+function isOverdue(r){
+  if(!r || r.sent || !r.due) return false;
+  try{
+    const dueMs = new Date(r.due.replace(' ','T')).getTime();
+    return dueMs < Date.now();
+  }catch{ return false; }
 }
 
 /* -- QUICK CAPTURE ------------------------------- */
@@ -6031,7 +6040,7 @@ function _getFilteredRems(){
   } else if(_remPageFilter==='completed'){
     filtered = rems.filter(r=>r.sent);
   } else if(_remPageFilter==='overdue-only'){
-    filtered = rems.filter(r=>!r.sent && r.due && r.due.slice(0,10) < todayStr);
+    filtered = rems.filter(r=>isOverdue(r));
   } else {
     filtered = rems.filter(r=>!r.sent);
   }
@@ -8786,7 +8795,7 @@ function updateDashboardWidgets(){
   const totalItems  = notes.length + reminders.length;
   const pending     = reminders.filter(r=>!r.sent).length;
   const completed   = reminders.filter(r=>r.sent).length;
-  const missed      = reminders.filter(r=>!r.sent && r.due && r.due.slice(0,10) < todayStr).length;
+  const missed      = reminders.filter(r=>isOverdue(r)).length;
 
   const elNotes   = document.getElementById('stat-notes');
   const elPend    = document.getElementById('stat-pending');
@@ -8877,8 +8886,8 @@ function updateDashboardWidgets(){
   // -- MISSED & OVERDUE --
   const missedEl = document.getElementById('dash-missed-list');
   if(missedEl){
-    const overdueRems = reminders.filter(r=>!r.sent && r.due && r.due.slice(0,10) < todayStr)
-      .sort((a,b)=>b.due.localeCompare(a.due))
+    const overdueRems = reminders.filter(r=>isOverdue(r))
+      .sort((a,b)=>(b.due||'').localeCompare(a.due||''))
       .slice(0,4);
 
     const overdueTasks = (TASKNOTES||[])
@@ -9014,8 +9023,8 @@ function checkDueReminders(){
     try{
       const due = new Date(r.due.replace(' ','T'));
       const diff = due - now;
-      // fire if within next 5 minutes or already overdue (up to 1hr past)
-      if(diff <= 5*60*1000 && diff > -60*60*1000){
+      // fire if within next 5 minutes or already overdue today (up to 24hr past)
+      if(diff <= 5*60*1000 && diff > -24*60*60*1000){
         const n = new Notification('⏰ '+r.title,{
           body: r.body||(r.due?'Due: '+r.due:''),
           icon: 'data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⏰</text></svg>'
@@ -9054,18 +9063,9 @@ function getBadgeCount(){
     return taskDate === today;
   }).length;
 
-  // 2. Only strictly OVERDUE reminders (past due, not sent, not today)
+  // 2. Overdue reminders (including today's past-time items)
   const now = new Date();
-  const pendingRem = (DATA.reminders||[]).filter(r=>{
-    if(r.sent) return false;
-    if(!r.due) return false;
-    try{
-      const dueDate = r.due.slice(0,10);
-      if(dueDate === today) return false; // today's reminders don't count as overdue
-      const due = new Date(r.due.replace(' ','T'));
-      return due < now;
-    }catch{ return false; }
-  }).length;
+  const pendingRem = (DATA.reminders||[]).filter(r=>isOverdue(r)).length;
 
   return pendingTasks + pendingRem;
 }
