@@ -455,6 +455,39 @@ body.theme-ember .db-pin-dot.filled{background:var(--accent);border-color:var(--
 
 /* -- RICH DASHBOARD -------------------------------- */
 .dash-wrap{padding:20px 28px;display:flex;flex-direction:column;gap:16px}
+/* Quick Capture */
+.quick-capture{
+  display:flex;align-items:center;gap:8px;
+  background:var(--sidebar);border:1.5px solid var(--border);
+  border-radius:12px;padding:8px 12px;transition:border-color .2s
+}
+.quick-capture:focus-within{border-color:var(--accent)}
+.qc-icon{font-size:16px;flex-shrink:0}
+.qc-input{
+  flex:1;background:none;border:none;outline:none;
+  font-size:14px;color:var(--text);font-family:'Inter',sans-serif;
+  min-width:0
+}
+.qc-input::placeholder{color:var(--muted)}
+.qc-type{
+  background:var(--s2);border:1px solid var(--border);border-radius:6px;
+  padding:4px 8px;font-size:11px;color:var(--text2);font-family:'Inter',sans-serif;
+  cursor:pointer;outline:none;flex-shrink:0
+}
+.qc-type option{background:var(--sidebar)}
+.qc-btn{
+  background:var(--accent);color:#fff;border:none;border-radius:8px;
+  padding:6px 14px;font-size:12px;font-weight:600;cursor:pointer;
+  font-family:'Inter',sans-serif;flex-shrink:0;transition:background .2s
+}
+.qc-btn:hover{background:var(--accent2)}
+@media(max-width:640px){
+  .quick-capture{flex-wrap:wrap}
+  .qc-input{min-width:100%;order:2;margin-top:4px}
+  .qc-icon{order:0}
+  .qc-type{order:1;margin-left:auto}
+  .qc-btn{order:3;width:100%;margin-top:4px}
+}
 .stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
 .stat-card{
   background:var(--sidebar);border:1px solid var(--border);
@@ -3133,26 +3166,30 @@ body.theme-midnight .ncard.pinned-card, body.theme-ember .ncard.pinned-card {bor
 <aside>
   <div class="sidebar-logo">📓 MyNotes</div>
 
-  <div class="sidebar-section">Views</div>
+  <div class="sidebar-section">Home</div>
   <button class="nav-item active" id="nav-dashboard" onclick="showPage('dashboard',this)" title="Show everything">
-    <span class="nav-icon">🏠</span> All Items
+    <span class="nav-icon">🏠</span> Dashboard
     <span class="nav-count" id="nav-all">0</span>
   </button>
+
+  <div class="sidebar-section">Capture</div>
   <button class="nav-item" id="nav-notes-btn" onclick="showPage('notes',this)">
     <span class="nav-icon">📝</span> Notes
     <span class="nav-count" id="nav-notes">0</span>
-  </button>
-  <button class="nav-item" id="nav-reminders-btn" onclick="showPage('reminders',this)">
-    <span class="nav-icon">⏰</span> Reminders
-    <span class="nav-count" id="nav-reminders">0</span>
   </button>
   <button class="nav-item" id="nav-sticky-btn" onclick="showPage('sticky',this)">
     <span class="nav-icon">📌</span> Sticky Notes
     <span class="nav-count" id="nav-sticky-count">0</span>
   </button>
-  <button class="nav-item" id="nav-journal-btn" onclick="showPage('journal',this)">
-    <span class="nav-icon">📈</span> Trading Journal
-    <span class="nav-count" id="nav-journal-count">0</span>
+  <button class="nav-item" id="nav-daybook-btn" onclick="showPage('daybook',this)">
+    <span class="nav-icon">📖</span> Daybook
+    <span class="nav-count" id="nav-daybook-count">0</span>
+  </button>
+
+  <div class="sidebar-section">Execution</div>
+  <button class="nav-item" id="nav-reminders-btn" onclick="showPage('reminders',this)">
+    <span class="nav-icon">⏰</span> Reminders
+    <span class="nav-count" id="nav-reminders">0</span>
   </button>
   <button class="nav-item" id="nav-routine-btn" onclick="showPage('routine',this)">
     <span class="nav-icon">🔁</span> Routine
@@ -3162,13 +3199,15 @@ body.theme-midnight .ncard.pinned-card, body.theme-ember .ncard.pinned-card {bor
     <span class="nav-icon">✍️</span> Task Notes
     <span class="nav-count" id="nav-tasknotes-count">0</span>
   </button>
+
+  <div class="sidebar-section">Tracking</div>
+  <button class="nav-item" id="nav-journal-btn" onclick="showPage('journal',this)">
+    <span class="nav-icon">📈</span> Trading Journal
+    <span class="nav-count" id="nav-journal-count">0</span>
+  </button>
   <button class="nav-item" id="nav-finance-btn" onclick="showPage('finance',this)">
     <span class="nav-icon">💰</span> Finance Tracker
     <span class="nav-count" id="nav-finance-count">0</span>
-  </button>
-  <button class="nav-item" id="nav-daybook-btn" onclick="showPage('daybook',this)">
-    <span class="nav-icon">📖</span> Daybook
-    <span class="nav-count" id="nav-daybook-count">0</span>
   </button>
 
   <div class="sidebar-section">Status</div>
@@ -3189,6 +3228,7 @@ body.theme-midnight .ncard.pinned-card, body.theme-ember .ncard.pinned-card {bor
     <div class="sync-pill">
       <div class="sdot" id="sdot"></div>
       <span id="stext">Ready</span>
+      <span id="sync-time" style="margin-left:auto;font-size:10px;color:var(--muted);font-variant-numeric:tabular-nums"></span>
     </div>
     <button class="btn-ghost" onclick="openSettings()" style="width:100%;margin-top:8px;justify-content:center;display:flex">
       ⚙️ Settings
@@ -3282,6 +3322,18 @@ body.theme-midnight .ncard.pinned-card, body.theme-ember .ncard.pinned-card {bor
         </div>
         <div class="dash-greeting-right" id="dash-greet-emoji">🌅</div>
       </div>
+      <!-- Quick Capture -->
+      <div class="quick-capture" id="quick-capture">
+        <span class="qc-icon">💡</span>
+        <input type="text" id="qc-input" class="qc-input" placeholder="Add a thought, note, or reminder..." autocomplete="off">
+        <select id="qc-type" class="qc-type">
+          <option value="note">Note</option>
+          <option value="reminder">Reminder</option>
+          <option value="sticky">Sticky</option>
+          <option value="daybook">Daybook</option>
+        </select>
+        <button class="qc-btn" onclick="quickCapture()">Add</button>
+      </div>
       <!-- Stat cards -->
       <div class="stats-row">
         <div class="stat-card sc-total" id="sc-notes" onclick="statFilter('note',this)">
@@ -3357,9 +3409,9 @@ body.theme-midnight .ncard.pinned-card, body.theme-ember .ncard.pinned-card {bor
           <div class="dash-widget-title"><span class="dwt-dot dwt-green"></span>Next Routine</div>
           <div class="routine-items" id="dash-routine-list"><div class="dash-empty">No routines set up yet.</div></div>
         </div>
-        <div class="dash-widget">
-          <div class="dash-widget-title"><span class="dwt-dot dwt-red"></span>Missed &amp; Overdue</div>
-          <div class="missed-items" id="dash-missed-list"><div class="dash-empty">Nothing missed — great job! 🎉</div></div>
+        <div class="dash-widget" id="dash-missed-widget">
+          <div class="dash-widget-title" onclick="toggleMissedWidget()" style="cursor:pointer;user-select:none"><span class="dwt-dot dwt-red"></span>Missed &amp; Overdue <span id="missed-toggle" style="margin-left:auto;font-size:10px;color:var(--muted);transition:transform .2s">▼</span></div>
+          <div class="missed-items" id="dash-missed-list"><div class="dash-empty">✨ All clear — you're on top of everything!</div></div>
         </div>
       </div>
       <!-- Tasks widget -->
@@ -4711,6 +4763,13 @@ async function saveToFirebase(){
 function setSyncing(on,label){
   document.getElementById('sdot').className='sdot'+(on?' syncing':'');
   document.getElementById('stext').textContent=label||'Synced';
+  if(!on && label!=='Error'){
+    const now=new Date();
+    const h=now.getHours(),m=now.getMinutes();
+    const ampm=h>=12?'PM':'AM', h12=h===0?12:h>12?h-12:h;
+    const ts=document.getElementById('sync-time');
+    if(ts) ts.textContent=`${h12}:${String(m).padStart(2,'0')} ${ampm}`;
+  }
 }
 
 /* -- VIEW TOGGLE --------------------------------- */
@@ -4769,8 +4828,8 @@ function renderAll(){
   const nl=document.getElementById('notes-list');
   const rl=document.getElementById('reminders-list');
 
-  const emptyNote=`<div class="empty-state"><div class="ei">📝</div><p>No notes yet</p></div>`;
-  const emptyRem=`<div class="empty-state"><div class="ei">⏰</div><p>No reminders yet</p></div>`;
+  const emptyNote=`<div class="empty-state"><div class="ei">📝</div><p>Start capturing your thoughts</p></div>`;
+  const emptyRem=`<div class="empty-state"><div class="ei">⏰</div><p>No reminders — your schedule is clear</p></div>`;
 
   const sortedNotes=[...notes].reverse().sort((a,b)=>(b.pinned?1:0)-(a.pinned?1:0));
   const sortedRems=[...reminders].reverse();
@@ -5231,6 +5290,55 @@ function localToday(){
   const pad=n=>String(n).padStart(2,'0');
   return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
 }
+
+/* -- QUICK CAPTURE ------------------------------- */
+function toggleMissedWidget(){
+  const list=document.getElementById('dash-missed-list');
+  const arrow=document.getElementById('missed-toggle');
+  if(!list) return;
+  const collapsed=list.style.display==='none';
+  list.style.display=collapsed?'':'none';
+  if(arrow) arrow.textContent=collapsed?'▼':'▶';
+}
+
+function quickCapture(){
+  const input=document.getElementById('qc-input');
+  const type=document.getElementById('qc-type').value;
+  const text=input.value.trim();
+  if(!text){toast('Type something first','error');return;}
+
+  const now=new Date();
+  const pad=n=>String(n).padStart(2,'0');
+  const dateStr=`${now.getFullYear()}-${pad(now.getMonth()+1)}-${pad(now.getDate())}`;
+  const timeStr=`${pad(now.getHours())}:${pad(now.getMinutes())}`;
+
+  if(type==='note'){
+    if(!DATA.notes) DATA.notes=[];
+    DATA.notes.push({id:'n_'+Date.now(),title:text,body:'',folder:'personal',created:now.toISOString()});
+  } else if(type==='reminder'){
+    if(!DATA.reminders) DATA.reminders=[];
+    DATA.reminders.push({id:'r_'+Date.now(),text:text,date:dateStr,time:'23:59',done:false,created:now.toISOString()});
+  } else if(type==='sticky'){
+    if(!DATA.stickies) DATA.stickies=[];
+    DATA.stickies.push({id:'s_'+Date.now(),text:text,bg:'#fde68a',pinned:false});
+  } else if(type==='daybook'){
+    if(!DATA.daybook) DATA.daybook=[];
+    DATA.daybook.push({id:'db_'+Date.now(),date:dateStr,time:timeStr,text:text,tags:[],created:now.toISOString()});
+  }
+
+  input.value='';
+  renderAll();
+  if(typeof dbRender==='function') dbRender();
+  if(typeof dbUpdateCounts==='function') dbUpdateCounts();
+  if(typeof renderFinance==='function') renderFinance();
+  if(typeof renderTaskNotes==='function') renderTaskNotes();
+  saveToFirebase();
+  toast(`Added to ${type} ✓`,'success');
+}
+// Enter key support for quick capture
+document.addEventListener('keydown',e=>{
+  if(e.target.id==='qc-input' && e.key==='Enter'){e.preventDefault();quickCapture();}
+});
 
 /* -- STAT CARD FILTER ---------------------------- */
 function statFilter(type, btn){
@@ -7321,7 +7429,7 @@ function renderTaskNotes(){
     list.innerHTML = `<div class="tan-empty">
       <div class="tan-empty-icon">${isFiltered?'🔍':'🎉'}</div>
       <div style="font-size:15px;font-weight:700;color:var(--text)">${isFiltered?'No matching notes':'All caught up!'}</div>
-      <div style="font-size:13px">${isFiltered?'Try a different filter or search term.':'No open tasks right now — great work.'}</div>
+      <div style="font-size:13px">${isFiltered?'Try a different filter or search term.':'Nothing pending — take a break or plan ahead! ☕'}</div>
     </div>`;
     return;
   }
@@ -8783,8 +8891,13 @@ function updateDashboardWidgets(){
     ];
 
     if(!allOverdue.length){
-      missedEl.innerHTML='<div class="dash-empty">Nothing missed — great job! 🎉</div>';
+      missedEl.innerHTML='<div class="dash-empty">✨ All clear — you\'re on top of everything!</div>';
+      // Auto-collapse when empty
+      const widget=document.getElementById('dash-missed-widget');
+      if(widget) widget.style.opacity='.6';
     } else {
+      const widget=document.getElementById('dash-missed-widget');
+      if(widget) widget.style.opacity='1';
       missedEl.innerHTML = allOverdue.map(item=>{
         const dueDate = new Date(item.due+'T00:00:00');
         const diffDays = Math.round((now-dueDate)/(1000*60*60*24));
