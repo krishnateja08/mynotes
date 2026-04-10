@@ -2797,7 +2797,6 @@ body.theme-ember .fin-vtbtn.active{color:#0f0d0b}
 /* -- RESPONSIVE ------------------------------------ */
 @media(max-width:860px){
   .stats-row{grid-template-columns:repeat(2,1fr)}
-  .gh-fields{grid-template-columns:1fr}
   .sp-toolbar{flex-direction:column;align-items:flex-start}
   .sp-toolbar-right{width:100%;justify-content:space-between}
   /* hide SGT on tablet, keep IST + CST + FOCUS toggle */
@@ -4573,8 +4572,7 @@ body.theme-midnight .ncard.pinned-card, body.theme-ember .ncard.pinned-card {bor
 
 <script>
 let DATA={notes:[],reminders:[],stickies:[],archived:[],trades:[],routines:[],routine_logs:[],tasknotes:[],finance:[],note_folders:[],rem_lists:[],daybook:[]};
-let fileSHA=null;
-let dataLoaded=false; // guard: prevents any save before GitHub data is fully loaded
+let dataLoaded=false; // guard: prevents any save before data is fully loaded
 let currentType='note';
 
 /* -- THEME --------------------------------------- */
@@ -4764,9 +4762,7 @@ async function saveToFirebase(){
   }
 }
 
-// Aliases so all existing saveToGitHub/loadFromGitHub calls just work
-const saveToGitHub = saveToFirebase;
-const loadFromGitHub = loadFromFirebase;
+
 
 function setSyncing(on,label){
   document.getElementById('sdot').className='sdot'+(on?' syncing':'');
@@ -4976,7 +4972,7 @@ async function markReminderDone(id){
   if(!rem) return;
   rem.sent = !rem.sent;
   renderAll();
-  await saveToGitHub();
+  await saveToFirebase();
   toast(rem.sent ? '✅ Marked as done!' : '↩ Reopened', 'success');
 }
 
@@ -5265,7 +5261,7 @@ async function saveItem(){
   const lbl=document.getElementById('autosave-lbl');
   if(lbl){lbl.classList.add('show');setTimeout(()=>lbl.classList.remove('show'),2500);}
   closeModal();renderAll();
-  await saveToGitHub();
+  await saveToFirebase();
   toast('Saved ✓','success');
 }
 
@@ -5274,7 +5270,7 @@ async function deleteItem(id){
   DATA.notes=(DATA.notes||[]).filter(n=>n.id!==id);
   DATA.reminders=(DATA.reminders||[]).filter(r=>r.id!==id);
   renderAll();
-  await saveToGitHub();
+  await saveToFirebase();
 }
 
 const uid=()=>Math.random().toString(36).slice(2,10);
@@ -5667,7 +5663,7 @@ async function saveCurrentNoteInline(){
   if(metaEl) metaEl.textContent = now;
   showSavedIndicator();
   renderAll();
-  await saveToGitHub();
+  await saveToFirebase();
 }
 
 function showSavedIndicator(){
@@ -5698,7 +5694,7 @@ async function createNewNote(){
   // force select & focus title
   selectNote(newNote.id, false);
   setTimeout(()=>document.getElementById('notes-editor-title')?.focus(), 60);
-  await saveToGitHub();
+  await saveToFirebase();
 }
 
 async function createNewFolder(){
@@ -5708,7 +5704,7 @@ async function createNewFolder(){
   if(!DATA.note_folders) DATA.note_folders=DEFAULT_FOLDERS.slice();
   DATA.note_folders.push(folder);
   renderFolderPanel();
-  await saveToGitHub();
+  await saveToFirebase();
 }
 
 async function renameFolder(folderId){
@@ -5720,7 +5716,7 @@ async function renameFolder(folderId){
   f.name = newName.trim();
   renderFolderPanel();
   renderNotesList();
-  await saveToGitHub();
+  await saveToFirebase();
   toast('Folder renamed ✓','success');
 }
 
@@ -5757,7 +5753,7 @@ async function deleteFolder(folderId){
   renderFolderPanel();
   renderNotesList();
   showNoteEditor(null);
-  await saveToGitHub();
+  await saveToFirebase();
   toast('Folder deleted ✓','success');
 }
 
@@ -5770,7 +5766,7 @@ async function deleteCurrentNote(){
   renderFolderPanel();
   renderNotesList();
   showNoteEditor(null);
-  await saveToGitHub();
+  await saveToFirebase();
 }
 
 
@@ -6227,7 +6223,7 @@ function _doAddReminder(listId){
   DATA.reminders.push(rem);
   renderAll();
   renderRemindersPage();
-  saveToGitHub();
+  saveToFirebase();
   // re-focus the input so user can keep adding
   setTimeout(()=>{ const inp=document.getElementById('rem-add-input'); if(inp){ inp.value=''; inp.focus(); } },50);
 }
@@ -6238,7 +6234,7 @@ async function toggleRemDone(id){
   rem.sent = !rem.sent;
   renderAll();
   renderRemindersPage();
-  await saveToGitHub();
+  await saveToFirebase();
 }
 
 async function deleteReminder(id){
@@ -6246,7 +6242,7 @@ async function deleteReminder(id){
   DATA.reminders = (DATA.reminders||[]).filter(r=>r.id!==id);
   renderAll();
   renderRemindersPage();
-  await saveToGitHub();
+  await saveToFirebase();
 }
 
 function openRemInlineEdit(id){
@@ -6269,7 +6265,7 @@ async function clearCompletedReminders(){
   DATA.reminders = (DATA.reminders||[]).filter(r=>!r.sent);
   renderAll();
   updateDashboardWidgets();
-  await saveToGitHub();
+  await saveToFirebase();
   toast('Completed reminders cleared ✓','success');
 }
 
@@ -6283,7 +6279,7 @@ async function createRemList(){
   if(!DATA.rem_lists) DATA.rem_lists=DEFAULT_REM_LISTS.slice();
   DATA.rem_lists.push(list);
   renderRemindersPage();
-  await saveToGitHub();
+  await saveToFirebase();
 }
 
 async function deleteCurrentRemList(){
@@ -6296,7 +6292,7 @@ async function deleteCurrentRemList(){
   _remListId=null; _remPageFilter='all';
   renderAll();
   renderRemindersPage();
-  await saveToGitHub();
+  await saveToFirebase();
 }
 
 /* == MOBILE PANEL NAVIGATION == */
@@ -6464,7 +6460,7 @@ function initSticky(){
       onclick="pickSPColor('${c.id}')"
       id="spdot-${c.id}">
     </div>`).join('');
-  // Load from DATA (GitHub sync) — migrate from localStorage if needed
+  // Load from DATA (Firebase sync) — migrate from localStorage if needed
   STICKIES = DATA.stickies || [];
   ARCHIVED = DATA.archived || [];
   // One-time migration: if DATA empty but localStorage has data, migrate it
@@ -6477,7 +6473,7 @@ function initSticky(){
         ARCHIVED = lsArch;
         DATA.stickies = STICKIES;
         DATA.archived = ARCHIVED;
-        saveToGitHub();
+        saveToFirebase();
         localStorage.removeItem('mynotes_stickies');
         localStorage.removeItem('mynotes_stickies_archive');
         toast('Sticky notes migrated to cloud sync ✓','success');
@@ -6637,7 +6633,7 @@ function toggleStickyPin(id){
   saveStickies(true); renderStickyBoard();
 }
 
-let _stickyGitHubTimer = null;
+let _stickySaveTimer = null;
 
 function saveStickies(immediate=false){
   DATA.stickies = STICKIES;
@@ -6646,12 +6642,12 @@ function saveStickies(immediate=false){
   if(el) el.textContent=STICKIES.length;
   const cnt=document.getElementById('sp-count');
   if(cnt) cnt.textContent=STICKIES.length+' stick'+(STICKIES.length===1?'y':'ies');
-  // debounce GitHub save — 1.5s after last change (immediate for delete/pin/archive)
-  clearTimeout(_stickyGitHubTimer);
+  // debounce Firebase save — 1.5s after last change (immediate for delete/pin/archive)
+  clearTimeout(_stickySaveTimer);
   if(immediate){
-    saveToGitHub();
+    saveToFirebase();
   } else {
-    _stickyGitHubTimer = setTimeout(()=>saveToGitHub(), 1500);
+    _stickySaveTimer = setTimeout(()=>saveToFirebase(), 1500);
   }
 }
 
@@ -6815,10 +6811,10 @@ function updateJournalCount(){
 }
 
 async function saveTrades(){
-  // Save trades into DATA.trades and push to GitHub
+  // Save trades into DATA.trades and push to Firebase
   DATA.trades = TRADES;
   updateJournalCount();
-  await saveToGitHub();
+  await saveToFirebase();
 }
 
 function uid_trade(){ return 'T'+Date.now().toString(36)+Math.random().toString(36).slice(2,5); }
@@ -7233,7 +7229,7 @@ function updateTaskNotesCount(){
 async function saveTaskNotes(){
   DATA.tasknotes = TASKNOTES;
   updateTaskNotesCount();
-  await saveToGitHub();
+  await saveToFirebase();
 }
 
 function tanSetFilter(f, btn){
@@ -7538,9 +7534,9 @@ async function saveFinance(){
   DATA.finance = FINANCE;
   updateFinanceCount();
   // Always persist to localStorage immediately as a safety net for mobile
-  // In case GitHub sync fails or is slow, data is never lost
+  // In case Firebase sync fails or is slow, data is never lost
   try{ localStorage.setItem('fin_backup', JSON.stringify(FINANCE)); }catch(e){}
-  const ok = await saveToGitHub();
+  const ok = await saveToFirebase();
   return ok;
 }
 
@@ -7669,7 +7665,7 @@ async function saveFinEntry(){
   const saveBtn = document.querySelector('#fin-modal-overlay .btn');
   if(saveBtn){ saveBtn.disabled=true; saveBtn.textContent='⏳ Saving…'; }
 
-  // On slow mobile networks, GitHub data may not be loaded yet — wait up to 8s
+  // On slow mobile networks, Firebase data may not be loaded yet — wait up to 8s
   if(!dataLoaded){
     toast('Saving\u2026 please wait','success');
     let waited=0;
@@ -7781,7 +7777,7 @@ async function submitFinPayModal(){
   });
   closeFinPayModal();
   renderFinance();
-  await saveToGitHub();
+  await saveToFirebase();
   toast('Payment recorded ✓','success');
 }
 
@@ -8115,7 +8111,7 @@ async function saveRoutines(){
   DATA.routines     = ROUTINES;
   DATA.routine_logs = ROUTINE_LOGS;
   updateRoutineCount();
-  await saveToGitHub();
+  await saveToFirebase();
 }
 
 /* -- ROUTINE DRAG-TO-REORDER ---------------------- */
@@ -8257,7 +8253,7 @@ function renderTodayChecklist(){
     container.innerHTML=`<div style="text-align:center;padding:60px 20px;color:#8898c0">
       <div style="font-size:40px;opacity:.3">🔗</div>
       <p style="font-size:15px;font-weight:700;color:#1a2040;margin-top:12px">Sign in first</p>
-      <p style="font-size:13px;margin-top:6px">Click <strong>⚙️ Settings</strong> in the sidebar to connect your GitHub account</p>
+      <p style="font-size:13px;margin-top:6px">Click <strong>⚙️ Settings</strong> in the sidebar to sign in with Google</p>
     </div>`;
     updateProgress(0,0);
     return;
@@ -9870,7 +9866,7 @@ async function dbSaveEntry(){
   dbCloseCompose();
   dbRender();
   dbUpdateCounts();
-  await saveToGitHub();
+  await saveToFirebase();
 }
 
 async function dbDeleteEntry(id){
@@ -9879,7 +9875,7 @@ async function dbDeleteEntry(id){
   dbRender();
   dbUpdateCounts();
   toast('Entry deleted','success');
-  await saveToGitHub();
+  await saveToFirebase();
 }
 
 /* -- INIT ---------------------------------------- */
@@ -9957,8 +9953,8 @@ window.addEventListener('DOMContentLoaded',()=>{
   });
 
   // NOTE: initSticky() is intentionally NOT called here.
-  // It is called inside loadFromGitHub() AFTER real data is loaded from GitHub.
-  // Calling it here with empty DATA triggers saveToGitHub() which wipes everything.
+  // It is called inside loadFromFirebase() AFTER real data is loaded from Firebase.
+  // Calling it here with empty DATA triggers saveToFirebase() which wipes everything.
   initJournalListeners();
   initFAB();
   startClock();
