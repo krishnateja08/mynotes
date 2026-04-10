@@ -272,45 +272,6 @@ body.theme-ember .btn{color:#0f0d0b;background:var(--accent)}
 
 aside{transition:background 0.3s,border-color 0.3s}
 
-/* ===== FAB (Floating Action Button) ================== */
-.fab-wrap{
-  position:fixed;bottom:28px;right:28px;z-index:300;
-  display:flex;flex-direction:column;align-items:flex-end;gap:10px
-}
-.fab-menu{
-  display:flex;flex-direction:column;align-items:flex-end;gap:8px;
-  transition:all 0.2s;pointer-events:none;opacity:0;transform:translateY(10px)
-}
-.fab-menu.open{opacity:1;transform:translateY(0);pointer-events:auto}
-.fab-option{
-  display:flex;align-items:center;gap:9px;
-  background:var(--sidebar);border:1px solid var(--border);
-  border-radius:24px;padding:8px 16px 8px 12px;
-  font-size:13px;font-weight:600;color:var(--text);
-  cursor:pointer;font-family:'Inter',sans-serif;
-  box-shadow:0 4px 16px rgba(0,0,0,.12);
-  transition:all 0.15s;white-space:nowrap
-}
-.fab-option:hover{border-color:var(--accent);color:var(--accent);background:var(--bg)}
-body.theme-midnight .fab-option{box-shadow:0 4px 20px rgba(0,0,0,.4)}
-body.theme-ember .fab-option{box-shadow:0 4px 20px rgba(0,0,0,.5)}
-.fab-icon-sm{font-size:15px}
-.fab-main{
-  width:52px;height:52px;border-radius:50%;
-  background:var(--accent);color:#fff;
-  border:none;font-size:22px;cursor:pointer;
-  display:flex;align-items:center;justify-content:center;
-  box-shadow:0 4px 20px rgba(0,0,0,.18);
-  transition:all 0.2s;font-family:'Inter',sans-serif;
-  position:relative;z-index:1
-}
-body.theme-midnight .fab-main{box-shadow:0 4px 20px rgba(232,168,74,.25)}
-body.theme-ember .fab-main{box-shadow:0 4px 20px rgba(212,114,74,.25)}
-body.theme-cream .fab-main{background:#1d4ed8;box-shadow:0 4px 20px rgba(29,78,216,.35)}
-body.theme-beige .fab-main{background:#1d4ed8;box-shadow:0 4px 20px rgba(29,78,216,.35)}
-.fab-main:hover{background:var(--accent2);transform:scale(1.07)}
-.fab-main.open{transform:rotate(45deg);background:var(--accent2)}
-
 /* -- PAGE SCROLL AREA ----------------------------- */
 #page-scroll-area{
   flex:1;min-height:0;overflow-y:auto;
@@ -4288,23 +4249,6 @@ body.theme-midnight .ncard.pinned-card, body.theme-ember .ncard.pinned-card {bor
 </div>
 
 <!-- -- FLOATING ACTION BUTTON -------------------- -->
-<div class="fab-wrap" id="fab-wrap">
-  <div class="fab-menu" id="fab-menu">
-    <div class="fab-option" onclick="fabAction('note')">
-      <span class="fab-icon-sm">📝</span> Note
-    </div>
-    <div class="fab-option" onclick="fabAction('reminder')">
-      <span class="fab-icon-sm">⏰</span> Reminder
-    </div>
-    <div class="fab-option" onclick="fabAction('routine')">
-      <span class="fab-icon-sm">🔁</span> Routine
-    </div>
-    <div class="fab-option" onclick="fabAction('sticky')">
-      <span class="fab-icon-sm">📌</span> Sticky
-    </div>
-  </div>
-  <button class="fab-main" id="fab-main" title="Quick Add">＋</button>
-</div>
 
 <!-- -- ADD/EDIT MODAL ---------------------------- -->
 <div class="overlay" id="modal-overlay">
@@ -9526,55 +9470,6 @@ function mdPreviewCopyHandler(e){
 
 
 /* -- FAB (Floating Action Button) --------------- */
-function initFAB(){
-  const wrap = document.getElementById('fab-wrap');
-  if(!wrap) return;
-  const mainBtn = document.getElementById('fab-main');
-  const menu    = document.getElementById('fab-menu');
-  let open = false;
-
-  mainBtn.addEventListener('click', e=>{
-    e.stopPropagation();
-    open = !open;
-    mainBtn.classList.toggle('open', open);
-    menu.classList.toggle('open', open);
-  });
-
-  document.addEventListener('click', ()=>{
-    if(open){ open=false; mainBtn.classList.remove('open'); menu.classList.remove('open'); }
-  });
-}
-
-function fabAction(type){
-  const mainBtn = document.getElementById('fab-main');
-  const menu    = document.getElementById('fab-menu');
-  if(mainBtn) mainBtn.classList.remove('open');
-  if(menu)    menu.classList.remove('open');
-
-  if(type==='note'){
-    // Navigate to Notes page and create new note
-    const navNotes = document.querySelector('.nav-item[onclick*="page-notes"]');
-    if(navNotes) navNotes.click();
-    setTimeout(()=>createNewNote(), 120);
-  } else if(type==='reminder'){
-    // Navigate to Reminders page
-    const navRem = document.querySelector('.nav-item[onclick*="page-reminders"]');
-    if(navRem) navRem.click();
-    setTimeout(()=>{
-      const addRow = document.querySelector('.rem-add-input');
-      if(addRow) addRow.focus();
-    }, 150);
-  } else if(type==='routine'){
-    const navRt = document.querySelector('.nav-item[onclick*="page-routine"]');
-    if(navRt) navRt.click();
-    setTimeout(()=>openRoutineGroupModal(), 150);
-  } else if(type==='sticky'){
-    const navSt = document.querySelector('.nav-item[onclick*="page-sticky"]');
-    if(navSt) navSt.click();
-    setTimeout(()=>addSticky(), 150);
-  }
-}
-
 /* ── DAYBOOK ──────────────────────────────────────── */
 let _dbFilter = 'all';
 let _dbEditId = null;
@@ -9956,7 +9851,6 @@ window.addEventListener('DOMContentLoaded',()=>{
   // It is called inside loadFromFirebase() AFTER real data is loaded from Firebase.
   // Calling it here with empty DATA triggers saveToFirebase() which wipes everything.
   initJournalListeners();
-  initFAB();
   startClock();
   initNotesPasteHandler();
 
