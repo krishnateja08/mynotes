@@ -4581,6 +4581,7 @@ function applyTheme(t){
     const el=document.getElementById('theme-btn-'+k);
     if(el) el.classList.toggle('selected',k===t);
   });
+  setTimeout(closeSettings, 300);
 }
 
 /* -- FIREBASE CONFIG ----------------------------- */
@@ -9979,6 +9980,7 @@ window.addEventListener('DOMContentLoaded',()=>{
   fbAuth.onAuthStateChanged(user=>{
     updateAuthUI(user);
     if(user){
+      closeSettings();
       loadFromFirebase();
     } else {
       dataLoaded=true;
