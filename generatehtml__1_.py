@@ -3197,47 +3197,86 @@ body.theme-midnight .ncard:hover, body.theme-ember .ncard:hover {background:var(
 body.theme-midnight .ncard.pinned-card, body.theme-ember .ncard.pinned-card {border-top:3px solid var(--accent)}
 
 /* ── Shopping ─────────────────────────────── */
-.shop-wrap{padding:16px 28px;display:flex;flex-direction:column;gap:14px;overflow-y:auto;flex:1}
-.shop-card{background:rgba(255,255,255,.4);border:0.5px solid rgba(200,180,138,.15);border-radius:12px;overflow:hidden;transition:all .2s}
-body.theme-midnight .shop-card{background:rgba(255,255,255,.04);border-color:rgba(255,255,255,.08)}
-body.theme-ember .shop-card{background:rgba(255,255,255,.03);border-color:rgba(255,255,255,.06)}
-.shop-hdr{display:flex;align-items:center;gap:10px;padding:12px 14px;border-bottom:0.5px solid rgba(200,180,138,.1);cursor:pointer}
-.shop-hdr:hover{background:rgba(255,255,255,.2)}
-body.theme-midnight .shop-hdr:hover{background:rgba(255,255,255,.04)}
-.shop-icon{width:34px;height:34px;border-radius:8px;background:rgba(0,0,0,.04);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
-body.theme-midnight .shop-icon{background:rgba(255,255,255,.06)}
-.shop-name{font-size:14px;font-weight:600;color:var(--text)}
-.shop-sub{font-size:11px;color:var(--muted)}
-.shop-count{margin-left:auto;font-size:11px;color:var(--muted);font-weight:600;background:rgba(0,0,0,.04);border-radius:10px;padding:2px 8px}
-body.theme-midnight .shop-count{background:rgba(255,255,255,.06)}
-.shop-actions{display:flex;gap:4px}
-.shop-act-btn{width:26px;height:26px;border-radius:6px;border:none;background:rgba(0,0,0,.04);cursor:pointer;font-size:11px;display:flex;align-items:center;justify-content:center;color:var(--muted);font-family:'Inter',sans-serif}
-.shop-act-btn:hover{background:rgba(0,0,0,.08);color:var(--text)}
-body.theme-midnight .shop-act-btn{background:rgba(255,255,255,.06)}
-.shop-items{padding:0}
-.shop-entry{display:flex;align-items:center;gap:10px;padding:8px 14px;border-bottom:0.5px solid rgba(200,180,138,.06);font-size:13px;transition:background .1s}
-.shop-entry:hover{background:rgba(255,255,255,.25)}
+.shop-layout{display:flex;flex:1;min-height:0;overflow:hidden;height:calc(100vh - 58px)}
+.shop-left{
+  width:200px;flex-shrink:0;background:#d4c4a8;
+  border-right:1px solid var(--border);
+  display:flex;flex-direction:column;overflow:hidden
+}
+body.theme-beige .shop-left{background:#e0d6c4}
+body.theme-midnight .shop-left{background:#1a2130}
+body.theme-ember .shop-left{background:#161210}
+.shop-left-hdr{
+  padding:14px 14px 10px;border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;flex-shrink:0
+}
+.shop-left-title{font-family:'Inter',sans-serif;font-size:14px;font-weight:700;color:var(--text)}
+.shop-new-btn{background:none;border:none;color:var(--accent);font-size:18px;cursor:pointer;padding:0 2px;line-height:1;font-weight:700}
+.shop-list{flex:1;min-height:0;overflow-y:auto;padding:6px 0;scrollbar-width:thin;scrollbar-color:var(--border) transparent}
+.shop-list::-webkit-scrollbar{width:4px}
+.shop-list::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
+.shop-folder-wrap{position:relative}
+.shop-folder{
+  display:flex;align-items:center;gap:8px;
+  padding:9px 14px;cursor:pointer;
+  transition:background 0.12s;font-size:13px;font-weight:600;color:var(--text2)
+}
+.shop-folder:hover{background:var(--sidebar)}
+.shop-folder.active{background:rgba(139,94,42,.15);color:var(--accent)}
+body.theme-beige .shop-folder.active{background:rgba(124,92,191,.12);color:var(--accent)}
+body.theme-midnight .shop-folder.active{background:rgba(232,168,74,.08);color:var(--accent)}
+body.theme-ember .shop-folder.active{background:rgba(212,114,74,.08);color:var(--accent)}
+.shop-folder-icon{font-size:15px;width:20px;text-align:center;flex-shrink:0}
+.shop-folder-name{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.shop-folder-count{font-size:11px;background:var(--border);border-radius:10px;padding:1px 7px;color:var(--text2);font-weight:700;flex-shrink:0}
+.shop-folder.active .shop-folder-count{background:rgba(139,94,42,.2);color:var(--accent)}
+.shop-folder-actions{display:none;gap:2px;margin-left:4px;flex-shrink:0}
+.shop-folder-wrap:hover .shop-folder-actions{display:flex}
+.shop-fa-btn{background:none;border:none;cursor:pointer;font-size:11px;padding:2px 4px;border-radius:4px;opacity:.6;transition:opacity .15s;line-height:1}
+.shop-fa-btn:hover{opacity:1;background:var(--border)}
+.shop-fa-btn.del:hover{background:rgba(192,64,64,.15)}
+.shop-left-footer{padding:10px;border-top:1px solid var(--border);flex-shrink:0}
+.shop-left-footer button{width:100%;background:var(--accent);color:#fff;border:none;border-radius:8px;padding:9px;font-size:13px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;display:flex;align-items:center;justify-content:center;gap:6px}
+.shop-left-footer button:hover{opacity:.85}
+
+.shop-right{flex:1;display:flex;flex-direction:column;min-width:0;overflow:hidden;background:var(--bg)}
+.shop-right-hdr{
+  padding:14px 18px 12px;border-bottom:1px solid var(--border);
+  display:flex;align-items:center;gap:10px;flex-shrink:0;background:var(--sidebar)
+}
+.shop-right-icon{font-size:22px}
+.shop-right-name{font-size:16px;font-weight:700;color:var(--text)}
+.shop-right-sub{font-size:11px;color:var(--muted);font-weight:500}
+.shop-items-wrap{flex:1;overflow-y:auto;padding:0;scrollbar-width:thin;scrollbar-color:var(--border) transparent}
+.shop-items-wrap::-webkit-scrollbar{width:4px}
+.shop-items-wrap::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
+.shop-entry{display:flex;align-items:center;gap:10px;padding:10px 18px;border-bottom:1px solid rgba(200,180,138,.1);font-size:13px;transition:background .1s}
+.shop-entry:hover{background:rgba(255,255,255,.2)}
 body.theme-midnight .shop-entry:hover{background:rgba(255,255,255,.03)}
 .shop-entry:last-child{border-bottom:none}
-.shop-entry.bought .se-name{text-decoration:line-through;opacity:.45}
-.se-check{width:16px;height:16px;border-radius:4px;border:1.5px solid var(--border2);flex-shrink:0;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:9px;color:transparent;transition:all .15s}
+.shop-entry.bought .se-name{text-decoration:line-through;opacity:.4}
+.se-check{width:18px;height:18px;border-radius:5px;border:1.5px solid var(--border2);flex-shrink:0;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:10px;color:transparent;transition:all .15s}
 .se-check.done{background:var(--green);border-color:var(--green);color:#fff}
 .se-name{flex:1;color:var(--text);font-weight:500;min-width:0}
-.se-date{font-size:10px;color:var(--muted);min-width:50px;text-align:right}
-.se-del{font-size:10px;color:var(--muted);cursor:pointer;opacity:0;transition:opacity .15s;padding:2px 5px;border-radius:4px}
+.se-date{font-size:10px;color:var(--muted);min-width:55px;text-align:right}
+.se-del{font-size:11px;color:var(--muted);cursor:pointer;opacity:0;transition:opacity .15s;padding:2px 5px;border-radius:4px}
 .se-del:hover{color:var(--red)}
 .shop-entry:hover .se-del{opacity:1}
-.shop-add-row{display:flex;align-items:center;gap:8px;padding:8px 14px;border-top:0.5px solid rgba(200,180,138,.08)}
-.shop-add-input{flex:1;background:rgba(255,255,255,.3);border:0.5px solid rgba(200,180,138,.2);border-radius:6px;padding:6px 10px;font-size:12px;color:var(--text);font-family:'Inter',sans-serif;outline:none}
-body.theme-midnight .shop-add-input{background:rgba(255,255,255,.05);border-color:rgba(255,255,255,.08)}
+.shop-add-bar{display:flex;align-items:center;gap:8px;padding:10px 18px;border-top:1px solid var(--border);flex-shrink:0;background:var(--sidebar)}
+.shop-add-input{flex:1;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:8px 12px;font-size:13px;color:var(--text);font-family:'Inter',sans-serif;outline:none}
 .shop-add-input::placeholder{color:var(--muted)}
 .shop-add-input:focus{border-color:var(--accent)}
-.shop-add-btn{background:var(--green);color:#fff;border:none;border-radius:6px;padding:6px 12px;font-size:11px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif}
+.shop-add-btn{background:var(--accent);color:#fff;border:none;border-radius:8px;padding:8px 16px;font-size:13px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif}
 .shop-add-btn:hover{opacity:.85}
-.shop-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:60px 20px;color:var(--muted);gap:8px}
+.shop-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:60px 20px;color:var(--muted);gap:8px;flex:1}
 .shop-empty-icon{font-size:40px;opacity:.3}
 .shop-empty-text{font-size:14px}
-@media(max-width:640px){.shop-wrap{padding:12px 14px}}
+@media(max-width:640px){
+  .shop-layout{flex-direction:column;height:auto}
+  .shop-left{width:100%;border-right:none;border-bottom:1px solid var(--border);max-height:200px}
+  .shop-right{min-height:400px}
+  .shop-entry .se-del{opacity:1}
+}
 
 </style>
 </head>
@@ -4153,8 +4192,25 @@ body.theme-midnight .shop-add-input{background:rgba(255,255,255,.05);border-colo
 </div>
 
 <!-- == SHOPPING PAGE == -->
-<div id="page-shopping" style="display:none;flex-direction:column;width:100%;min-height:calc(100vh - 60px);background:var(--bg)">
-  <div class="shop-wrap" id="shop-wrap"></div>
+<div id="page-shopping" style="display:none;flex-direction:column;width:100%;background:var(--bg)">
+  <div class="shop-layout">
+    <div class="shop-left">
+      <div class="shop-left-hdr">
+        <div class="shop-left-title">🛒 Shops</div>
+        <button class="shop-new-btn" onclick="shopOpenModal()" title="Add Shop">＋</button>
+      </div>
+      <div class="shop-list" id="shop-list"></div>
+      <div class="shop-left-footer">
+        <button onclick="shopOpenModal()">+ Add Shop</button>
+      </div>
+    </div>
+    <div class="shop-right" id="shop-right">
+      <div class="shop-empty" id="shop-empty-state">
+        <div class="shop-empty-icon">🛒</div>
+        <div class="shop-empty-text">Select a shop or add one to get started</div>
+      </div>
+    </div>
+  </div>
 </div>
 
 <!-- ── FINANCE ENTRY MODAL ─────────────────────────── -->
@@ -10097,63 +10153,102 @@ function initNotesPasteHandler(){
 
 /* ── SHOPPING ──────────────────────────────────────── */
 const SHOP_ICONS = ['🏪','🏬','🛒','💊','🥬','📦','👕','🔧','🍞','🧴','🎮','🏥'];
+let _activeShopId = null;
 
 function shopGetData(){ if(!DATA.shopping) DATA.shopping=[]; return DATA.shopping; }
 
-function shopRender(){
-  const wrap=document.getElementById('shop-wrap');
-  if(!wrap) return;
-  const shops=shopGetData();
-
-  // Update nav count
-  const totalItems=shops.reduce((s,sh)=>s+(sh.items||[]).length,0);
+function shopUpdateCount(){
+  const totalItems=shopGetData().reduce((s,sh)=>s+(sh.items||[]).length,0);
   const navCount=document.getElementById('nav-shopping-count');
   if(navCount) navCount.textContent=totalItems;
+}
+
+function shopRender(){
+  shopRenderList();
+  shopRenderItems();
+  shopUpdateCount();
+}
+
+function shopRenderList(){
+  const list=document.getElementById('shop-list');
+  if(!list) return;
+  const shops=shopGetData();
 
   if(!shops.length){
-    wrap.innerHTML=`<div class="shop-empty">
-      <div class="shop-empty-icon">🛒</div>
-      <div class="shop-empty-text">No shops yet — add one to get started</div>
-      <button class="btn" onclick="shopOpenModal()" style="margin-top:8px">+ Add Shop</button>
-    </div>`;
+    list.innerHTML=`<div style="padding:20px 14px;text-align:center;color:var(--muted);font-size:12px">No shops yet</div>`;
     return;
   }
 
-  wrap.innerHTML=shops.map(sh=>{
+  // Auto-select first shop if none selected
+  if(!_activeShopId || !shops.find(s=>s.id===_activeShopId)){
+    _activeShopId=shops[0].id;
+  }
+
+  list.innerHTML=shops.map(sh=>{
     const items=sh.items||[];
     const pending=items.filter(i=>!i.done).length;
-    const bought=items.filter(i=>i.done).length;
-
-    const itemsHtml=items.map(it=>{
-      const d=it.added?(it.added.slice(5,10).replace('-','/')):'';
-      return `<div class="shop-entry${it.done?' bought':''}">
-        <div class="se-check${it.done?' done':''}" onclick="shopToggleItem('${sh.id}','${it.id}')">${it.done?'✓':''}</div>
-        <div class="se-name">${esc(it.name)}</div>
-        <div class="se-date">${d}</div>
-        <div class="se-del" onclick="shopDelItem('${sh.id}','${it.id}')">✕</div>
-      </div>`;
-    }).join('');
-
-    return `<div class="shop-card">
-      <div class="shop-hdr">
-        <div class="shop-icon">${sh.icon||'🏪'}</div>
-        <div style="flex:1;min-width:0">
-          <div class="shop-name">${esc(sh.name)}</div>
-          <div class="shop-sub">${pending} pending · ${bought} bought</div>
+    const isActive=sh.id===_activeShopId;
+    return `<div class="shop-folder-wrap${isActive?' active':''}">
+      <div class="shop-folder${isActive?' active':''}" onclick="shopSelect('${sh.id}')">
+        <span class="shop-folder-icon">${sh.icon||'🏪'}</span>
+        <span class="shop-folder-name">${esc(sh.name)}</span>
+        <span class="shop-folder-count">${pending>0?pending:items.length}</span>
+        <div class="shop-folder-actions">
+          <button class="shop-fa-btn" onclick="event.stopPropagation();shopOpenModal('${sh.id}')" title="Edit">✎</button>
+          <button class="shop-fa-btn del" onclick="event.stopPropagation();shopDelShop('${sh.id}')" title="Delete">✕</button>
         </div>
-        <div class="shop-count">${items.length}</div>
-        <div class="shop-actions">
-          <button class="shop-act-btn" onclick="shopOpenModal('${sh.id}')" title="Edit">✎</button>
-          <button class="shop-act-btn" onclick="shopDelShop('${sh.id}')" title="Delete">✕</button>
-        </div>
-      </div>
-      <div class="shop-items">${itemsHtml}</div>
-      <div class="shop-add-row">
-        <input class="shop-add-input" id="shop-input-${sh.id}" placeholder="Add item to ${esc(sh.name)}..." onkeydown="if(event.key==='Enter')shopAddItem('${sh.id}')">
-        <button class="shop-add-btn" onclick="shopAddItem('${sh.id}')">Add</button>
       </div>
     </div>`;
   }).join('');
+}
+
+function shopRenderItems(){
+  const right=document.getElementById('shop-right');
+  const emptyState=document.getElementById('shop-empty-state');
+  if(!right) return;
+
+  const shops=shopGetData();
+  const sh=shops.find(s=>s.id===_activeShopId);
+
+  if(!sh){
+    right.innerHTML=`<div class="shop-empty"><div class="shop-empty-icon">🛒</div><div class="shop-empty-text">Select a shop or add one to get started</div></div>`;
+    return;
+  }
+
+  const items=sh.items||[];
+  const pending=items.filter(i=>!i.done).length;
+  const bought=items.filter(i=>i.done).length;
+
+  const itemsHtml=items.length ? items.map(it=>{
+    const d=it.added?(it.added.slice(5,10).replace('-','/')):'';
+    return `<div class="shop-entry${it.done?' bought':''}">
+      <div class="se-check${it.done?' done':''}" onclick="shopToggleItem('${sh.id}','${it.id}')">${it.done?'✓':''}</div>
+      <div class="se-name">${esc(it.name)}</div>
+      <div class="se-date">${d}</div>
+      <div class="se-del" onclick="shopDelItem('${sh.id}','${it.id}')">✕</div>
+    </div>`;
+  }).join('') : `<div class="shop-empty"><div class="shop-empty-icon">📋</div><div class="shop-empty-text">No items yet — add one below</div></div>`;
+
+  right.innerHTML=`
+    <div class="shop-right-hdr">
+      <div class="shop-right-icon">${sh.icon||'🏪'}</div>
+      <div style="flex:1">
+        <div class="shop-right-name">${esc(sh.name)}</div>
+        <div class="shop-right-sub">${pending} pending · ${bought} bought</div>
+      </div>
+    </div>
+    <div class="shop-items-wrap">${itemsHtml}</div>
+    <div class="shop-add-bar">
+      <input class="shop-add-input" id="shop-item-input" placeholder="Add item to ${esc(sh.name)}..." onkeydown="if(event.key==='Enter')shopAddItem()">
+      <button class="shop-add-btn" onclick="shopAddItem()">Add</button>
+    </div>`;
+
+  setTimeout(()=>{const el=document.getElementById('shop-item-input');if(el)el.focus();},50);
+}
+
+function shopSelect(id){
+  _activeShopId=id;
+  shopRender();
 }
 
 function shopOpenModal(editId){
@@ -10161,7 +10256,6 @@ function shopOpenModal(editId){
   document.getElementById('shop-edit-id').value=editId||'';
   document.getElementById('shop-modal-title').textContent=editId?'Edit Shop':'Add Shop';
 
-  // Icon grid
   const grid=document.getElementById('shop-icon-grid');
   grid.innerHTML=SHOP_ICONS.map(ic=>`<div style="width:32px;height:32px;border-radius:6px;background:var(--s2);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:14px;cursor:pointer" onclick="document.getElementById('shop-icon-input').value=this.textContent;document.querySelectorAll('#shop-icon-grid>div').forEach(d=>d.style.borderColor='var(--border)');this.style.borderColor='var(--accent)'">${ic}</div>`).join('');
 
@@ -10192,7 +10286,9 @@ async function shopSave(){
     if(sh){sh.name=name;sh.icon=icon;}
     toast('Shop updated ✓','success');
   } else {
-    shops.push({id:'shop_'+Date.now(),name,icon,items:[]});
+    const newId='shop_'+Date.now();
+    shops.push({id:newId,name,icon,items:[]});
+    _activeShopId=newId;
     toast('Shop added ✓','success');
   }
   shopCloseModal();
@@ -10203,26 +10299,25 @@ async function shopSave(){
 async function shopDelShop(id){
   if(!confirm('Delete this shop and all its items?')) return;
   DATA.shopping=shopGetData().filter(s=>s.id!==id);
+  if(_activeShopId===id) _activeShopId=null;
   shopRender();
   toast('Shop deleted','success');
   await saveToFirebase();
 }
 
-async function shopAddItem(shopId){
-  const input=document.getElementById('shop-input-'+shopId);
+async function shopAddItem(){
+  const input=document.getElementById('shop-item-input');
   if(!input) return;
   const name=input.value.trim();
   if(!name){toast('Type an item name','error');return;}
-  const sh=shopGetData().find(s=>s.id===shopId);
+  const sh=shopGetData().find(s=>s.id===_activeShopId);
   if(!sh) return;
   if(!sh.items) sh.items=[];
   const now=new Date();
   const pad=n=>String(n).padStart(2,'0');
-  sh.items.push({id:'si_'+Date.now(),name,done:false,added:`${now.getFullYear()}-${pad(now.getMonth()+1)}-${pad(now.getDate())}`});
+  sh.items.unshift({id:'si_'+Date.now(),name,done:false,added:`${now.getFullYear()}-${pad(now.getMonth()+1)}-${pad(now.getDate())}`});
   input.value='';
   shopRender();
-  // Re-focus the input after render
-  setTimeout(()=>{const el=document.getElementById('shop-input-'+shopId);if(el)el.focus();},50);
   await saveToFirebase();
 }
 
