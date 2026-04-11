@@ -3341,6 +3341,7 @@ body.theme-midnight .ncard.pinned-card, body.theme-ember .ncard.pinned-card {bor
         <select id="qc-type" class="qc-type">
           <option value="note">Note</option>
           <option value="reminder">Reminder</option>
+          <option value="task">Task</option>
           <option value="sticky">Sticky</option>
           <option value="daybook">Daybook</option>
         </select>
@@ -5340,6 +5341,10 @@ function quickCapture(){
   } else if(type==='reminder'){
     if(!DATA.reminders) DATA.reminders=[];
     DATA.reminders.push({id:'r_'+Date.now(),text:text,date:dateStr,time:'23:59',done:false,created:now.toISOString()});
+  } else if(type==='task'){
+    if(!DATA.tasknotes) DATA.tasknotes=[];
+    DATA.tasknotes.push({id:'tn_'+Date.now(),text:text,done:false,category:'personal',date:dateStr,created:now.toISOString()});
+    if(typeof TASKNOTES!=='undefined') TASKNOTES=DATA.tasknotes;
   } else if(type==='sticky'){
     if(!DATA.stickies) DATA.stickies=[];
     DATA.stickies.push({id:'s_'+Date.now(),text:text,bg:'#fde68a',pinned:false});
