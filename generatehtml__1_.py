@@ -4192,7 +4192,7 @@ body.theme-midnight .shop-entry:hover{background:rgba(255,255,255,.03)}
 </div>
 
 <!-- == SHOPPING PAGE == -->
-<div id="page-shopping" style="display:none;flex-direction:column;width:100%;background:var(--bg)">
+<div id="page-shopping" style="display:none;flex-direction:column;width:100%;height:calc(100vh - 58px);background:var(--bg)">
   <div class="shop-layout">
     <div class="shop-left">
       <div class="shop-left-hdr">
@@ -6617,6 +6617,8 @@ function showPage(page, btn){
   });
   // Reset scroll on page switch (desktop: scroll area, mobile: window)
   const sa = document.getElementById('page-scroll-area');
+  // Hide scroll area for full-height pages (daybook, shopping are outside it)
+  if(sa) sa.style.display = (page==='daybook'||page==='shopping') ? 'none' : '';
   if(sa) sa.scrollTop = 0;
   window.scrollTo(0,0);
 
