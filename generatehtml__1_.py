@@ -3196,6 +3196,49 @@ body.theme-midnight .ncard, body.theme-ember .ncard {background:var(--s2);border
 body.theme-midnight .ncard:hover, body.theme-ember .ncard:hover {background:var(--sidebar)}
 body.theme-midnight .ncard.pinned-card, body.theme-ember .ncard.pinned-card {border-top:3px solid var(--accent)}
 
+/* ── Shopping ─────────────────────────────── */
+.shop-wrap{padding:16px 28px;display:flex;flex-direction:column;gap:14px;overflow-y:auto;flex:1}
+.shop-card{background:rgba(255,255,255,.4);border:0.5px solid rgba(200,180,138,.15);border-radius:12px;overflow:hidden;transition:all .2s}
+body.theme-midnight .shop-card{background:rgba(255,255,255,.04);border-color:rgba(255,255,255,.08)}
+body.theme-ember .shop-card{background:rgba(255,255,255,.03);border-color:rgba(255,255,255,.06)}
+.shop-hdr{display:flex;align-items:center;gap:10px;padding:12px 14px;border-bottom:0.5px solid rgba(200,180,138,.1);cursor:pointer}
+.shop-hdr:hover{background:rgba(255,255,255,.2)}
+body.theme-midnight .shop-hdr:hover{background:rgba(255,255,255,.04)}
+.shop-icon{width:34px;height:34px;border-radius:8px;background:rgba(0,0,0,.04);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+body.theme-midnight .shop-icon{background:rgba(255,255,255,.06)}
+.shop-name{font-size:14px;font-weight:600;color:var(--text)}
+.shop-sub{font-size:11px;color:var(--muted)}
+.shop-count{margin-left:auto;font-size:11px;color:var(--muted);font-weight:600;background:rgba(0,0,0,.04);border-radius:10px;padding:2px 8px}
+body.theme-midnight .shop-count{background:rgba(255,255,255,.06)}
+.shop-actions{display:flex;gap:4px}
+.shop-act-btn{width:26px;height:26px;border-radius:6px;border:none;background:rgba(0,0,0,.04);cursor:pointer;font-size:11px;display:flex;align-items:center;justify-content:center;color:var(--muted);font-family:'Inter',sans-serif}
+.shop-act-btn:hover{background:rgba(0,0,0,.08);color:var(--text)}
+body.theme-midnight .shop-act-btn{background:rgba(255,255,255,.06)}
+.shop-items{padding:0}
+.shop-entry{display:flex;align-items:center;gap:10px;padding:8px 14px;border-bottom:0.5px solid rgba(200,180,138,.06);font-size:13px;transition:background .1s}
+.shop-entry:hover{background:rgba(255,255,255,.25)}
+body.theme-midnight .shop-entry:hover{background:rgba(255,255,255,.03)}
+.shop-entry:last-child{border-bottom:none}
+.shop-entry.bought .se-name{text-decoration:line-through;opacity:.45}
+.se-check{width:16px;height:16px;border-radius:4px;border:1.5px solid var(--border2);flex-shrink:0;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:9px;color:transparent;transition:all .15s}
+.se-check.done{background:var(--green);border-color:var(--green);color:#fff}
+.se-name{flex:1;color:var(--text);font-weight:500;min-width:0}
+.se-date{font-size:10px;color:var(--muted);min-width:50px;text-align:right}
+.se-del{font-size:10px;color:var(--muted);cursor:pointer;opacity:0;transition:opacity .15s;padding:2px 5px;border-radius:4px}
+.se-del:hover{color:var(--red)}
+.shop-entry:hover .se-del{opacity:1}
+.shop-add-row{display:flex;align-items:center;gap:8px;padding:8px 14px;border-top:0.5px solid rgba(200,180,138,.08)}
+.shop-add-input{flex:1;background:rgba(255,255,255,.3);border:0.5px solid rgba(200,180,138,.2);border-radius:6px;padding:6px 10px;font-size:12px;color:var(--text);font-family:'Inter',sans-serif;outline:none}
+body.theme-midnight .shop-add-input{background:rgba(255,255,255,.05);border-color:rgba(255,255,255,.08)}
+.shop-add-input::placeholder{color:var(--muted)}
+.shop-add-input:focus{border-color:var(--accent)}
+.shop-add-btn{background:var(--green);color:#fff;border:none;border-radius:6px;padding:6px 12px;font-size:11px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif}
+.shop-add-btn:hover{opacity:.85}
+.shop-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:60px 20px;color:var(--muted);gap:8px}
+.shop-empty-icon{font-size:40px;opacity:.3}
+.shop-empty-text{font-size:14px}
+@media(max-width:640px){.shop-wrap{padding:12px 14px}}
+
 </style>
 </head>
 <body class="theme-cream">
@@ -3249,6 +3292,10 @@ body.theme-midnight .ncard.pinned-card, body.theme-ember .ncard.pinned-card {bor
   <button class="nav-item" id="nav-finance-btn" onclick="showPage('finance',this)">
     <span class="nav-icon">💰</span> Finance Tracker
     <span class="nav-count" id="nav-finance-count">0</span>
+  </button>
+  <button class="nav-item" id="nav-shopping-btn" onclick="showPage('shopping',this)">
+    <span class="nav-icon">🛒</span> Shopping
+    <span class="nav-count" id="nav-shopping-count">0</span>
   </button>
 
   <div class="sidebar-section">Status</div>
@@ -3320,6 +3367,10 @@ body.theme-midnight .ncard.pinned-card, body.theme-ember .ncard.pinned-card {bor
         <!-- daybook: new entry -->
         <div id="ctx-daybook" style="display:none;align-items:center;gap:8px">
           <button class="btn" onclick="dbOpenCompose()">+ New Entry</button>
+        </div>
+        <!-- shopping: new shop -->
+        <div id="ctx-shopping" style="display:none;align-items:center;gap:8px">
+          <button class="btn" onclick="shopOpenModal()">+ Add Shop</button>
         </div>
       </div>
       <!-- Clock -->
@@ -4101,6 +4152,11 @@ body.theme-midnight .ncard.pinned-card, body.theme-ember .ncard.pinned-card {bor
   </div>
 </div>
 
+<!-- == SHOPPING PAGE == -->
+<div id="page-shopping" style="display:none;flex-direction:column;width:100%;min-height:calc(100vh - 60px);background:var(--bg)">
+  <div class="shop-wrap" id="shop-wrap"></div>
+</div>
+
 <!-- ── FINANCE ENTRY MODAL ─────────────────────────── -->
 <div class="overlay" id="fin-modal-overlay">
 <div class="modal" style="max-width:520px;display:flex;flex-direction:column;max-height:92vh;overflow-y:auto;-webkit-overflow-scrolling:touch">
@@ -4497,6 +4553,26 @@ body.theme-midnight .ncard.pinned-card, body.theme-ember .ncard.pinned-card {bor
 </div>
 </div>
 
+<!-- -- SHOP MODAL -------------------------------- -->
+<div class="overlay" id="shop-modal-overlay">
+<div class="modal" style="max-width:380px">
+  <div class="mhead">
+    <h2 id="shop-modal-title">Add Shop</h2>
+    <button class="mclose" onclick="shopCloseModal()">✕</button>
+  </div>
+  <input type="hidden" id="shop-edit-id">
+  <div class="frow"><label>Shop Name</label><input id="shop-name-input" placeholder="e.g. Reliance Fresh, DMart, Amazon..."></div>
+  <div class="frow"><label>Icon (emoji)</label>
+    <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px" id="shop-icon-grid"></div>
+    <input id="shop-icon-input" placeholder="Or type custom emoji" maxlength="2" style="width:80px">
+  </div>
+  <div class="mfoot" style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px">
+    <button class="btn-ghost" onclick="shopCloseModal()">Cancel</button>
+    <button class="btn" onclick="shopSave()">Save Shop</button>
+  </div>
+</div>
+</div>
+
 <!-- -- SETTINGS PANEL ---------------------------- -->
 <div id="settings-panel">
 <div class="settings-modal">
@@ -4615,7 +4691,7 @@ body.theme-midnight .ncard.pinned-card, body.theme-ember .ncard.pinned-card {bor
 <div id="toast"></div>
 
 <script>
-let DATA={notes:[],reminders:[],stickies:[],archived:[],trades:[],routines:[],routine_logs:[],tasknotes:[],finance:[],note_folders:[],rem_lists:[],daybook:[]};
+let DATA={notes:[],reminders:[],stickies:[],archived:[],trades:[],routines:[],routine_logs:[],tasknotes:[],finance:[],note_folders:[],rem_lists:[],daybook:[],shopping:[]};
 let dataLoaded=false; // guard: prevents any save before data is fully loaded
 let currentType='note';
 
@@ -4678,7 +4754,7 @@ async function firebaseSignIn(){
 async function firebaseSignOut(){
   if(!confirm('Sign out? Local unsaved changes will be lost.')) return;
   await fbAuth.signOut();
-  DATA={notes:[],reminders:[],stickies:[],archived:[],trades:[],routines:[],routine_logs:[],tasknotes:[],finance:[],note_folders:[],rem_lists:[],daybook:[]};
+  DATA={notes:[],reminders:[],stickies:[],archived:[],trades:[],routines:[],routine_logs:[],tasknotes:[],finance:[],note_folders:[],rem_lists:[],daybook:[],shopping:[]};
   dataLoaded=false;
   renderAll();
   toast('Signed out','success');
@@ -4717,6 +4793,7 @@ async function loadFromFirebase(){
     if(!DATA.stickies)      DATA.stickies      = [];
     if(!DATA.archived)      DATA.archived      = [];
     if(!DATA.daybook)       DATA.daybook       = [];
+    if(!DATA.shopping)      DATA.shopping      = [];
     if(!DATA.notes)         DATA.notes         = [];
     if(!DATA.reminders)     DATA.reminders     = [];
 
@@ -4770,6 +4847,7 @@ async function loadFromFirebase(){
     initSticky();
     dbUpdateCounts();
     dbRender();
+    shopRender();
 
     if(needsRepair && JSON.stringify(DATA) !== _beforeRepair){
       await saveToFirebase();
@@ -6467,8 +6545,8 @@ createNewNote = async function(){
 function showPage(page, btn){
   // Lock daybook when navigating away
   if(page !== 'daybook' && dbGetPin()) _dbUnlocked = false;
-  const pages = ['dashboard','notes','reminders','sticky','journal','routine','tasknotes','finance','daybook'];
-  const displayMap = {dashboard:'',notes:'flex',reminders:'flex',sticky:'flex',journal:'flex',routine:'flex',tasknotes:'flex',finance:'flex',daybook:'flex'};
+  const pages = ['dashboard','notes','reminders','sticky','journal','routine','tasknotes','finance','daybook','shopping'];
+  const displayMap = {dashboard:'',notes:'flex',reminders:'flex',sticky:'flex',journal:'flex',routine:'flex',tasknotes:'flex',finance:'flex',daybook:'flex',shopping:'flex'};
   pages.forEach(p=>{
     const el=document.getElementById('page-'+p);
     if(el){
@@ -6496,12 +6574,13 @@ function showPage(page, btn){
     routine:'🔁 Routine',
     tasknotes:'✍️ Task Notes',
     finance:'💰 Finance Tracker',
-    daybook:'📖 Daybook'
+    daybook:'📖 Daybook',
+    shopping:'🛒 Shopping'
   };
   document.getElementById('page-title').textContent = titles[page]||'📋 Dashboard';
 
   // 5. Context-aware actions
-  ['dashboard','notes','reminders','sticky','journal','routine','tasknotes','finance','daybook'].forEach(p=>{
+  ['dashboard','notes','reminders','sticky','journal','routine','tasknotes','finance','daybook','shopping'].forEach(p=>{
     const el=document.getElementById('ctx-'+p);
     if(el) el.style.display=p===page?'flex':'none';
   });
@@ -6557,6 +6636,7 @@ function showPage(page, btn){
       dbUpdateCounts();
     }
   }
+  if(page==='shopping') shopRender();
 }
 
 /* -- STICKY NOTES PAGE --------------------------- */
@@ -10013,6 +10093,155 @@ function initNotesPasteHandler(){
     ta.dispatchEvent(new Event('input')); // trigger autosave
     toast('Table pasted as Markdown ✓', 'success');
   });
+}
+
+/* ── SHOPPING ──────────────────────────────────────── */
+const SHOP_ICONS = ['🏪','🏬','🛒','💊','🥬','📦','👕','🔧','🍞','🧴','🎮','🏥'];
+
+function shopGetData(){ if(!DATA.shopping) DATA.shopping=[]; return DATA.shopping; }
+
+function shopRender(){
+  const wrap=document.getElementById('shop-wrap');
+  if(!wrap) return;
+  const shops=shopGetData();
+
+  // Update nav count
+  const totalItems=shops.reduce((s,sh)=>s+(sh.items||[]).length,0);
+  const navCount=document.getElementById('nav-shopping-count');
+  if(navCount) navCount.textContent=totalItems;
+
+  if(!shops.length){
+    wrap.innerHTML=`<div class="shop-empty">
+      <div class="shop-empty-icon">🛒</div>
+      <div class="shop-empty-text">No shops yet — add one to get started</div>
+      <button class="btn" onclick="shopOpenModal()" style="margin-top:8px">+ Add Shop</button>
+    </div>`;
+    return;
+  }
+
+  wrap.innerHTML=shops.map(sh=>{
+    const items=sh.items||[];
+    const pending=items.filter(i=>!i.done).length;
+    const bought=items.filter(i=>i.done).length;
+
+    const itemsHtml=items.map(it=>{
+      const d=it.added?(it.added.slice(5,10).replace('-','/')):'';
+      return `<div class="shop-entry${it.done?' bought':''}">
+        <div class="se-check${it.done?' done':''}" onclick="shopToggleItem('${sh.id}','${it.id}')">${it.done?'✓':''}</div>
+        <div class="se-name">${esc(it.name)}</div>
+        <div class="se-date">${d}</div>
+        <div class="se-del" onclick="shopDelItem('${sh.id}','${it.id}')">✕</div>
+      </div>`;
+    }).join('');
+
+    return `<div class="shop-card">
+      <div class="shop-hdr">
+        <div class="shop-icon">${sh.icon||'🏪'}</div>
+        <div style="flex:1;min-width:0">
+          <div class="shop-name">${esc(sh.name)}</div>
+          <div class="shop-sub">${pending} pending · ${bought} bought</div>
+        </div>
+        <div class="shop-count">${items.length}</div>
+        <div class="shop-actions">
+          <button class="shop-act-btn" onclick="shopOpenModal('${sh.id}')" title="Edit">✎</button>
+          <button class="shop-act-btn" onclick="shopDelShop('${sh.id}')" title="Delete">✕</button>
+        </div>
+      </div>
+      <div class="shop-items">${itemsHtml}</div>
+      <div class="shop-add-row">
+        <input class="shop-add-input" id="shop-input-${sh.id}" placeholder="Add item to ${esc(sh.name)}..." onkeydown="if(event.key==='Enter')shopAddItem('${sh.id}')">
+        <button class="shop-add-btn" onclick="shopAddItem('${sh.id}')">Add</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function shopOpenModal(editId){
+  const overlay=document.getElementById('shop-modal-overlay');
+  document.getElementById('shop-edit-id').value=editId||'';
+  document.getElementById('shop-modal-title').textContent=editId?'Edit Shop':'Add Shop';
+
+  // Icon grid
+  const grid=document.getElementById('shop-icon-grid');
+  grid.innerHTML=SHOP_ICONS.map(ic=>`<div style="width:32px;height:32px;border-radius:6px;background:var(--s2);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:14px;cursor:pointer" onclick="document.getElementById('shop-icon-input').value=this.textContent;document.querySelectorAll('#shop-icon-grid>div').forEach(d=>d.style.borderColor='var(--border)');this.style.borderColor='var(--accent)'">${ic}</div>`).join('');
+
+  if(editId){
+    const sh=shopGetData().find(s=>s.id===editId);
+    if(sh){
+      document.getElementById('shop-name-input').value=sh.name||'';
+      document.getElementById('shop-icon-input').value=sh.icon||'🏪';
+    }
+  } else {
+    document.getElementById('shop-name-input').value='';
+    document.getElementById('shop-icon-input').value='🏪';
+  }
+  overlay.classList.add('open');
+  document.getElementById('shop-name-input').focus();
+}
+function shopCloseModal(){document.getElementById('shop-modal-overlay').classList.remove('open');}
+
+async function shopSave(){
+  const name=document.getElementById('shop-name-input').value.trim();
+  if(!name){toast('Enter a shop name','error');return;}
+  const icon=document.getElementById('shop-icon-input').value.trim()||'🏪';
+  const editId=document.getElementById('shop-edit-id').value;
+  const shops=shopGetData();
+
+  if(editId){
+    const sh=shops.find(s=>s.id===editId);
+    if(sh){sh.name=name;sh.icon=icon;}
+    toast('Shop updated ✓','success');
+  } else {
+    shops.push({id:'shop_'+Date.now(),name,icon,items:[]});
+    toast('Shop added ✓','success');
+  }
+  shopCloseModal();
+  shopRender();
+  await saveToFirebase();
+}
+
+async function shopDelShop(id){
+  if(!confirm('Delete this shop and all its items?')) return;
+  DATA.shopping=shopGetData().filter(s=>s.id!==id);
+  shopRender();
+  toast('Shop deleted','success');
+  await saveToFirebase();
+}
+
+async function shopAddItem(shopId){
+  const input=document.getElementById('shop-input-'+shopId);
+  if(!input) return;
+  const name=input.value.trim();
+  if(!name){toast('Type an item name','error');return;}
+  const sh=shopGetData().find(s=>s.id===shopId);
+  if(!sh) return;
+  if(!sh.items) sh.items=[];
+  const now=new Date();
+  const pad=n=>String(n).padStart(2,'0');
+  sh.items.push({id:'si_'+Date.now(),name,done:false,added:`${now.getFullYear()}-${pad(now.getMonth()+1)}-${pad(now.getDate())}`});
+  input.value='';
+  shopRender();
+  // Re-focus the input after render
+  setTimeout(()=>{const el=document.getElementById('shop-input-'+shopId);if(el)el.focus();},50);
+  await saveToFirebase();
+}
+
+async function shopToggleItem(shopId,itemId){
+  const sh=shopGetData().find(s=>s.id===shopId);
+  if(!sh) return;
+  const it=(sh.items||[]).find(i=>i.id===itemId);
+  if(!it) return;
+  it.done=!it.done;
+  shopRender();
+  await saveToFirebase();
+}
+
+async function shopDelItem(shopId,itemId){
+  const sh=shopGetData().find(s=>s.id===shopId);
+  if(!sh) return;
+  sh.items=(sh.items||[]).filter(i=>i.id!==itemId);
+  shopRender();
+  await saveToFirebase();
 }
 
 window.addEventListener('DOMContentLoaded',()=>{
