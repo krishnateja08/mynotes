@@ -215,39 +215,67 @@ body.theme-ember .page-title{color:#e09070}
 
 /* -- CLOCK --------------------------------------- */
 .clock-bar{
-  display:flex;align-items:stretch;
-  border-left:1px solid var(--border);flex-shrink:0
+  display:flex;align-items:center;gap:5px;
+  padding:0 12px;flex-shrink:0
 }
 .clock-block{
-  display:flex;flex-direction:column;justify-content:center;align-items:flex-start;
-  padding:0 14px;min-width:102px;border-left:1px solid var(--border);
-  background:transparent
+  display:flex;flex-direction:column;justify-content:center;align-items:center;
+  padding:4px 12px;min-width:92px;border-radius:8px;
+  background:rgba(0,0,0,.05);border:0.5px solid rgba(0,0,0,.06);
+  transition:all 0.2s ease
 }
-.clock-block:first-child{border-left:none}
-body.theme-cream  .clock-block{background:rgba(255,255,255,.35)}
-body.theme-beige  .clock-block{background:rgba(255,255,255,.3)}
-body.theme-midnight .clock-block{background:rgba(122,154,191,.04);border-left-color:rgba(122,154,191,.15)}
-body.theme-ember   .clock-block{background:rgba(212,114,74,.04);border-left-color:rgba(212,114,74,.12)}
+.clock-block:hover{background:rgba(0,0,0,.08)}
+body.theme-cream  .clock-block{background:rgba(0,0,0,.05);border-color:rgba(0,0,0,.06)}
+body.theme-beige  .clock-block{background:rgba(0,0,0,.04);border-color:rgba(0,0,0,.05)}
+body.theme-midnight .clock-block{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.08)}
+body.theme-midnight .clock-block:hover{background:rgba(255,255,255,.1)}
+body.theme-ember   .clock-block{background:rgba(255,255,255,.05);border-color:rgba(255,255,255,.06)}
+body.theme-ember   .clock-block:hover{background:rgba(255,255,255,.08)}
 .clock-zone{
   font-size:9px;font-weight:700;text-transform:uppercase;
-  letter-spacing:1.2px;color:var(--muted);
-  display:flex;align-items:center;gap:4px;margin-bottom:1px
+  letter-spacing:1.5px;color:var(--muted);
+  display:flex;align-items:center;gap:4px;margin-bottom:1px;
+  opacity:.6
 }
 .clock-zone-flag{font-size:11px}
 .clock-time{
-  font-size:14px;font-weight:600;
+  font-size:13px;font-weight:600;
   font-family:'Courier New',Courier,monospace;
   font-variant-numeric:tabular-nums;line-height:1.2;
-  letter-spacing:0.5px;opacity:.92
+  letter-spacing:0.5px;color:var(--text)
 }
-body.theme-cream  .clock-time{color:#2a5a8a}
-body.theme-beige  .clock-time{color:#7c5cbf}
-body.theme-midnight .clock-time{color:#7a9abf}
-body.theme-ember .clock-time{color:#a07050}
+body.theme-cream  .clock-time{color:#3c2a14}
+body.theme-beige  .clock-time{color:#2d2420}
+body.theme-midnight .clock-time{color:#c8d8e8}
+body.theme-ember .clock-time{color:#c8b090}
 .clock-date{
-  font-size:9px;font-weight:600;margin-top:2px;
-  letter-spacing:0.3px;opacity:.7;color:var(--muted)
+  font-size:9px;font-weight:500;margin-top:1px;
+  letter-spacing:0.3px;color:var(--muted);opacity:.5
 }
+.topbar-sync{
+  display:flex;align-items:center;gap:5px;
+  padding:4px 10px;border-radius:7px;font-size:11px;font-weight:500;
+  color:var(--muted);background:rgba(0,0,0,.04);
+  border:0.5px solid rgba(0,0,0,.05)
+}
+body.theme-midnight .topbar-sync,body.theme-ember .topbar-sync{
+  background:rgba(255,255,255,.05);border-color:rgba(255,255,255,.06)
+}
+.topbar-sync-dot{width:5px;height:5px;border-radius:50%;background:var(--green);transition:background .2s}
+.topbar-sync-dot.syncing{background:var(--accent);animation:blink 1s infinite}
+.topbar-sync-dot.error{background:var(--red)}
+.topbar-avatar{
+  width:30px;height:30px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:11px;font-weight:600;cursor:pointer;
+  background:rgba(0,0,0,.06);color:var(--text2);
+  border:0.5px solid rgba(0,0,0,.06);
+  transition:all 0.2s ease;overflow:hidden
+}
+.topbar-avatar:hover{background:rgba(0,0,0,.1)}
+body.theme-midnight .topbar-avatar{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.1);color:#c8d8e8}
+body.theme-ember .topbar-avatar{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.08);color:#c8b090}
+.topbar-avatar img{width:100%;height:100%;border-radius:50%;object-fit:cover}
 .search-wrap{position:relative}
 .search-wrap input{
   background:var(--s2);border:1px solid var(--border);border-radius:8px;
@@ -2844,7 +2872,8 @@ body.theme-ember .fin-vtbtn.active{color:#0f0d0b}
   .sidebar-overlay.open{display:block}
   .topbar{padding:0}
   /* hide clocks entirely on mobile */
-  .clock-bar{display:none}
+  .clock-bar .clock-block{display:none}
+  .clock-bar{gap:6px}
   .hamburger{
     display:flex!important;align-items:center;justify-content:center;
     background:var(--s2);border:1px solid var(--border2);
@@ -3310,7 +3339,13 @@ body.theme-midnight .ncard.pinned-card, body.theme-ember .ncard.pinned-card {bor
           <div class="clock-time" id="clk-sgt-time">--:--:--</div>
           <div class="clock-date" id="clk-sgt-date">--</div>
         </div>
-
+        <div class="topbar-sync" id="topbar-sync-pill">
+          <div class="topbar-sync-dot" id="topbar-sdot"></div>
+          <span id="topbar-stext">Synced</span>
+        </div>
+        <div class="topbar-avatar" id="topbar-avatar" onclick="openSettings()" title="Profile">
+          <span id="topbar-initials">--</span>
+        </div>
       </div>
     </div>
   </div>
@@ -4612,6 +4647,8 @@ const fbDb   = firebase.firestore();
 
 /* -- AUTH ---------------------------------------- */
 function updateAuthUI(user){
+  const tbAvatar=document.getElementById('topbar-avatar');
+  const tbInitials=document.getElementById('topbar-initials');
   if(user){
     document.getElementById('auth-signed-out').style.display='none';
     document.getElementById('auth-signed-in').style.display='block';
@@ -4620,10 +4657,15 @@ function updateAuthUI(user){
     if(user.photoURL) {
       const av=document.getElementById('auth-avatar');
       av.src=user.photoURL; av.style.display='block';
+      if(tbAvatar) tbAvatar.innerHTML=`<img src="${user.photoURL}" alt="">`;
+    } else if(tbInitials){
+      const names=(user.displayName||'').split(' ');
+      tbInitials.textContent=(names[0]?names[0][0]:'')+(names[1]?names[1][0]:'');
     }
   } else {
     document.getElementById('auth-signed-out').style.display='block';
     document.getElementById('auth-signed-in').style.display='none';
+    if(tbInitials) tbInitials.textContent='--';
   }
 }
 async function firebaseSignIn(){
@@ -4777,6 +4819,11 @@ async function saveToFirebase(){
 function setSyncing(on,label){
   document.getElementById('sdot').className='sdot'+(on?' syncing':'');
   document.getElementById('stext').textContent=label||'Synced';
+  // Topbar sync pill
+  const tsDot=document.getElementById('topbar-sdot');
+  const tsText=document.getElementById('topbar-stext');
+  if(tsDot) tsDot.className='topbar-sync-dot'+(on?' syncing':'')+(label==='Error'?' error':'');
+  if(tsText) tsText.textContent=label||'Synced';
   if(!on && label!=='Error'){
     const now=new Date();
     const h=now.getHours(),m=now.getMinutes();
