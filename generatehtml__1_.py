@@ -3272,10 +3272,18 @@ body.theme-midnight .shop-entry:hover{background:rgba(255,255,255,.03)}
 .shop-empty-icon{font-size:40px;opacity:.3}
 .shop-empty-text{font-size:14px}
 @media(max-width:640px){
-  .shop-layout{flex-direction:column;height:auto}
-  .shop-left{width:100%;border-right:none;border-bottom:1px solid var(--border);max-height:200px}
-  .shop-right{min-height:400px}
+  .shop-layout{flex-direction:column;height:auto!important}
+  .shop-left{width:100%;border-right:none;border-bottom:1px solid var(--border);max-height:180px;overflow-y:auto}
+  .shop-left-hdr{padding:10px 14px 8px}
+  .shop-left-footer{padding:6px 10px}
+  .shop-left-footer button{padding:7px;font-size:12px}
+  .shop-right{min-height:50vh}
+  .shop-right-hdr{padding:10px 14px}
+  .shop-entry{padding:10px 14px}
   .shop-entry .se-del{opacity:1}
+  .shop-add-bar{padding:8px 14px}
+  .shop-add-input{font-size:14px;padding:10px 12px}
+  #page-shopping{height:auto!important}
 }
 
 </style>
