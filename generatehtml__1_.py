@@ -771,8 +771,8 @@ body.theme-ember .dash-tasks-count.open{background:rgba(212,114,74,.1);color:#d4
 .ncard{
   background:var(--sidebar);
   border:1px solid transparent;
-  border-radius:12px;padding:14px 16px;
-  display:flex;flex-direction:column;gap:8px;
+  border-radius:12px;padding:16px 18px;
+  display:flex;flex-direction:column;gap:10px;
   transition:border-color 0.18s,box-shadow 0.18s,background 0.18s;
   position:relative;overflow:hidden;
   cursor:pointer;
@@ -807,8 +807,9 @@ body.theme-ember .dash-tasks-count.open{background:rgba(212,114,74,.1);color:#d4
 .ncard.cl-purple .ctitle{color:#7c3aed}
 
 /* overdue card */
-.ncard.overdue{border-left:4px solid var(--red)!important;}
-.ncard.overdue{border-color:rgba(200,60,60,.3)}
+.ncard.overdue{border-left:4px solid var(--red)!important;border-color:rgba(200,60,60,.25);background:rgba(220,60,60,.04)}
+body.theme-midnight .ncard.overdue{background:rgba(220,60,60,.06)}
+body.theme-ember .ncard.overdue{background:rgba(220,60,60,.06)}
 .ncard.overdue::after{background:var(--red)}
 .ncard:hover::after{opacity:.8}
 
@@ -1099,13 +1100,13 @@ body.theme-ember .notes-list-item.active{background:rgba(212,114,74,.08)}
   border-radius:12px;padding:2px 8px;font-size:10px;font-weight:700;
   letter-spacing:.3px;flex-shrink:0;
 }
-.prio-high{background:rgba(194,65,12,.1);color:#c2410c}
-.prio-medium{background:rgba(180,83,9,.1);color:#b45309}
-.prio-low{background:rgba(22,163,74,.1);color:#16a34a}
-.prio-badge::before{content:'';display:inline-block;width:0;height:0;flex-shrink:0}
-.prio-high::before{border-left:3px solid transparent;border-right:3px solid transparent;border-bottom:5px solid #c2410c}
-.prio-medium::before{width:7px;height:0;border-bottom:none;border-left:none;border-right:none;border-top:none;background:#b45309;height:2px;border-radius:1px}
-.prio-low::before{border-left:3px solid transparent;border-right:3px solid transparent;border-top:5px solid #16a34a}
+.prio-high{background:rgba(220,38,38,.1);color:#dc2626}
+.prio-medium{background:rgba(59,130,246,.1);color:#3b82f6}
+.prio-low{background:rgba(156,163,175,.12);color:#9ca3af}
+.prio-badge::before{content:'';display:inline-block;width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.prio-high::before{background:#dc2626}
+.prio-medium::before{background:#3b82f6}
+.prio-low::before{background:#9ca3af}
 
 
 /* == DASHBOARD WIDGETS ROW == */
@@ -5092,15 +5093,16 @@ function renderReminderCard(r){
   const tags=(r.tags||[]).map(t=>`<span class="ctag">#${esc(t)}</span>`).join('');
   const rep=r.repeat&&r.repeat!=='none'?`<span class="ctag">🔁 ${r.repeat}</span>`:'';
   const prio=r.priority||'medium';
-  const prioMap={high:'▲ High',medium:'— Med',low:'▼ Low'};
+  const prioMap={high:'High',medium:'Med',low:'Low'};
   const prioBadge=`<span class="prio-badge prio-${prio}">${prioMap[prio]||''}</span>`;
+  const catIcon=r.category==='official'?'💼':'🏠';
   const catDot=`<span class="cat-dot ${r.category==='official'?'cat-official':'cat-personal'}" title="${r.category||'personal'}"></span>`;
   const doneBtn = !r.sent
     ? `<button class="cbtn done-btn" onclick="event.stopPropagation();markReminderDone('${r.id}')">✅ Done</button>`
     : `<button class="cbtn" onclick="event.stopPropagation();markReminderDone('${r.id}')">↩ Reopen</button>`;
   return`<div class="ncard ${sc}" data-type="reminder" data-id="${r.id}" onclick="handleCardClick(event,'${r.id}')">
     <div class="ceyebrow"><span class="ctype">⏰ Reminder</span><span class="schip ${sc}">${sl}</span>${prioBadge}</div>
-    <div class="ctitle">${catDot}${esc(r.title)}</div>
+    <div class="ctitle">${catDot}<span style="font-size:13px;margin-right:3px">${catIcon}</span>${esc(r.title)}</div>
     ${r.body?`<div class="cbody">${esc(r.body)}</div>`:''}
     <div class="due-row">📅 Due: <strong>${esc(r.due||'')}</strong></div>
     ${(tags||rep)?`<div class="tags-row">${tags}${rep}</div>`:''}
@@ -5152,7 +5154,7 @@ function renderReminderRow(r){
     <div class="lrow-accent${accentCls}"></div>
     <div class="lrow-icon">${statusIcon}</div>
     <div class="lrow-main">
-      <div class="lrow-title">${esc(r.title)}</div>
+      <div class="lrow-title">${r.category==='official'?'💼':'🏠'} ${esc(r.title)}</div>
       ${r.body?`<div class="lrow-sub">${esc(r.body)}</div>`:''}
     </div>
     ${tags?`<div class="lrow-tags">${tags}${rep}</div>`:''}
@@ -6416,16 +6418,16 @@ function _renderRemChecklist(){
     </div>`;
   }
 
-  // Add new reminder row (only when not in completed view)
+  // Add new reminder row at TOP (only when not in completed view)
   if(_remPageFilter!=='completed'){
     const listId = _remListId || 'personal';
-    html += `<div class="rem-add-row">
+    html = `<div class="rem-add-row" style="position:sticky;top:0;z-index:3;background:var(--bg);padding-bottom:4px">
       <div class="rem-add-plus" onclick="document.getElementById('rem-add-input').focus()">＋</div>
       <input class="rem-add-input" id="rem-add-input" placeholder="New reminder… (press Enter to add)"
         onkeydown="remAddKeydown(event,'${listId}')">
       <input type="date" class="rem-add-due-input" id="rem-add-due" title="Due date">
       <button class="cbtn" style="font-size:11px;padding:4px 12px;flex-shrink:0" onclick="remAddClick('${listId}')">Add</button>
-    </div>`;
+    </div>` + html;
   }
 
   // Completed section
@@ -6447,7 +6449,7 @@ function _renderRemChecklist(){
     html = `<div class="rem-empty">
       <div class="rem-empty-icon">⏰</div>
       <p>No reminders here.</p>
-      <p style="font-size:12px;color:var(--muted)">Add one below to get started</p>
+      <p style="font-size:12px;color:var(--muted)">Add one above to get started</p>
     </div>`;
     if(_remPageFilter!=='completed'){
       const listId = _remListId||'personal';
