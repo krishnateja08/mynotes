@@ -3287,6 +3287,76 @@ body.theme-midnight .shop-entry:hover{background:rgba(255,255,255,.03)}
   #page-shopping{height:auto!important}
 }
 
+/* -- INVESTMENTS PAGE -------------------------------- */
+.inv-wrap{display:flex;flex-direction:column;height:calc(100vh - 58px);overflow:hidden}
+.inv-header{display:flex;align-items:center;justify-content:space-between;padding:20px 24px 14px;flex-shrink:0}
+.inv-title{font-family:'Inter',sans-serif;font-size:18px;font-weight:800;color:var(--text);display:flex;align-items:center;gap:8px}
+.inv-summary{display:flex;gap:14px;padding:0 24px 16px;flex-shrink:0;flex-wrap:wrap}
+.inv-sum-card{
+  flex:1;min-width:180px;
+  background:var(--sidebar);border:1px solid var(--border);border-radius:12px;
+  padding:14px 18px;transition:all .2s
+}
+.inv-sum-card:hover{border-color:var(--accent);transform:translateY(-2px);box-shadow:0 4px 16px rgba(0,0,0,.06)}
+.inv-sum-label{font-size:10px;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);font-weight:700;margin-bottom:4px}
+.inv-sum-val{font-size:22px;font-weight:800;color:var(--accent);font-variant-numeric:tabular-nums}
+.inv-sum-sub{font-size:11px;color:var(--text2);margin-top:2px}
+.inv-table-wrap{flex:1;overflow-y:auto;padding:0 24px 20px;scrollbar-width:thin;scrollbar-color:var(--border) transparent}
+.inv-table-wrap::-webkit-scrollbar{width:4px}
+.inv-table-wrap::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
+.inv-table{width:100%;border-collapse:separate;border-spacing:0;background:var(--sidebar);border:1px solid var(--border);border-radius:12px;overflow:hidden}
+.inv-table thead th{
+  text-align:left;padding:11px 14px;font-size:10px;font-weight:700;
+  text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);
+  background:var(--s2);border-bottom:1px solid var(--border);
+  position:sticky;top:0;z-index:2
+}
+.inv-table thead th.r{text-align:right}
+.inv-table tbody td{padding:10px 14px;font-size:13px;color:var(--text);border-bottom:1px solid rgba(200,180,138,.12);vertical-align:middle}
+.inv-table tbody td.r{text-align:right}
+.inv-table tbody tr{transition:background .12s}
+.inv-table tbody tr:hover{background:rgba(255,255,255,.15)}
+body.theme-midnight .inv-table tbody tr:hover{background:rgba(255,255,255,.03)}
+body.theme-ember .inv-table tbody tr:hover{background:rgba(255,255,255,.02)}
+.inv-table tbody tr:last-child td{border-bottom:none}
+.inv-val{font-family:'Courier New',monospace;font-weight:600;color:var(--accent);font-variant-numeric:tabular-nums}
+.inv-pct{font-family:'Courier New',monospace;color:var(--text2)}
+.inv-bar-wrap{width:100%;height:6px;background:var(--border);border-radius:6px;overflow:hidden;min-width:60px}
+.inv-bar-fill{height:100%;border-radius:6px;background:var(--accent);transition:width .4s ease}
+.inv-status{display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:600;padding:2px 8px;border-radius:12px}
+.inv-status.on-target{color:var(--green);background:rgba(42,122,64,.1)}
+.inv-status.over{color:#d97706;background:rgba(217,119,6,.1)}
+.inv-status.under{color:var(--red);background:rgba(192,64,64,.1)}
+.inv-gap{font-family:'Courier New',monospace;font-weight:700;font-size:12px}
+.inv-gap.pos{color:#d97706}
+.inv-gap.neg{color:var(--red)}
+.inv-gap.zero{color:var(--green)}
+.inv-actions{display:flex;gap:4px;justify-content:flex-end;opacity:0;transition:opacity .15s}
+.inv-table tbody tr:hover .inv-actions{opacity:1}
+.inv-abtn{background:none;border:none;cursor:pointer;font-size:13px;padding:4px 6px;border-radius:6px;color:var(--muted);transition:all .12s;line-height:1}
+.inv-abtn:hover{color:var(--text);background:var(--s2)}
+.inv-abtn.del:hover{color:var(--red);background:rgba(192,64,64,.1)}
+.inv-edit-input{background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:5px 8px;font-size:13px;color:var(--text);font-family:'Inter',sans-serif;outline:none;width:100%;transition:border-color .2s}
+.inv-edit-input:focus{border-color:var(--accent)}
+.inv-edit-input.num{text-align:right;width:100px;font-family:'Courier New',monospace}
+.inv-tfoot td{padding:12px 14px!important;font-weight:700;font-size:14px;border-top:2px solid var(--accent);background:var(--s2)}
+.inv-tfoot .inv-val{font-size:15px}
+.inv-rebalance{color:var(--red);font-size:11px;font-weight:600;display:flex;align-items:center;gap:4px}
+.inv-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:60px 20px;color:var(--muted);gap:8px;flex:1}
+.inv-empty-icon{font-size:40px;opacity:.3}
+.inv-empty-text{font-size:14px}
+@media(max-width:640px){
+  .inv-header{padding:14px 14px 10px}
+  .inv-summary{padding:0 14px 12px}
+  .inv-sum-card{min-width:140px;padding:10px 14px}
+  .inv-table-wrap{padding:0 10px 16px}
+  .inv-table thead th{padding:9px 10px;font-size:9px}
+  .inv-table tbody td{padding:8px 10px;font-size:12px}
+  .inv-actions{opacity:1}
+  .inv-bar-wrap{min-width:40px}
+  .inv-sum-val{font-size:18px}
+}
+
 </style>
 </head>
 <body class="theme-cream">
@@ -3344,6 +3414,10 @@ body.theme-midnight .shop-entry:hover{background:rgba(255,255,255,.03)}
   <button class="nav-item" id="nav-shopping-btn" onclick="showPage('shopping',this)">
     <span class="nav-icon">🛒</span> Shopping
     <span class="nav-count" id="nav-shopping-count">0</span>
+  </button>
+  <button class="nav-item" id="nav-investments-btn" onclick="showPage('investments',this)">
+    <span class="nav-icon">📊</span> Investments
+    <span class="nav-count" id="nav-investments-count">0</span>
   </button>
 
   <div class="sidebar-section">Status</div>
@@ -3419,6 +3493,10 @@ body.theme-midnight .shop-entry:hover{background:rgba(255,255,255,.03)}
         <!-- shopping: new shop -->
         <div id="ctx-shopping" style="display:none;align-items:center;gap:8px">
           <button class="btn" onclick="shopOpenModal()">+ Add Shop</button>
+        </div>
+        <!-- investments: add asset -->
+        <div id="ctx-investments" style="display:none;align-items:center;gap:8px">
+          <button class="btn" onclick="invOpenAddRow()">+ Add Asset</button>
         </div>
       </div>
       <!-- Clock -->
@@ -4222,6 +4300,36 @@ body.theme-midnight .shop-entry:hover{background:rgba(255,255,255,.03)}
   </div>
 </div>
 
+<!-- == INVESTMENTS PAGE == -->
+<div id="page-investments" style="display:none;flex-direction:column;width:100%;height:calc(100vh - 58px);background:var(--bg)">
+  <div class="inv-wrap">
+    <div class="inv-header">
+      <span class="inv-title">📊 Investment Portfolio</span>
+      <button class="btn" onclick="invOpenAddRow()">+ Add Asset</button>
+    </div>
+    <div class="inv-summary">
+      <div class="inv-sum-card">
+        <div class="inv-sum-label">Total Portfolio</div>
+        <div class="inv-sum-val" id="inv-sum-total">₹0</div>
+        <div class="inv-sum-sub" id="inv-sum-total-sub">0 assets</div>
+      </div>
+      <div class="inv-sum-card">
+        <div class="inv-sum-label">Target Allocation</div>
+        <div class="inv-sum-val" id="inv-sum-target">0%</div>
+        <div class="inv-sum-sub" id="inv-sum-target-sub">—</div>
+      </div>
+      <div class="inv-sum-card">
+        <div class="inv-sum-label">Top Holding</div>
+        <div class="inv-sum-val" id="inv-sum-top">—</div>
+        <div class="inv-sum-sub" id="inv-sum-top-sub">—</div>
+      </div>
+    </div>
+    <div class="inv-table-wrap">
+      <div id="inv-table-container"></div>
+    </div>
+  </div>
+</div>
+
 <!-- ── FINANCE ENTRY MODAL ─────────────────────────── -->
 <div class="overlay" id="fin-modal-overlay">
 <div class="modal" style="max-width:520px;display:flex;flex-direction:column;max-height:92vh;overflow-y:auto;-webkit-overflow-scrolling:touch">
@@ -4756,7 +4864,7 @@ body.theme-midnight .shop-entry:hover{background:rgba(255,255,255,.03)}
 <div id="toast"></div>
 
 <script>
-let DATA={notes:[],reminders:[],stickies:[],archived:[],trades:[],routines:[],routine_logs:[],tasknotes:[],finance:[],note_folders:[],rem_lists:[],daybook:[],shopping:[]};
+let DATA={notes:[],reminders:[],stickies:[],archived:[],trades:[],routines:[],routine_logs:[],tasknotes:[],finance:[],note_folders:[],rem_lists:[],daybook:[],shopping:[],investments:[]};
 let dataLoaded=false; // guard: prevents any save before data is fully loaded
 let currentType='note';
 
@@ -4819,7 +4927,7 @@ async function firebaseSignIn(){
 async function firebaseSignOut(){
   if(!confirm('Sign out? Local unsaved changes will be lost.')) return;
   await fbAuth.signOut();
-  DATA={notes:[],reminders:[],stickies:[],archived:[],trades:[],routines:[],routine_logs:[],tasknotes:[],finance:[],note_folders:[],rem_lists:[],daybook:[],shopping:[]};
+  DATA={notes:[],reminders:[],stickies:[],archived:[],trades:[],routines:[],routine_logs:[],tasknotes:[],finance:[],note_folders:[],rem_lists:[],daybook:[],shopping:[],investments:[]};
   dataLoaded=false;
   renderAll();
   toast('Signed out','success');
@@ -4859,6 +4967,7 @@ async function loadFromFirebase(){
     if(!DATA.archived)      DATA.archived      = [];
     if(!DATA.daybook)       DATA.daybook       = [];
     if(!DATA.shopping)      DATA.shopping      = [];
+    if(!DATA.investments)   DATA.investments   = [];
     if(!DATA.notes)         DATA.notes         = [];
     if(!DATA.reminders)     DATA.reminders     = [];
 
@@ -4913,6 +5022,7 @@ async function loadFromFirebase(){
     dbUpdateCounts();
     dbRender();
     shopRender();
+    invRender();
 
     if(needsRepair && JSON.stringify(DATA) !== _beforeRepair){
       await saveToFirebase();
@@ -4940,6 +5050,7 @@ async function saveToFirebase(){
     if(typeof TASKNOTES !== 'undefined' && TASKNOTES.length > 0)   DATA.tasknotes    = [...TASKNOTES];
     if(typeof ROUTINES !== 'undefined' && ROUTINES.length > 0)     DATA.routines     = [...ROUTINES];
     if(typeof ROUTINE_LOGS !== 'undefined' && ROUTINE_LOGS.length > 0) DATA.routine_logs = [...ROUTINE_LOGS];
+    if(typeof INVESTMENTS !== 'undefined' && INVESTMENTS.length > 0)  DATA.investments  = [...INVESTMENTS];
 
     // Store as a single JSON string payload to avoid Firestore nested object/array depth limits
     await fbDb.collection('users').doc(user.uid).set({
@@ -5003,6 +5114,7 @@ function renderAll(){
   updateRoutineCount();
   updateTaskNotesCount();
   updateFinanceCount();
+  updateInvestmentsCount();
   const now=new Date();
   const todayStr=localToday();
   const pending=reminders.filter(r=>!r.sent).length;
@@ -6611,8 +6723,8 @@ createNewNote = async function(){
 function showPage(page, btn){
   // Lock daybook when navigating away
   if(page !== 'daybook' && dbGetPin()) _dbUnlocked = false;
-  const pages = ['dashboard','notes','reminders','sticky','journal','routine','tasknotes','finance','daybook','shopping'];
-  const displayMap = {dashboard:'',notes:'flex',reminders:'flex',sticky:'flex',journal:'flex',routine:'flex',tasknotes:'flex',finance:'flex',daybook:'flex',shopping:'flex'};
+  const pages = ['dashboard','notes','reminders','sticky','journal','routine','tasknotes','finance','daybook','shopping','investments'];
+  const displayMap = {dashboard:'',notes:'flex',reminders:'flex',sticky:'flex',journal:'flex',routine:'flex',tasknotes:'flex',finance:'flex',daybook:'flex',shopping:'flex',investments:'flex'};
   pages.forEach(p=>{
     const el=document.getElementById('page-'+p);
     if(el){
@@ -6628,7 +6740,7 @@ function showPage(page, btn){
   // Reset scroll on page switch (desktop: scroll area, mobile: window)
   const sa = document.getElementById('page-scroll-area');
   // Hide scroll area for full-height pages (daybook, shopping are outside it)
-  if(sa) sa.style.display = (page==='daybook'||page==='shopping') ? 'none' : '';
+  if(sa) sa.style.display = (page==='daybook'||page==='shopping'||page==='investments') ? 'none' : '';
   if(sa) sa.scrollTop = 0;
   window.scrollTo(0,0);
 
@@ -6643,12 +6755,13 @@ function showPage(page, btn){
     tasknotes:'✍️ Task Notes',
     finance:'💰 Finance Tracker',
     daybook:'📖 Daybook',
-    shopping:'🛒 Shopping'
+    shopping:'🛒 Shopping',
+    investments:'📊 Investments'
   };
   document.getElementById('page-title').textContent = titles[page]||'📋 Dashboard';
 
   // 5. Context-aware actions
-  ['dashboard','notes','reminders','sticky','journal','routine','tasknotes','finance','daybook','shopping'].forEach(p=>{
+  ['dashboard','notes','reminders','sticky','journal','routine','tasknotes','finance','daybook','shopping','investments'].forEach(p=>{
     const el=document.getElementById('ctx-'+p);
     if(el) el.style.display=p===page?'flex':'none';
   });
@@ -6705,6 +6818,7 @@ function showPage(page, btn){
     }
   }
   if(page==='shopping') shopRender();
+  if(page==='investments') invRender();
 }
 
 /* -- STICKY NOTES PAGE --------------------------- */
@@ -10348,6 +10462,212 @@ async function shopDelItem(shopId,itemId){
   if(!sh) return;
   sh.items=(sh.items||[]).filter(i=>i.id!==itemId);
   shopRender();
+  await saveToFirebase();
+}
+
+/* ═══════════════════════════════════════════════════════
+   INVESTMENTS PORTFOLIO PAGE
+   ═══════════════════════════════════════════════════════ */
+let INVESTMENTS = [];
+let _invEditId = null;
+let _invAdding = false;
+
+function invGetData(){ if(!DATA.investments) DATA.investments=[]; INVESTMENTS=DATA.investments; return INVESTMENTS; }
+
+function invFormatINR(v){
+  return new Intl.NumberFormat('en-IN',{style:'currency',currency:'INR',maximumFractionDigits:0}).format(v);
+}
+
+function invCalcPortfolio(value, total){
+  return total > 0 ? ((value/total)*100).toFixed(2) : '0.00';
+}
+
+function invCalcGap(value, target, total){
+  const current = parseFloat(invCalcPortfolio(value, total));
+  return (current - target).toFixed(1);
+}
+
+function invGetStatus(gap){
+  const g = parseFloat(gap);
+  if(Math.abs(g) < 1) return {text:'On target', cls:'on-target', icon:'✓'};
+  if(g > 0) return {text:Math.abs(g).toFixed(1)+'% over', cls:'over', icon:'▲'};
+  return {text:Math.abs(g).toFixed(1)+'% under', cls:'under', icon:'▼'};
+}
+
+function updateInvestmentsCount(){
+  const el=document.getElementById('nav-investments-count');
+  if(el) el.textContent=(DATA.investments||[]).length;
+}
+
+function invRender(){
+  const assets = invGetData();
+  const container = document.getElementById('inv-table-container');
+  if(!container) return;
+
+  const total = assets.reduce((s,a)=>s+a.value,0);
+  const totalTarget = assets.reduce((s,a)=>s+a.target,0);
+
+  // Summary cards
+  document.getElementById('inv-sum-total').textContent = invFormatINR(total);
+  document.getElementById('inv-sum-total-sub').textContent = assets.length + ' asset' + (assets.length!==1?'s':'');
+  document.getElementById('inv-sum-target').textContent = totalTarget + '%';
+  document.getElementById('inv-sum-target-sub').textContent = totalTarget===100 ? 'Perfectly balanced' : (totalTarget<100?'Under-allocated by '+(100-totalTarget)+'%':'Over-allocated by '+(totalTarget-100)+'%');
+
+  if(assets.length){
+    const top = [...assets].sort((a,b)=>b.value-a.value)[0];
+    document.getElementById('inv-sum-top').textContent = top.name;
+    document.getElementById('inv-sum-top-sub').textContent = invFormatINR(top.value) + ' · ' + invCalcPortfolio(top.value, total) + '%';
+  } else {
+    document.getElementById('inv-sum-top').textContent = '—';
+    document.getElementById('inv-sum-top-sub').textContent = '—';
+  }
+
+  updateInvestmentsCount();
+
+  if(!assets.length && !_invAdding){
+    container.innerHTML=`<div class="inv-empty"><div class="inv-empty-icon">📊</div><div class="inv-empty-text">No investment assets yet — click <b>+ Add Asset</b> to begin tracking</div></div>`;
+    return;
+  }
+
+  let rows = '';
+  assets.forEach((a,i)=>{
+    const pct = invCalcPortfolio(a.value, total);
+    const gap = invCalcGap(a.value, a.target, total);
+    const status = invGetStatus(gap);
+    const gapNum = parseFloat(gap);
+    const gapCls = gapNum>0?'pos':gapNum<0?'neg':'zero';
+    const isEditing = _invEditId===a.id;
+
+    if(isEditing){
+      rows += `<tr>
+        <td><input class="inv-edit-input" id="inv-e-name" value="${esc(a.name)}" placeholder="Asset name"></td>
+        <td class="r"><input class="inv-edit-input num" id="inv-e-value" type="number" value="${a.value}" placeholder="0"></td>
+        <td class="r"><span class="inv-pct">${pct}%</span></td>
+        <td class="r"><input class="inv-edit-input num" id="inv-e-target" type="number" value="${a.target}" step="0.5" placeholder="0"></td>
+        <td><div class="inv-bar-wrap"><div class="inv-bar-fill" style="width:${Math.min(pct,100)}%"></div></div></td>
+        <td><span class="inv-status ${status.cls}">${status.icon} ${status.text}</span></td>
+        <td class="r"><span class="inv-gap ${gapCls}">${gapNum>0?'+':''}${gap}%</span></td>
+        <td class="r">
+          <div style="display:flex;gap:4px;justify-content:flex-end">
+            <button class="inv-abtn" onclick="invSaveEdit()" title="Save" style="color:var(--green)">✓</button>
+            <button class="inv-abtn" onclick="invCancelEdit()" title="Cancel">✕</button>
+          </div>
+        </td>
+      </tr>`;
+    } else {
+      rows += `<tr>
+        <td><span style="font-weight:600">${esc(a.name)}</span></td>
+        <td class="r"><span class="inv-val">${invFormatINR(a.value)}</span></td>
+        <td class="r"><span class="inv-pct">${pct}%</span></td>
+        <td class="r"><span class="inv-pct">${a.target}%</span></td>
+        <td><div class="inv-bar-wrap"><div class="inv-bar-fill" style="width:${Math.min(pct,100)}%"></div></div></td>
+        <td><span class="inv-status ${status.cls}">${status.icon} ${status.text}</span></td>
+        <td class="r"><span class="inv-gap ${gapCls}">${gapNum>0?'+':''}${gap}%</span></td>
+        <td class="r">
+          <div class="inv-actions">
+            <button class="inv-abtn" onclick="invStartEdit('${a.id}')" title="Edit">✎</button>
+            <button class="inv-abtn del" onclick="invDelete('${a.id}')" title="Delete">✕</button>
+          </div>
+        </td>
+      </tr>`;
+    }
+  });
+
+  // Add row (inline)
+  let addRow = '';
+  if(_invAdding){
+    addRow = `<tr style="background:rgba(42,122,64,.05)">
+      <td><input class="inv-edit-input" id="inv-a-name" placeholder="e.g. Fixed Deposit" autofocus></td>
+      <td class="r"><input class="inv-edit-input num" id="inv-a-value" type="number" placeholder="0"></td>
+      <td class="r"><span class="inv-pct">—</span></td>
+      <td class="r"><input class="inv-edit-input num" id="inv-a-target" type="number" placeholder="0" step="0.5"></td>
+      <td colspan="3"><span style="font-size:11px;color:var(--muted)">Fill in details and save</span></td>
+      <td class="r">
+        <div style="display:flex;gap:4px;justify-content:flex-end">
+          <button class="inv-abtn" onclick="invSaveNew()" title="Save" style="color:var(--green);opacity:1">✓</button>
+          <button class="inv-abtn" onclick="invCancelAdd()" title="Cancel" style="opacity:1">✕</button>
+        </div>
+      </td>
+    </tr>`;
+  }
+
+  // Footer
+  const footerHtml = `<tr class="inv-tfoot">
+    <td style="font-size:14px">TOTAL PORTFOLIO</td>
+    <td class="r"><span class="inv-val">${invFormatINR(total)}</span></td>
+    <td class="r"><span class="inv-pct" style="font-weight:700">100.00%</span></td>
+    <td class="r"><span class="inv-pct" style="font-weight:700">${totalTarget}%</span></td>
+    <td colspan="4">${totalTarget!==100?'<div class="inv-rebalance">⚠ Rebalance needed — targets sum to '+totalTarget+'%</div>':''}</td>
+  </tr>`;
+
+  container.innerHTML = `<table class="inv-table">
+    <thead><tr>
+      <th>Asset</th><th class="r">Value (INR)</th><th class="r">% Portfolio</th><th class="r">Target %</th>
+      <th>Allocation</th><th>Status</th><th class="r">Gap</th><th class="r">Actions</th>
+    </tr></thead>
+    <tbody>${rows}${addRow}</tbody>
+    <tfoot>${footerHtml}</tfoot>
+  </table>`;
+
+  // Auto-focus add row name input
+  if(_invAdding){
+    setTimeout(()=>{const el=document.getElementById('inv-a-name');if(el)el.focus();},50);
+  }
+}
+
+function invOpenAddRow(){
+  _invAdding = true;
+  _invEditId = null;
+  invRender();
+}
+function invCancelAdd(){
+  _invAdding = false;
+  invRender();
+}
+
+async function invSaveNew(){
+  const name = (document.getElementById('inv-a-name').value||'').trim();
+  const value = parseFloat(document.getElementById('inv-a-value').value)||0;
+  const target = parseFloat(document.getElementById('inv-a-target').value)||0;
+  if(!name){toast('Enter an asset name','error');return;}
+  const assets = invGetData();
+  assets.push({id:'inv_'+Date.now(), name, value, target});
+  _invAdding = false;
+  invRender();
+  toast('Asset added ✓','success');
+  await saveToFirebase();
+}
+
+function invStartEdit(id){
+  _invEditId = id;
+  _invAdding = false;
+  invRender();
+}
+function invCancelEdit(){
+  _invEditId = null;
+  invRender();
+}
+
+async function invSaveEdit(){
+  const name = (document.getElementById('inv-e-name').value||'').trim();
+  const value = parseFloat(document.getElementById('inv-e-value').value)||0;
+  const target = parseFloat(document.getElementById('inv-e-target').value)||0;
+  if(!name){toast('Enter an asset name','error');return;}
+  const assets = invGetData();
+  const a = assets.find(x=>x.id===_invEditId);
+  if(a){a.name=name;a.value=value;a.target=target;}
+  _invEditId = null;
+  invRender();
+  toast('Asset updated ✓','success');
+  await saveToFirebase();
+}
+
+async function invDelete(id){
+  if(!confirm('Delete this asset?')) return;
+  DATA.investments = invGetData().filter(a=>a.id!==id);
+  INVESTMENTS = DATA.investments;
+  invRender();
+  toast('Asset deleted','success');
   await saveToFirebase();
 }
 
