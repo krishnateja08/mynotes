@@ -616,6 +616,55 @@ body.theme-ember .db-pin-dot.filled{background:var(--accent);border-color:var(--
   80%{transform:translateX(6px)}
 }
 
+/* -- INVESTMENTS PIN LOCK ------------------------------ */
+.inv-lock-overlay{
+  position:absolute;inset:0;
+  background:var(--bg);
+  display:flex;align-items:center;justify-content:center;
+  z-index:100;flex-direction:column;gap:0
+}
+.inv-lock-box{
+  background:var(--sidebar);border:1px solid var(--border);
+  border-radius:16px;padding:36px 40px;
+  display:flex;flex-direction:column;align-items:center;gap:18px;
+  min-width:300px;max-width:360px;width:90%
+}
+.inv-lock-icon{font-size:40px;line-height:1;margin-bottom:4px}
+.inv-lock-title{font-family:'Inter',sans-serif;font-size:20px;font-weight:700;color:var(--text);text-align:center}
+.inv-lock-sub{font-size:12px;color:var(--muted);text-align:center;line-height:1.5}
+.inv-pin-dots{display:flex;gap:12px;margin:6px 0}
+.inv-pin-dot{
+  width:14px;height:14px;border-radius:50%;
+  border:2px solid var(--border2);background:transparent;
+  transition:all .15s
+}
+.inv-pin-dot.filled{background:#1a9a6c;border-color:#1a9a6c}
+body.theme-beige .inv-pin-dot.filled{background:var(--accent);border-color:var(--accent)}
+body.theme-midnight .inv-pin-dot.filled{background:var(--accent);border-color:var(--accent)}
+body.theme-ember .inv-pin-dot.filled{background:var(--accent);border-color:var(--accent)}
+body.theme-rose .inv-pin-dot.filled{background:#b06090;border-color:#b06090}
+body.theme-ocean .inv-pin-dot.filled{background:#00d2b4;border-color:#00d2b4}
+.inv-pin-error{font-size:12px;color:var(--red);font-weight:600;min-height:16px;text-align:center}
+.inv-numpad{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;width:100%}
+.inv-num-btn{
+  background:var(--bg);border:1px solid var(--border);
+  border-radius:10px;padding:14px 0;
+  font-size:18px;font-weight:600;color:var(--text);
+  cursor:pointer;font-family:'Inter',sans-serif;
+  transition:all .12s;text-align:center;line-height:1
+}
+.inv-num-btn:hover{background:var(--s2);border-color:var(--border2)}
+.inv-num-btn:active{transform:scale(.94)}
+.inv-num-btn.del{font-size:16px;color:var(--muted)}
+.inv-num-btn.clear{font-size:13px;color:var(--muted)}
+@keyframes inv-shake{
+  0%,100%{transform:translateX(0)}
+  20%{transform:translateX(-8px)}
+  40%{transform:translateX(8px)}
+  60%{transform:translateX(-6px)}
+  80%{transform:translateX(6px)}
+}
+
 /* -- RICH DASHBOARD -------------------------------- */
 .dash-wrap{padding:20px 28px;display:flex;flex-direction:column;gap:16px}
 /* Quick Capture */
@@ -4596,6 +4645,35 @@ body.theme-beige .inv-mcard-total{background:linear-gradient(135deg,#5a4a9a,#7c5
 
 <!-- == INVESTMENTS PAGE == -->
 <div id="page-investments" style="display:none;flex-direction:column;width:100%;height:calc(100vh - 58px);background:var(--bg)">
+  <!-- PIN LOCK OVERLAY -->
+  <div class="inv-lock-overlay" id="inv-lock-overlay" style="display:none">
+    <div class="inv-lock-box">
+      <div class="inv-lock-icon">🔐</div>
+      <div class="inv-lock-title">Investments is Locked</div>
+      <div class="inv-lock-sub" id="inv-lock-sub">Enter your PIN to view your portfolio</div>
+      <div class="inv-pin-dots" id="inv-pin-dots">
+        <div class="inv-pin-dot" id="inv-dot-0"></div>
+        <div class="inv-pin-dot" id="inv-dot-1"></div>
+        <div class="inv-pin-dot" id="inv-dot-2"></div>
+        <div class="inv-pin-dot" id="inv-dot-3"></div>
+      </div>
+      <div class="inv-pin-error" id="inv-pin-error"></div>
+      <div class="inv-numpad">
+        <button class="inv-num-btn" onclick="invPinPress('1')">1</button>
+        <button class="inv-num-btn" onclick="invPinPress('2')">2</button>
+        <button class="inv-num-btn" onclick="invPinPress('3')">3</button>
+        <button class="inv-num-btn" onclick="invPinPress('4')">4</button>
+        <button class="inv-num-btn" onclick="invPinPress('5')">5</button>
+        <button class="inv-num-btn" onclick="invPinPress('6')">6</button>
+        <button class="inv-num-btn" onclick="invPinPress('7')">7</button>
+        <button class="inv-num-btn" onclick="invPinPress('8')">8</button>
+        <button class="inv-num-btn" onclick="invPinPress('9')">9</button>
+        <button class="inv-num-btn clear" onclick="invPinClear()">CLR</button>
+        <button class="inv-num-btn" onclick="invPinPress('0')">0</button>
+        <button class="inv-num-btn del" onclick="invPinBack()">⌫</button>
+      </div>
+    </div>
+  </div>
   <div class="inv-wrap">
     <div class="inv-header">
       <span class="inv-title">📊 Investment Portfolio</span>
@@ -5187,9 +5265,9 @@ body.theme-beige .inv-mcard-total{background:linear-gradient(135deg,#5a4a9a,#7c5
   </div>
 
   <!-- DAYBOOK PIN -->
-  <div class="settings-section-title" style="margin-top:24px">🔐 Daybook PIN Lock</div>
+  <div class="settings-section-title" style="margin-top:24px">🔐 Daybook & Investments PIN Lock</div>
   <p style="font-size:12px;color:var(--muted);margin-bottom:14px;line-height:1.6">
-    Set a 4-digit PIN to lock your Daybook. Leave blank to disable the lock. PIN is stored only in your browser.
+    Set a 4-digit PIN to lock your Daybook and Investments. Leave blank to disable the lock. PIN is stored only in your browser.
   </p>
   <div style="display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap">
     <div class="frow" style="flex:1;min-width:140px;margin-bottom:0">
@@ -7071,6 +7149,8 @@ createNewNote = async function(){
 function showPage(page, btn){
   // Lock daybook when navigating away
   if(page !== 'daybook' && dbGetPin()) _dbUnlocked = false;
+  // Lock investments when navigating away (uses same PIN)
+  if(page !== 'investments' && dbGetPin()) _invUnlocked = false;
   const pages = ['dashboard','notes','reminders','sticky','journal','routine','tasknotes','finance','daybook','shopping','investments'];
   const displayMap = {dashboard:'',notes:'flex',reminders:'flex',sticky:'flex',journal:'flex',routine:'flex',tasknotes:'flex',finance:'flex',daybook:'flex',shopping:'flex',investments:'flex'};
   pages.forEach(p=>{
@@ -7166,7 +7246,15 @@ function showPage(page, btn){
     }
   }
   if(page==='shopping') shopRender();
-  if(page==='investments') invRender();
+  if(page==='investments'){
+    const pin = dbGetPin();
+    if(pin && !_invUnlocked){
+      invShowLockScreen();
+    } else {
+      invHideLockScreen();
+      invRender();
+    }
+  }
 }
 
 /* -- STICKY NOTES PAGE --------------------------- */
@@ -10277,21 +10365,23 @@ function dbSavePin(){
   if(p1!==p2){ msg.style.color='var(--red)'; msg.textContent='PINs do not match.'; return; }
   localStorage.setItem('db_pin', p1);
   _dbUnlocked = false; // force re-lock on next visit
+  _invUnlocked = false; // force re-lock investments too
   document.getElementById('cfg-db-pin').value='';
   document.getElementById('cfg-db-pin2').value='';
   msg.style.color='var(--green)';
-  msg.textContent='✓ PIN saved! Daybook will be locked next time you open it.';
+  msg.textContent='✓ PIN saved! Daybook & Investments will be locked next time you open them.';
   setTimeout(()=>{ msg.textContent=''; },3000);
 }
 
 function dbClearPin(){
   localStorage.removeItem('db_pin');
   _dbUnlocked = true;
+  _invUnlocked = true;
   document.getElementById('cfg-db-pin').value='';
   document.getElementById('cfg-db-pin2').value='';
   const msg = document.getElementById('db-pin-settings-msg');
   msg.style.color='var(--green)';
-  msg.textContent='✓ PIN removed. Daybook is now unlocked.';
+  msg.textContent='✓ PIN removed. Daybook & Investments are now unlocked.';
   setTimeout(()=>{ msg.textContent=''; },3000);
 }
 
@@ -10356,6 +10446,71 @@ document.addEventListener('keydown', e=>{
   if(/^[0-9]$/.test(e.key)) dbPinPress(e.key);
   else if(e.key==='Backspace') dbPinBack();
   else if(e.key==='Escape') dbPinClear();
+});
+
+/* ── INVESTMENTS PIN LOCK (uses same Daybook PIN) ── */
+let _invUnlocked = false;
+let _invPinEntry = '';
+
+function invShowLockScreen(){
+  _invPinEntry = '';
+  invUpdateInvDots();
+  document.getElementById('inv-pin-error').textContent='';
+  document.getElementById('inv-lock-sub').textContent='Enter your PIN to view your portfolio';
+  document.getElementById('inv-lock-overlay').style.display='flex';
+}
+
+function invHideLockScreen(){
+  document.getElementById('inv-lock-overlay').style.display='none';
+}
+
+function invUpdateInvDots(){
+  for(let i=0;i<4;i++){
+    const dot = document.getElementById('inv-dot-'+i);
+    if(dot) dot.classList.toggle('filled', i < _invPinEntry.length);
+  }
+}
+
+function invPinPress(digit){
+  if(_invPinEntry.length >= 4) return;
+  _invPinEntry += digit;
+  invUpdateInvDots();
+  document.getElementById('inv-pin-error').textContent='';
+  if(_invPinEntry.length === 4) setTimeout(invCheckInvPin, 120);
+}
+
+function invPinBack(){
+  _invPinEntry = _invPinEntry.slice(0,-1);
+  invUpdateInvDots();
+}
+
+function invPinClear(){
+  _invPinEntry = '';
+  invUpdateInvDots();
+  document.getElementById('inv-pin-error').textContent='';
+}
+
+function invCheckInvPin(){
+  const stored = dbGetPin(); // same PIN as Daybook
+  if(_invPinEntry === stored){
+    _invUnlocked = true;
+    invHideLockScreen();
+    invRender();
+  } else {
+    document.getElementById('inv-pin-error').textContent='Wrong PIN. Try again.';
+    const box = document.querySelector('.inv-lock-box');
+    if(box){ box.style.animation='none'; void box.offsetWidth; box.style.animation='inv-shake .35s ease'; }
+    setTimeout(()=>{ _invPinEntry=''; invUpdateInvDots(); },600);
+  }
+}
+
+// keyboard support on investment lock screen
+document.addEventListener('keydown', e=>{
+  const overlay = document.getElementById('inv-lock-overlay');
+  if(!overlay || overlay.style.display==='none') return;
+  if(/^[0-9]$/.test(e.key)) invPinPress(e.key);
+  else if(e.key==='Backspace') invPinBack();
+  else if(e.key==='Escape') invPinClear();
 });
 
 function dbGetEntries(){ return DATA.daybook || []; }
