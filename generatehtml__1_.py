@@ -12,6 +12,7 @@ HTML = r"""<!DOCTYPE html>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 html{scroll-behavior:smooth}
@@ -3469,6 +3470,36 @@ body.theme-beige .inv-mcard-total{background:linear-gradient(135deg,#5a4a9a,#7c5
 .inv-medit-save{background:var(--green);color:#fff}
 .inv-medit-cancel{background:var(--s2);color:var(--text);border:1px solid var(--border)!important}
 
+/* -- INVESTMENT PIE CHART ---- */
+.inv-chart-section{
+  margin-top:24px;padding:0 0 28px;
+  border-top:1.5px solid var(--border)
+}
+.inv-chart-heading{
+  display:flex;align-items:center;gap:14px;
+  padding:24px 0 18px
+}
+.inv-chart-icon{font-size:28px;line-height:1}
+.inv-chart-title{
+  font-family:'Inter',sans-serif;font-size:18px;font-weight:800;
+  color:var(--text);letter-spacing:-.3px
+}
+.inv-chart-sub{font-size:12px;color:var(--muted);font-weight:500;margin-top:1px}
+.inv-chart-wrap{
+  position:relative;
+  max-width:520px;
+  margin:0 auto;
+  padding:8px
+}
+@media(max-width:640px){
+  .inv-chart-heading{padding:18px 0 14px;gap:10px}
+  .inv-chart-icon{font-size:22px}
+  .inv-chart-title{font-size:15px}
+  .inv-chart-sub{font-size:11px}
+  .inv-chart-wrap{max-width:340px;padding:4px}
+  .inv-chart-section{margin-top:16px;padding-bottom:20px}
+}
+
 </style>
 </head>
 <body class="theme-cream">
@@ -4438,6 +4469,19 @@ body.theme-beige .inv-mcard-total{background:linear-gradient(135deg,#5a4a9a,#7c5
     </div>
     <div class="inv-table-wrap">
       <div id="inv-table-container"></div>
+      <!-- Portfolio Allocation Chart -->
+      <div class="inv-chart-section" id="inv-chart-section" style="display:none">
+        <div class="inv-chart-heading">
+          <span class="inv-chart-icon">🥧</span>
+          <div>
+            <div class="inv-chart-title">Portfolio Allocation</div>
+            <div class="inv-chart-sub">Visual breakdown of your investment distribution</div>
+          </div>
+        </div>
+        <div class="inv-chart-wrap">
+          <canvas id="inv-pie-chart"></canvas>
+        </div>
+      </div>
     </div>
   </div>
 </div>
@@ -10797,6 +10841,115 @@ function invRender(){
       if(el)el.focus();
     },50);
   }
+
+  // ── PIE CHART ─────────────────────────────
+  invRenderChart(assets, total);
+}
+
+let _invChartInstance = null;
+function invRenderChart(assets, total){
+  const section = document.getElementById('inv-chart-section');
+  const canvas = document.getElementById('inv-pie-chart');
+  if(!section || !canvas) return;
+
+  if(!assets.length || total <= 0){
+    section.style.display = 'none';
+    if(_invChartInstance){ _invChartInstance.destroy(); _invChartInstance=null; }
+    return;
+  }
+  section.style.display = '';
+
+  const labels = assets.map(a => a.name);
+  const values = assets.map(a => a.value);
+  const colors = assets.map((_,i) => INV_BAR_COLORS[i % INV_BAR_COLORS.length]);
+  const pcts = assets.map(a => invCalcPortfolio(a.value, total));
+
+  // Detect dark theme
+  const isDark = document.body.classList.contains('theme-midnight') || document.body.classList.contains('theme-ember');
+  const textColor = isDark ? '#c8c8c8' : '#3c3c3c';
+  const legendColor = isDark ? '#a0a0a0' : '#5a5a5a';
+
+  if(_invChartInstance){
+    _invChartInstance.data.labels = labels;
+    _invChartInstance.data.datasets[0].data = values;
+    _invChartInstance.data.datasets[0].backgroundColor = colors;
+    _invChartInstance.options.plugins.legend.labels.color = legendColor;
+    _invChartInstance.update();
+    return;
+  }
+
+  const ctx = canvas.getContext('2d');
+  _invChartInstance = new Chart(ctx, {
+    type: 'pie',
+    data: {
+      labels: labels,
+      datasets: [{
+        data: values,
+        backgroundColor: colors,
+        borderColor: isDark ? 'rgba(20,20,20,.6)' : 'rgba(255,255,255,.8)',
+        borderWidth: 2.5,
+        hoverBorderWidth: 3,
+        hoverBorderColor: isDark ? '#fff' : '#333',
+        hoverOffset: 12
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: true,
+      layout: { padding: 10 },
+      plugins: {
+        legend: {
+          position: 'right',
+          labels: {
+            color: legendColor,
+            font: { family: "'Inter',sans-serif", size: 12, weight: '600' },
+            padding: 12,
+            usePointStyle: true,
+            pointStyleWidth: 14,
+            generateLabels: function(chart){
+              const data = chart.data;
+              return data.labels.map((label, i)=>{
+                const val = data.datasets[0].data[i];
+                const pct = total > 0 ? ((val/total)*100).toFixed(1) : '0.0';
+                const shortName = label.length > 22 ? label.substring(0,20)+'…' : label;
+                return {
+                  text: shortName + '  ' + pct + '%',
+                  fillStyle: data.datasets[0].backgroundColor[i],
+                  strokeStyle: 'transparent',
+                  lineWidth: 0,
+                  pointStyle: 'rectRounded',
+                  hidden: false,
+                  index: i
+                };
+              });
+            }
+          }
+        },
+        tooltip: {
+          backgroundColor: isDark ? 'rgba(30,30,30,.95)' : 'rgba(255,255,255,.96)',
+          titleColor: isDark ? '#e0e0e0' : '#222',
+          bodyColor: isDark ? '#c0c0c0' : '#444',
+          borderColor: isDark ? 'rgba(255,255,255,.15)' : 'rgba(0,0,0,.1)',
+          borderWidth: 1,
+          titleFont: { family: "'Inter',sans-serif", size: 13, weight: '700' },
+          bodyFont: { family: "'Courier New',monospace", size: 13, weight: '600' },
+          padding: 12,
+          cornerRadius: 10,
+          displayColors: true,
+          boxWidth: 12,
+          boxHeight: 12,
+          boxPadding: 4,
+          callbacks: {
+            label: function(ctx){
+              const val = ctx.raw;
+              const pct = total > 0 ? ((val/total)*100).toFixed(2) : '0.00';
+              return ' ' + new Intl.NumberFormat('en-IN',{style:'currency',currency:'INR',maximumFractionDigits:0}).format(val) + '  (' + pct + '%)';
+            }
+          }
+        }
+      }
+    }
+  });
 }
 
 function invOpenAddRow(){
