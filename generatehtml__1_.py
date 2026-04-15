@@ -3389,18 +3389,85 @@ body.theme-midnight .inv-rebalance{color:#fbbf24}
 .inv-table tbody tr:nth-child(even){background:rgba(0,0,0,.015)}
 body.theme-midnight .inv-table tbody tr:nth-child(even){background:rgba(255,255,255,.015)}
 body.theme-ember .inv-table tbody tr:nth-child(even){background:rgba(255,255,255,.012)}
-@media(max-width:640px){
-  .inv-header{padding:14px 14px 10px}
-  .inv-summary{padding:0 14px 12px}
-  .inv-sum-card{min-width:140px;padding:12px 14px}
-  .inv-table-wrap{padding:0 10px 16px}
-  .inv-table thead th{padding:10px 10px;font-size:9px;letter-spacing:1.2px}
-  .inv-table tbody td{padding:9px 10px;font-size:12px}
-  .inv-actions{opacity:1}
-  .inv-bar-wrap{min-width:50px;height:10px}
+@media(max-width:860px){
+  .inv-summary{gap:10px}
+  .inv-sum-card{min-width:130px;padding:12px 14px}
   .inv-sum-val{font-size:20px}
+  .inv-table thead th{padding:10px 10px;font-size:9px;letter-spacing:1px}
+  .inv-table tbody td{padding:9px 10px;font-size:12px}
+  .inv-table .inv-col-alloc,
+  .inv-table .inv-col-status{display:none}
   .inv-asset-name{font-size:12px}
+  .inv-val{font-size:12px}
+  .inv-bar-wrap{height:10px}
 }
+@media(max-width:640px){
+  .inv-wrap{height:auto;min-height:calc(100vh - 58px)}
+  .inv-header{padding:14px 14px 10px;flex-wrap:wrap;gap:8px}
+  .inv-title{font-size:16px}
+  .inv-header .btn{font-size:12px;padding:7px 12px}
+  .inv-summary{padding:0 14px 12px;gap:8px}
+  .inv-sum-card{min-width:calc(50% - 4px);flex:0 0 calc(50% - 4px);padding:10px 12px}
+  .inv-sum-card:nth-child(3){flex:0 0 100%}
+  .inv-sum-val{font-size:18px}
+  .inv-sum-label{font-size:8px;letter-spacing:1.5px}
+  .inv-sum-sub{font-size:10px}
+  /* Hide full table on mobile */
+  .inv-table-wrap .inv-table{display:none}
+  /* Show card view on mobile */
+  .inv-cards-mobile{display:flex!important}
+  .inv-actions{opacity:1}
+}
+/* Card layout for mobile — hidden on desktop */
+.inv-cards-mobile{
+  display:none;flex-direction:column;gap:10px;padding:0 0 16px
+}
+.inv-mcard{
+  background:var(--sidebar);border:1px solid var(--border);border-radius:12px;
+  padding:14px 16px;position:relative;overflow:hidden;transition:all .15s
+}
+.inv-mcard::before{
+  content:'';position:absolute;left:0;top:0;bottom:0;width:4px;border-radius:4px 0 0 4px
+}
+.inv-mcard-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.inv-mcard-name{font-weight:700;font-size:15px;color:var(--text);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.inv-mcard-actions{display:flex;gap:2px;flex-shrink:0}
+.inv-mcard-actions .inv-abtn{opacity:1;font-size:15px}
+.inv-mcard-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px 16px}
+.inv-mcard-item{display:flex;flex-direction:column;gap:1px}
+.inv-mcard-lbl{font-size:9px;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);font-weight:700}
+.inv-mcard-v{font-size:14px;font-weight:600;color:var(--text)}
+.inv-mcard-v.money{font-family:'Courier New',monospace;color:#1a6b4a;font-weight:700}
+body.theme-midnight .inv-mcard-v.money{color:#5adb8a}
+body.theme-ember .inv-mcard-v.money{color:#7aaa60}
+.inv-mcard-bar{margin-top:10px}
+.inv-mcard-bar-wrap{width:100%;height:8px;background:rgba(0,0,0,.06);border-radius:6px;overflow:hidden}
+body.theme-midnight .inv-mcard-bar-wrap,body.theme-ember .inv-mcard-bar-wrap{background:rgba(255,255,255,.06)}
+.inv-mcard-bar-fill{height:100%;border-radius:6px;position:relative}
+.inv-mcard-bar-fill::after{content:'';position:absolute;inset:0;background:linear-gradient(180deg,rgba(255,255,255,.3) 0%,transparent 60%);border-radius:6px}
+/* Mobile total card */
+.inv-mcard-total{
+  background:linear-gradient(135deg,#1a8a5a,#2ecc71);border:none;
+  padding:16px 18px;border-radius:12px;color:#fff
+}
+body.theme-midnight .inv-mcard-total{background:linear-gradient(135deg,#1a3a2a,#2a5a3a)}
+body.theme-ember .inv-mcard-total{background:linear-gradient(135deg,#1a2a18,#2a4020)}
+body.theme-beige .inv-mcard-total{background:linear-gradient(135deg,#5a4a9a,#7c5cbf)}
+.inv-mcard-total .inv-mcard-name{color:#fff;font-size:14px;text-transform:uppercase;letter-spacing:1px}
+.inv-mcard-total .inv-mcard-lbl{color:rgba(255,255,255,.65)}
+.inv-mcard-total .inv-mcard-v{color:#fff}
+.inv-mcard-total .inv-mcard-v.money{color:#fff}
+.inv-mcard-total .inv-mcard-rebal{color:#fef3c7;font-size:11px;font-weight:700;margin-top:8px;font-style:italic}
+/* Mobile edit form */
+.inv-medit{background:var(--s2);border:1.5px solid var(--accent);border-radius:12px;padding:14px 16px}
+.inv-medit-fields{display:flex;flex-direction:column;gap:8px;margin-bottom:10px}
+.inv-medit-fields label{font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);font-weight:700;margin-bottom:2px}
+.inv-medit-fields .inv-edit-input{width:100%;font-size:14px;padding:9px 12px}
+.inv-medit-fields .inv-edit-input.num{width:100%;text-align:left}
+.inv-medit-btns{display:flex;gap:8px;justify-content:flex-end}
+.inv-medit-btns button{padding:8px 16px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;border:none}
+.inv-medit-save{background:var(--green);color:#fff}
+.inv-medit-cancel{background:var(--s2);color:var(--text);border:1px solid var(--border)!important}
 
 </style>
 </head>
@@ -10583,6 +10650,7 @@ function invRender(){
   }
 
   let rows = '';
+  let cards = '';
   assets.forEach((a,i)=>{
     const pct = invCalcPortfolio(a.value, total);
     const gap = invCalcGap(a.value, a.target, total);
@@ -10598,8 +10666,8 @@ function invRender(){
         <td class="r"><input class="inv-edit-input num" id="inv-e-value" type="number" value="${a.value}" placeholder="0"></td>
         <td class="r"><span class="inv-pct">${pct}%</span></td>
         <td class="r"><input class="inv-edit-input num" id="inv-e-target" type="number" value="${a.target}" step="0.5" placeholder="0"></td>
-        <td><div class="inv-bar-wrap"><div class="inv-bar-fill" style="width:${Math.min(pct,100)}%;background:${barColor}"></div></div></td>
-        <td><span class="inv-status ${status.cls}">${status.icon} ${status.text}</span></td>
+        <td class="inv-col-alloc"><div class="inv-bar-wrap"><div class="inv-bar-fill" style="width:${Math.min(pct,100)}%;background:${barColor}"></div></div></td>
+        <td class="inv-col-status"><span class="inv-status ${status.cls}">${status.icon} ${status.text}</span></td>
         <td class="r"><span class="inv-gap ${gapCls}">${gapNum>0?'+':''}${gap}%</span></td>
         <td class="r">
           <div style="display:flex;gap:4px;justify-content:flex-end">
@@ -10608,14 +10676,26 @@ function invRender(){
           </div>
         </td>
       </tr>`;
+      // Mobile edit card
+      cards += `<div class="inv-medit">
+        <div class="inv-medit-fields">
+          <div><label>Asset Name</label><input class="inv-edit-input" id="inv-me-name" value="${esc(a.name)}" placeholder="Asset name"></div>
+          <div><label>Value (INR)</label><input class="inv-edit-input" id="inv-me-value" type="number" value="${a.value}" placeholder="0"></div>
+          <div><label>Target %</label><input class="inv-edit-input" id="inv-me-target" type="number" value="${a.target}" step="0.5" placeholder="0"></div>
+        </div>
+        <div class="inv-medit-btns">
+          <button class="inv-medit-cancel" onclick="invCancelEdit()">Cancel</button>
+          <button class="inv-medit-save" onclick="invSaveEdit(true)">Save</button>
+        </div>
+      </div>`;
     } else {
       rows += `<tr>
         <td><span class="inv-asset-name">${esc(a.name)}</span></td>
         <td class="r"><span class="inv-val">${invFormatINR(a.value)}</span></td>
         <td class="r"><span class="inv-pct">${pct}%</span></td>
         <td class="r"><span class="inv-pct" style="font-weight:700">${a.target}%</span></td>
-        <td><div class="inv-bar-wrap"><div class="inv-bar-fill" style="width:${Math.min(pct,100)}%;background:${barColor}"></div></div></td>
-        <td><span class="inv-status ${status.cls}">${status.icon} ${status.text}</span></td>
+        <td class="inv-col-alloc"><div class="inv-bar-wrap"><div class="inv-bar-fill" style="width:${Math.min(pct,100)}%;background:${barColor}"></div></div></td>
+        <td class="inv-col-status"><span class="inv-status ${status.cls}">${status.icon} ${status.text}</span></td>
         <td class="r"><span class="inv-gap ${gapCls}">${gapNum>0?'+':''}${gap}%</span></td>
         <td class="r">
           <div class="inv-actions">
@@ -10624,11 +10704,29 @@ function invRender(){
           </div>
         </td>
       </tr>`;
+      // Mobile card
+      cards += `<div class="inv-mcard" style="border-left:4px solid ${barColor}">
+        <div class="inv-mcard-top">
+          <span class="inv-mcard-name">${esc(a.name)}</span>
+          <div class="inv-mcard-actions">
+            <button class="inv-abtn" onclick="invStartEdit('${a.id}')" title="Edit">✎</button>
+            <button class="inv-abtn del" onclick="invDelete('${a.id}')" title="Delete">✕</button>
+          </div>
+        </div>
+        <div class="inv-mcard-grid">
+          <div class="inv-mcard-item"><span class="inv-mcard-lbl">Value</span><span class="inv-mcard-v money">${invFormatINR(a.value)}</span></div>
+          <div class="inv-mcard-item"><span class="inv-mcard-lbl">% Portfolio</span><span class="inv-mcard-v">${pct}%</span></div>
+          <div class="inv-mcard-item"><span class="inv-mcard-lbl">Target</span><span class="inv-mcard-v" style="font-weight:700">${a.target}%</span></div>
+          <div class="inv-mcard-item"><span class="inv-mcard-lbl">Status</span><span class="inv-status ${status.cls}" style="font-size:11px;padding:2px 8px">${status.icon} ${status.text}</span></div>
+        </div>
+        <div class="inv-mcard-bar"><div class="inv-mcard-bar-wrap"><div class="inv-mcard-bar-fill" style="width:${Math.min(pct,100)}%;background:${barColor}"></div></div></div>
+      </div>`;
     }
   });
 
-  // Add row (inline)
+  // Add row (inline — desktop table)
   let addRow = '';
+  let addCard = '';
   if(_invAdding){
     addRow = `<tr style="background:rgba(42,122,64,.06)">
       <td><input class="inv-edit-input" id="inv-a-name" placeholder="e.g. Fixed Deposit" autofocus></td>
@@ -10643,29 +10741,61 @@ function invRender(){
         </div>
       </td>
     </tr>`;
+    // Mobile add card
+    addCard = `<div class="inv-medit">
+      <div style="font-weight:700;font-size:14px;color:var(--text);margin-bottom:10px">+ New Asset</div>
+      <div class="inv-medit-fields">
+        <div><label>Asset Name</label><input class="inv-edit-input" id="inv-ma-name" placeholder="e.g. Fixed Deposit"></div>
+        <div><label>Value (INR)</label><input class="inv-edit-input" id="inv-ma-value" type="number" placeholder="0"></div>
+        <div><label>Target %</label><input class="inv-edit-input" id="inv-ma-target" type="number" placeholder="0" step="0.5"></div>
+      </div>
+      <div class="inv-medit-btns">
+        <button class="inv-medit-cancel" onclick="invCancelAdd()">Cancel</button>
+        <button class="inv-medit-save" onclick="invSaveNew(true)">Save</button>
+      </div>
+    </div>`;
   }
 
-  // Footer — bold green row
+  // Footer — bold green row (desktop)
   const footerHtml = `<tr class="inv-tfoot">
     <td style="font-size:15px;font-weight:800;letter-spacing:.3px">TOTAL PORTFOLIO</td>
     <td class="r"><span class="inv-val">${invFormatINR(total)}</span></td>
     <td class="r"><span class="inv-pct">100.00%</span></td>
     <td class="r"><span class="inv-pct">${totalTarget}%</span></td>
-    <td colspan="4">${totalTarget!==100?'<div class="inv-rebalance">← Rebalance needed</div>':''}</td>
+    <td colspan="4" class="inv-col-alloc inv-col-status">${totalTarget!==100?'<div class="inv-rebalance">← Rebalance needed</div>':''}</td>
   </tr>`;
 
-  container.innerHTML = `<table class="inv-table">
-    <thead><tr>
-      <th>Asset</th><th class="r">Value (INR)</th><th class="r">% Portfolio</th><th class="r">Target %</th>
-      <th>Allocation</th><th>Status</th><th class="r">Gap vs Target</th><th class="r">Actions</th>
-    </tr></thead>
-    <tbody>${rows}${addRow}</tbody>
-    <tfoot>${footerHtml}</tfoot>
-  </table>`;
+  // Mobile total card
+  const totalCard = `<div class="inv-mcard-total inv-mcard">
+    <div class="inv-mcard-top"><span class="inv-mcard-name">Total Portfolio</span></div>
+    <div class="inv-mcard-grid">
+      <div class="inv-mcard-item"><span class="inv-mcard-lbl">Value</span><span class="inv-mcard-v money">${invFormatINR(total)}</span></div>
+      <div class="inv-mcard-item"><span class="inv-mcard-lbl">% Portfolio</span><span class="inv-mcard-v">100.00%</span></div>
+      <div class="inv-mcard-item"><span class="inv-mcard-lbl">Target</span><span class="inv-mcard-v">${totalTarget}%</span></div>
+      <div class="inv-mcard-item"><span class="inv-mcard-lbl">Assets</span><span class="inv-mcard-v">${assets.length}</span></div>
+    </div>
+    ${totalTarget!==100?'<div class="inv-mcard-rebal">← Rebalance needed — targets sum to '+totalTarget+'%</div>':''}
+  </div>`;
 
-  // Auto-focus add row name input
+  container.innerHTML = `
+    <table class="inv-table">
+      <thead><tr>
+        <th>Asset</th><th class="r">Value (INR)</th><th class="r">% Portfolio</th><th class="r">Target %</th>
+        <th class="inv-col-alloc">Allocation</th><th class="inv-col-status">Status</th><th class="r">Gap vs Target</th><th class="r">Actions</th>
+      </tr></thead>
+      <tbody>${rows}${addRow}</tbody>
+      <tfoot>${footerHtml}</tfoot>
+    </table>
+    <div class="inv-cards-mobile">
+      ${addCard}${cards}${totalCard}
+    </div>`;
+
+  // Auto-focus: desktop table or mobile card
   if(_invAdding){
-    setTimeout(()=>{const el=document.getElementById('inv-a-name');if(el)el.focus();},50);
+    setTimeout(()=>{
+      const el=document.getElementById('inv-a-name')||document.getElementById('inv-ma-name');
+      if(el)el.focus();
+    },50);
   }
 }
 
@@ -10679,10 +10809,11 @@ function invCancelAdd(){
   invRender();
 }
 
-async function invSaveNew(){
-  const name = (document.getElementById('inv-a-name').value||'').trim();
-  const value = parseFloat(document.getElementById('inv-a-value').value)||0;
-  const target = parseFloat(document.getElementById('inv-a-target').value)||0;
+async function invSaveNew(fromMobile){
+  const pfx = fromMobile ? 'inv-ma-' : 'inv-a-';
+  const name = (document.getElementById(pfx+'name')?.value||'').trim();
+  const value = parseFloat(document.getElementById(pfx+'value')?.value)||0;
+  const target = parseFloat(document.getElementById(pfx+'target')?.value)||0;
   if(!name){toast('Enter an asset name','error');return;}
   const assets = invGetData();
   assets.push({id:'inv_'+Date.now(), name, value, target});
@@ -10702,10 +10833,11 @@ function invCancelEdit(){
   invRender();
 }
 
-async function invSaveEdit(){
-  const name = (document.getElementById('inv-e-name').value||'').trim();
-  const value = parseFloat(document.getElementById('inv-e-value').value)||0;
-  const target = parseFloat(document.getElementById('inv-e-target').value)||0;
+async function invSaveEdit(fromMobile){
+  const pfx = fromMobile ? 'inv-me-' : 'inv-e-';
+  const name = (document.getElementById(pfx+'name')?.value||'').trim();
+  const value = parseFloat(document.getElementById(pfx+'value')?.value)||0;
+  const target = parseFloat(document.getElementById(pfx+'target')?.value)||0;
   if(!name){toast('Enter an asset name','error');return;}
   const assets = invGetData();
   const a = assets.find(x=>x.id===_invEditId);
