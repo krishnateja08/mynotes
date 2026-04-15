@@ -82,6 +82,54 @@ body.theme-ember {
   --blue:     #6080a0;
   --over-bg:  rgba(0,0,0,.88);
 }
+body.theme-rose {
+  --bg:       #fdf8fa;
+  --sidebar:  #f4ecf0;
+  --s2:       #eedee6;
+  --border:   #dcc8d4;
+  --border2:  #c8a8b8;
+  --text:     #4a2838;
+  --text2:    #7a5068;
+  --muted:    #a08090;
+  --accent:   #b06090;
+  --accent2:  #c87898;
+  --green:    #48a060;
+  --red:      #c04848;
+  --blue:     #5a80b0;
+  --over-bg:  rgba(60,10,30,.65);
+}
+body.theme-ocean {
+  --bg:       #060e12;
+  --sidebar:  #0a1a1e;
+  --s2:       #0e2028;
+  --border:   #153038;
+  --border2:  #1a4050;
+  --text:     #b8e0d8;
+  --text2:    #508880;
+  --muted:    #2a5a50;
+  --accent:   #00d2b4;
+  --accent2:  #00b4a0;
+  --green:    #00dc8c;
+  --red:      #ff6868;
+  --blue:     #64b4ff;
+  --over-bg:  rgba(0,8,12,.9);
+}
+body.theme-arctic {
+  --bg:       #f0f2f8;
+  --sidebar:  #e4e8f0;
+  --s2:       #dce0ea;
+  --border:   #c8ccd8;
+  --border2:  #a8b0c0;
+  --text:     #2a3450;
+  --text2:    #5a6480;
+  --muted:    #8890a8;
+  --accent:   #4a5a80;
+  --accent2:  #5a6a90;
+  --green:    #288050;
+  --red:      #c04040;
+  --blue:     #3870a8;
+  --over-bg:  rgba(20,24,40,.6);
+}
 
 body{
   font-family:'Inter',sans-serif;
@@ -108,6 +156,85 @@ body.theme-cream aside{
 body.theme-beige aside{background:rgba(237,230,216,.85);border-right:1px solid rgba(212,200,176,.3)}
 body.theme-midnight aside{background:rgba(26,33,48,.88);border-right:1px solid rgba(37,46,64,.4)}
 body.theme-ember aside{background:rgba(22,18,16,.9);border-right:1px solid rgba(42,32,24,.4)}
+
+/* Rose Quartz overrides */
+body.theme-rose aside{background:rgba(244,236,240,.92);border-right:1px solid rgba(200,160,180,.2);box-shadow:3px 0 24px rgba(100,40,60,.06)}
+body.theme-rose .topbar{background:rgba(248,240,244,.85);border-bottom:1px solid rgba(200,160,180,.2);box-shadow:0 1px 12px rgba(100,40,60,.05)}
+body.theme-rose .nav-item.active{background:rgba(176,96,144,.12);color:var(--accent)}
+body.theme-rose .btn{color:#fff}
+body.theme-rose .page-title{color:#4a2838}
+body.theme-rose .clock-block{background:rgba(0,0,0,.03);border-color:rgba(0,0,0,.04)}
+body.theme-rose .clock-time{color:#4a2838}
+body.theme-rose .ctitle{color:#b06090}
+body.theme-rose .stat-num{color:#b06090}
+body.theme-rose .db-new-btn{background:#b06090}
+body.theme-rose .db-new-btn:hover{background:#984878}
+body.theme-rose .db-filter-btn.active{background:rgba(176,96,144,.1);color:var(--accent)}
+body.theme-rose .db-filter-btn.active .db-filter-count{background:rgba(176,96,144,.1);color:var(--accent)}
+body.theme-rose .dh-day{color:var(--accent)}
+body.theme-rose .dh-mon{color:var(--accent)}
+body.theme-rose .dh-ecount{background:rgba(176,96,144,.1);color:var(--accent)}
+body.theme-rose .db-entry-time{color:var(--accent)}
+body.theme-rose .db-compose-dt{color:var(--accent);background:rgba(176,96,144,.1)}
+body.theme-rose .ncard.pinned-card{border-top:3px solid #b06090}
+body.theme-rose .shop-folder.active{background:rgba(176,96,144,.1);color:var(--accent)}
+
+/* Ocean Depths overrides */
+body.theme-ocean aside{background:rgba(10,26,30,.92);border-right:1px solid rgba(0,210,180,.08);backdrop-filter:blur(16px)}
+body.theme-ocean .topbar{background:rgba(8,18,22,.88);border-bottom:1px solid rgba(0,210,180,.06);box-shadow:0 1px 12px rgba(0,0,0,.2)}
+body.theme-ocean .nav-item.active{background:rgba(0,210,180,.1);color:var(--accent)}
+body.theme-ocean .btn{color:#060e12;background:var(--accent)}
+body.theme-ocean .page-title{color:#70e8d4}
+body.theme-ocean .clock-block{background:rgba(255,255,255,.04);border-color:rgba(255,255,255,.06)}
+body.theme-ocean .clock-block:hover{background:rgba(255,255,255,.07)}
+body.theme-ocean .clock-time{color:#b8e0d8}
+body.theme-ocean .topbar-sync,body.theme-ocean .topbar-sync{background:rgba(255,255,255,.04);border-color:rgba(255,255,255,.05)}
+body.theme-ocean .topbar-avatar{background:rgba(0,210,180,.12);border-color:rgba(0,210,180,.15);color:#00d2b4}
+body.theme-ocean .ctitle{color:#00d2b4}
+body.theme-ocean .stat-num{color:#00d2b4}
+body.theme-ocean .ncard,body.theme-ocean .fin-card,body.theme-ocean .tan-item,body.theme-ocean .fin-sum-card,body.theme-ocean .stat-card{background:rgba(6,14,18,.7);backdrop-filter:blur(12px);border-color:rgba(0,210,180,.1)}
+body.theme-ocean .ncard:hover,body.theme-ocean .fin-card:hover,body.theme-ocean .tan-item:hover{border-color:rgba(0,210,180,.3)}
+body.theme-ocean .ncard.pinned-card{border-top:3px solid #00d2b4}
+body.theme-ocean .db-new-btn{background:#00b4a0}
+body.theme-ocean .db-new-btn:hover{background:#009a88}
+body.theme-ocean .db-filter-btn.active{background:rgba(0,210,180,.1);color:var(--accent)}
+body.theme-ocean .db-filter-btn.active .db-filter-count{background:rgba(0,210,180,.1);color:var(--accent)}
+body.theme-ocean .db-date-header{background:var(--bg);border-bottom-color:rgba(0,210,180,.08)}
+body.theme-ocean .dh-day{color:var(--accent)}
+body.theme-ocean .dh-mon{color:var(--accent)}
+body.theme-ocean .dh-ecount{background:rgba(0,210,180,.1);color:var(--accent)}
+body.theme-ocean .db-entry-time{color:var(--accent)}
+body.theme-ocean .db-entry:hover{background:rgba(0,210,180,.03)}
+body.theme-ocean .db-compose-dt{color:var(--accent);background:rgba(0,210,180,.08)}
+body.theme-ocean .db-tag-trade{background:rgba(0,210,180,.12);color:#00d2b4}
+body.theme-ocean .db-tag-personal{background:rgba(100,180,255,.12);color:#64b4ff}
+body.theme-ocean .db-tag-idea{background:rgba(255,180,80,.12);color:#ffb450}
+body.theme-ocean .db-tag-health{background:rgba(255,100,100,.12);color:#ff6868}
+body.theme-ocean .db-tag-work{background:rgba(100,180,255,.12);color:#64b4ff}
+body.theme-ocean .db-tag-family{background:rgba(220,140,180,.12);color:#dc8cb4}
+body.theme-ocean .shop-folder.active{background:rgba(0,210,180,.08);color:var(--accent)}
+
+/* Arctic Silver overrides */
+body.theme-arctic aside{background:rgba(228,232,240,.92);border-right:1px solid rgba(160,170,200,.15);box-shadow:3px 0 24px rgba(20,30,60,.06)}
+body.theme-arctic .topbar{background:rgba(236,238,246,.88);border-bottom:1px solid rgba(160,170,200,.15);box-shadow:0 1px 12px rgba(20,30,60,.05)}
+body.theme-arctic .nav-item.active{background:rgba(74,90,128,.1);color:var(--accent)}
+body.theme-arctic .btn{color:#fff}
+body.theme-arctic .page-title{color:#2a3450}
+body.theme-arctic .clock-block{background:rgba(0,0,0,.03);border-color:rgba(0,0,0,.04)}
+body.theme-arctic .clock-time{color:#2a3450}
+body.theme-arctic .ctitle{color:#4a5a80}
+body.theme-arctic .stat-num{color:#4a5a80}
+body.theme-arctic .db-new-btn{background:#4a5a80}
+body.theme-arctic .db-new-btn:hover{background:#3a4a6a}
+body.theme-arctic .db-filter-btn.active{background:rgba(74,90,128,.1);color:var(--accent)}
+body.theme-arctic .db-filter-btn.active .db-filter-count{background:rgba(74,90,128,.1);color:var(--accent)}
+body.theme-arctic .dh-day{color:var(--accent)}
+body.theme-arctic .dh-mon{color:var(--accent)}
+body.theme-arctic .dh-ecount{background:rgba(74,90,128,.08);color:var(--accent)}
+body.theme-arctic .db-entry-time{color:var(--accent)}
+body.theme-arctic .db-compose-dt{color:var(--accent);background:rgba(74,90,128,.08)}
+body.theme-arctic .ncard.pinned-card{border-top:3px solid #4a5a80}
+body.theme-arctic .shop-folder.active{background:rgba(74,90,128,.08);color:var(--accent)}
 .sidebar-logo{
   padding:22px 20px 18px;
   font-family:'Inter',sans-serif;font-size:18px;color:var(--accent);
@@ -1821,7 +1948,7 @@ body.theme-ember .tt.active{color:#0f0d0b;border-bottom-color:var(--accent)}
 .settings-section-title:first-of-type{margin-top:0}
 
 /* THEME CARDS */
-.theme-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:4px}
+.theme-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:4px}
 .theme-card{
   border:2px solid var(--border);border-radius:10px;overflow:hidden;
   cursor:pointer;transition:border-color 0.2s
@@ -3390,6 +3517,30 @@ body.theme-midnight .inv-rebalance{color:#fbbf24}
 .inv-table tbody tr:nth-child(even){background:rgba(0,0,0,.015)}
 body.theme-midnight .inv-table tbody tr:nth-child(even){background:rgba(255,255,255,.015)}
 body.theme-ember .inv-table tbody tr:nth-child(even){background:rgba(255,255,255,.012)}
+/* New theme investment overrides */
+body.theme-rose .inv-table thead th{background:linear-gradient(135deg,#b06090,#c87898);border-bottom-color:#984878;color:#fff}
+body.theme-rose .inv-tfoot td{background:linear-gradient(135deg,#b06090,#c87898);color:#fff!important}
+body.theme-rose .inv-tfoot .inv-val{color:#fff!important}
+body.theme-ocean .inv-sum-card:nth-child(1) .inv-sum-val{color:#00dc8c}
+body.theme-ocean .inv-sum-card:nth-child(2) .inv-sum-val{color:#64b4ff}
+body.theme-ocean .inv-sum-card:nth-child(3) .inv-sum-val{color:#ffb450}
+body.theme-ocean .inv-table thead th{background:linear-gradient(135deg,#0a2830,#154050);border-bottom-color:#0a1a20;color:#b8e0d8}
+body.theme-ocean .inv-table tbody tr:hover{background:rgba(0,210,180,.03)}
+body.theme-ocean .inv-table tbody tr:nth-child(even){background:rgba(255,255,255,.012)}
+body.theme-ocean .inv-val{color:#00dc8c}
+body.theme-ocean .inv-bar-wrap{background:rgba(255,255,255,.05)}
+body.theme-ocean .inv-status.on-target{color:#00dc8c;background:rgba(0,220,140,.1)}
+body.theme-ocean .inv-status.over{color:#ffb450;background:rgba(255,180,80,.1)}
+body.theme-ocean .inv-status.under{color:#ff6868;background:rgba(255,104,104,.1)}
+body.theme-ocean .inv-gap.pos{color:#ffb450}
+body.theme-ocean .inv-gap.neg{color:#ff6868}
+body.theme-ocean .inv-gap.zero{color:#00dc8c}
+body.theme-ocean .inv-tfoot td{background:linear-gradient(135deg,#0a2a20,#154838);color:#b8e8d8!important}
+body.theme-ocean .inv-tfoot .inv-val{color:#70ffc8!important}
+body.theme-ocean .inv-rebalance{color:#ffb450}
+body.theme-arctic .inv-table thead th{background:linear-gradient(135deg,#4a5a80,#5a6a90);border-bottom-color:#3a4a6a;color:#fff}
+body.theme-arctic .inv-tfoot td{background:linear-gradient(135deg,#4a5a80,#5a6a90);color:#fff!important}
+body.theme-arctic .inv-tfoot .inv-val{color:#e0e8ff!important}
 @media(max-width:860px){
   .inv-summary{gap:10px}
   .inv-sum-card{min-width:130px;padding:12px 14px}
@@ -3502,7 +3653,7 @@ body.theme-beige .inv-mcard-total{background:linear-gradient(135deg,#5a4a9a,#7c5
 
 </style>
 </head>
-<body class="theme-cream">
+<body class="theme-rose">
 <!-- mobile sidebar overlay -->
 <div class="sidebar-overlay" id="sidebar-overlay" onclick="closeSidebar()"></div>
 <div class="layout">
@@ -4914,8 +5065,21 @@ body.theme-beige .inv-mcard-total{background:linear-gradient(135deg,#5a4a9a,#7c5
   <div class="settings-section-title">🎨 Theme</div>
   <div class="theme-grid">
 
+    <!-- Rose Quartz (DEFAULT) -->
+    <div class="theme-card selected" id="theme-btn-rose" onclick="applyTheme('rose')">
+      <div class="theme-preview">
+        <div class="tp-side" style="background:#f4ecf0;border-right:1px solid #dcc8d4"></div>
+        <div class="tp-main" style="background:#fdf8fa">
+          <div class="tp-line" style="background:#b06090;width:60%"></div>
+          <div class="tp-line" style="background:#dcc8d4;width:90%"></div>
+          <div class="tp-line" style="background:#c8a8b8;width:70%"></div>
+        </div>
+      </div>
+      <div class="theme-name">&#x1F338; Rose Quartz</div>
+    </div>
+
     <!-- Warm Parchment -->
-    <div class="theme-card selected" id="theme-btn-cream" onclick="applyTheme('cream')">
+    <div class="theme-card" id="theme-btn-cream" onclick="applyTheme('cream')">
       <div class="theme-preview">
         <div class="tp-side" style="background:#e8dcc8;border-right:1px solid #c8b48a"></div>
         <div class="tp-main" style="background:#faf6ef">
@@ -4924,7 +5088,7 @@ body.theme-beige .inv-mcard-total{background:linear-gradient(135deg,#5a4a9a,#7c5
           <div class="tp-line" style="background:#c8b48a;width:70%"></div>
         </div>
       </div>
-      <div class="theme-name">🪵 Warm Parchment</div>
+      <div class="theme-name">&#x1FAB5; Warm Parchment</div>
     </div>
 
     <!-- Soft Beige -->
@@ -4937,7 +5101,33 @@ body.theme-beige .inv-mcard-total{background:linear-gradient(135deg,#5a4a9a,#7c5
           <div class="tp-line" style="background:#b8a888;width:70%"></div>
         </div>
       </div>
-      <div class="theme-name">🌸 Soft Beige</div>
+      <div class="theme-name">&#x1F338; Soft Beige</div>
+    </div>
+
+    <!-- Arctic Silver -->
+    <div class="theme-card" id="theme-btn-arctic" onclick="applyTheme('arctic')">
+      <div class="theme-preview">
+        <div class="tp-side" style="background:#e4e8f0;border-right:1px solid #c8ccd8"></div>
+        <div class="tp-main" style="background:#f0f2f8">
+          <div class="tp-line" style="background:#4a5a80;width:60%"></div>
+          <div class="tp-line" style="background:#c8ccd8;width:90%"></div>
+          <div class="tp-line" style="background:#a8b0c0;width:70%"></div>
+        </div>
+      </div>
+      <div class="theme-name">&#x2744;&#xFE0F; Arctic Silver</div>
+    </div>
+
+    <!-- Ocean Depths -->
+    <div class="theme-card" id="theme-btn-ocean" onclick="applyTheme('ocean')">
+      <div class="theme-preview" style="background:#060e12">
+        <div class="tp-side" style="background:#0a1a1e;border-right:1px solid #153038"></div>
+        <div class="tp-main" style="background:#060e12">
+          <div class="tp-line" style="background:#00d2b4;width:60%"></div>
+          <div class="tp-line" style="background:#153038;width:90%"></div>
+          <div class="tp-line" style="background:#1a4050;width:70%"></div>
+        </div>
+      </div>
+      <div class="theme-name" style="background:#0a1a1e;color:#00d2b4">&#x1F30A; Ocean Depths</div>
     </div>
 
     <!-- Midnight Slate -->
@@ -4950,7 +5140,7 @@ body.theme-beige .inv-mcard-total{background:linear-gradient(135deg,#5a4a9a,#7c5
           <div class="tp-line" style="background:#304060;width:70%"></div>
         </div>
       </div>
-      <div class="theme-name" style="background:#1a2130;color:#e8a84a">🌑 Midnight Slate</div>
+      <div class="theme-name" style="background:#1a2130;color:#e8a84a">&#x1F311; Midnight Slate</div>
     </div>
 
     <!-- Obsidian Ember -->
@@ -4963,7 +5153,7 @@ body.theme-beige .inv-mcard-total{background:linear-gradient(135deg,#5a4a9a,#7c5
           <div class="tp-line" style="background:#3a2a1a;width:70%"></div>
         </div>
       </div>
-      <div class="theme-name" style="background:#161210;color:#d4724a">🔥 Obsidian Ember</div>
+      <div class="theme-name" style="background:#161210;color:#d4724a">&#x1F525; Obsidian Ember</div>
     </div>
 
   </div>
@@ -5025,7 +5215,7 @@ let dataLoaded=false; // guard: prevents any save before data is fully loaded
 let currentType='note';
 
 /* -- THEME --------------------------------------- */
-const THEMES=['cream','beige','midnight','ember'];
+const THEMES=['rose','cream','beige','arctic','ocean','midnight','ember'];
 
 function applyTheme(t){
   document.body.className='theme-'+t;
@@ -5034,6 +5224,8 @@ function applyTheme(t){
     const el=document.getElementById('theme-btn-'+k);
     if(el) el.classList.toggle('selected',k===t);
   });
+  // Destroy pie chart so it re-renders with new theme colors
+  if(typeof _invChartInstance!=='undefined' && _invChartInstance){_invChartInstance.destroy();_invChartInstance=null;}
   setTimeout(closeSettings, 300);
 }
 
@@ -10865,7 +11057,7 @@ function invRenderChart(assets, total){
   const pcts = assets.map(a => invCalcPortfolio(a.value, total));
 
   // Detect dark theme
-  const isDark = document.body.classList.contains('theme-midnight') || document.body.classList.contains('theme-ember');
+  const isDark = document.body.classList.contains('theme-midnight') || document.body.classList.contains('theme-ember') || document.body.classList.contains('theme-ocean');
   const textColor = isDark ? '#c8c8c8' : '#3c3c3c';
   const legendColor = isDark ? '#a0a0a0' : '#5a5a5a';
 
@@ -11011,7 +11203,7 @@ async function invDelete(id){
 }
 
 window.addEventListener('DOMContentLoaded',()=>{
-  const savedTheme=localStorage.getItem('mynotes_theme')||'cream';
+  const savedTheme=localStorage.getItem('mynotes_theme')||'rose';
   applyTheme(savedTheme);
 
   // restore saved view preferences
