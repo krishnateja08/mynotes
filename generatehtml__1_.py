@@ -3290,71 +3290,116 @@ body.theme-midnight .shop-entry:hover{background:rgba(255,255,255,.03)}
 /* -- INVESTMENTS PAGE -------------------------------- */
 .inv-wrap{display:flex;flex-direction:column;height:calc(100vh - 58px);overflow:hidden}
 .inv-header{display:flex;align-items:center;justify-content:space-between;padding:20px 24px 14px;flex-shrink:0}
-.inv-title{font-family:'Inter',sans-serif;font-size:18px;font-weight:800;color:var(--text);display:flex;align-items:center;gap:8px}
+.inv-title{font-family:'Inter',sans-serif;font-size:20px;font-weight:800;color:var(--text);display:flex;align-items:center;gap:8px}
 .inv-summary{display:flex;gap:14px;padding:0 24px 16px;flex-shrink:0;flex-wrap:wrap}
 .inv-sum-card{
-  flex:1;min-width:180px;
-  background:var(--sidebar);border:1px solid var(--border);border-radius:12px;
-  padding:14px 18px;transition:all .2s
+  flex:1;min-width:180px;border-radius:14px;
+  padding:16px 20px;transition:all .25s;position:relative;overflow:hidden
 }
-.inv-sum-card:hover{border-color:var(--accent);transform:translateY(-2px);box-shadow:0 4px 16px rgba(0,0,0,.06)}
-.inv-sum-label{font-size:10px;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);font-weight:700;margin-bottom:4px}
-.inv-sum-val{font-size:22px;font-weight:800;color:var(--accent);font-variant-numeric:tabular-nums}
-.inv-sum-sub{font-size:11px;color:var(--text2);margin-top:2px}
+.inv-sum-card::before{content:'';position:absolute;top:0;left:0;right:0;bottom:0;opacity:.08;border-radius:14px;z-index:0}
+.inv-sum-card>*{position:relative;z-index:1}
+.inv-sum-card:nth-child(1){background:linear-gradient(135deg,#1a6b4a12,#2ecc7118);border:1.5px solid #2ecc7140}
+.inv-sum-card:nth-child(1) .inv-sum-val{color:#1a8a5a}
+body.theme-midnight .inv-sum-card:nth-child(1) .inv-sum-val,body.theme-ember .inv-sum-card:nth-child(1) .inv-sum-val{color:#5adb8a}
+.inv-sum-card:nth-child(2){background:linear-gradient(135deg,#2a5a9a12,#3b82f618);border:1.5px solid #3b82f640}
+.inv-sum-card:nth-child(2) .inv-sum-val{color:#2a6aba}
+body.theme-midnight .inv-sum-card:nth-child(2) .inv-sum-val,body.theme-ember .inv-sum-card:nth-child(2) .inv-sum-val{color:#60a5fa}
+.inv-sum-card:nth-child(3){background:linear-gradient(135deg,#9a4a2a12,#e8884818);border:1.5px solid #e8884840}
+.inv-sum-card:nth-child(3) .inv-sum-val{color:#c06030}
+body.theme-midnight .inv-sum-card:nth-child(3) .inv-sum-val,body.theme-ember .inv-sum-card:nth-child(3) .inv-sum-val{color:#f0a060}
+.inv-sum-card:hover{transform:translateY(-3px);box-shadow:0 8px 24px rgba(0,0,0,.1)}
+.inv-sum-label{font-size:10px;text-transform:uppercase;letter-spacing:2px;color:var(--muted);font-weight:700;margin-bottom:6px}
+.inv-sum-val{font-size:24px;font-weight:800;font-variant-numeric:tabular-nums;letter-spacing:-.5px}
+.inv-sum-sub{font-size:11px;color:var(--text2);margin-top:3px;font-weight:500}
 .inv-table-wrap{flex:1;overflow-y:auto;padding:0 24px 20px;scrollbar-width:thin;scrollbar-color:var(--border) transparent}
 .inv-table-wrap::-webkit-scrollbar{width:4px}
 .inv-table-wrap::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
-.inv-table{width:100%;border-collapse:separate;border-spacing:0;background:var(--sidebar);border:1px solid var(--border);border-radius:12px;overflow:hidden}
+.inv-table{width:100%;border-collapse:separate;border-spacing:0;border-radius:12px;overflow:hidden;border:1.5px solid var(--border);box-shadow:0 2px 12px rgba(0,0,0,.04)}
 .inv-table thead th{
-  text-align:left;padding:11px 14px;font-size:10px;font-weight:700;
-  text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);
-  background:var(--s2);border-bottom:1px solid var(--border);
+  text-align:left;padding:13px 14px;font-size:11px;font-weight:800;
+  text-transform:uppercase;letter-spacing:1.8px;
+  color:#fff;
+  background:linear-gradient(135deg,#c0392b,#e74c3c);
+  border-bottom:2px solid #a93226;
   position:sticky;top:0;z-index:2
 }
+body.theme-midnight .inv-table thead th{background:linear-gradient(135deg,#1a3050,#2a4070);border-bottom-color:#1a2a40;color:#c8d8e8}
+body.theme-ember .inv-table thead th{background:linear-gradient(135deg,#3a1a10,#5a2a18);border-bottom-color:#2a1a10;color:#c8b090}
+body.theme-beige .inv-table thead th{background:linear-gradient(135deg,#7c5cbf,#9b7de0);border-bottom-color:#6a4aaa;color:#fff}
 .inv-table thead th.r{text-align:right}
-.inv-table tbody td{padding:10px 14px;font-size:13px;color:var(--text);border-bottom:1px solid rgba(200,180,138,.12);vertical-align:middle}
+.inv-table tbody{background:var(--sidebar)}
+.inv-table tbody td{padding:12px 14px;font-size:14px;color:var(--text);border-bottom:1px solid rgba(200,180,138,.18);vertical-align:middle}
 .inv-table tbody td.r{text-align:right}
-.inv-table tbody tr{transition:background .12s}
-.inv-table tbody tr:hover{background:rgba(255,255,255,.15)}
-body.theme-midnight .inv-table tbody tr:hover{background:rgba(255,255,255,.03)}
-body.theme-ember .inv-table tbody tr:hover{background:rgba(255,255,255,.02)}
+.inv-table tbody tr{transition:all .15s}
+.inv-table tbody tr:hover{background:rgba(0,0,0,.03)}
+body.theme-midnight .inv-table tbody tr:hover{background:rgba(255,255,255,.04)}
+body.theme-ember .inv-table tbody tr:hover{background:rgba(255,255,255,.03)}
 .inv-table tbody tr:last-child td{border-bottom:none}
-.inv-val{font-family:'Courier New',monospace;font-weight:600;color:var(--accent);font-variant-numeric:tabular-nums}
-.inv-pct{font-family:'Courier New',monospace;color:var(--text2)}
-.inv-bar-wrap{width:100%;height:6px;background:var(--border);border-radius:6px;overflow:hidden;min-width:60px}
-.inv-bar-fill{height:100%;border-radius:6px;background:var(--accent);transition:width .4s ease}
-.inv-status{display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:600;padding:2px 8px;border-radius:12px}
-.inv-status.on-target{color:var(--green);background:rgba(42,122,64,.1)}
-.inv-status.over{color:#d97706;background:rgba(217,119,6,.1)}
-.inv-status.under{color:var(--red);background:rgba(192,64,64,.1)}
-.inv-gap{font-family:'Courier New',monospace;font-weight:700;font-size:12px}
+.inv-asset-name{font-weight:700;font-size:14px;color:var(--text);letter-spacing:-.1px}
+.inv-val{font-family:'Courier New',monospace;font-weight:700;font-size:14px;color:#1a6b4a;font-variant-numeric:tabular-nums}
+body.theme-midnight .inv-val{color:#5adb8a}
+body.theme-ember .inv-val{color:#7aaa60}
+.inv-pct{font-family:'Courier New',monospace;font-weight:600;color:var(--text);font-size:13px}
+.inv-bar-wrap{width:100%;height:14px;background:rgba(0,0,0,.06);border-radius:8px;overflow:hidden;min-width:80px;position:relative}
+body.theme-midnight .inv-bar-wrap,body.theme-ember .inv-bar-wrap{background:rgba(255,255,255,.06)}
+.inv-bar-fill{height:100%;border-radius:8px;transition:width .5s cubic-bezier(.4,0,.2,1);position:relative;min-width:2px}
+.inv-bar-fill::after{content:'';position:absolute;top:0;left:0;right:0;bottom:0;background:linear-gradient(180deg,rgba(255,255,255,.3) 0%,transparent 60%);border-radius:8px}
+.inv-status{display:inline-flex;align-items:center;gap:5px;font-size:13px;font-weight:700;padding:4px 12px;border-radius:20px;white-space:nowrap}
+.inv-status.on-target{color:#1a8a5a;background:rgba(26,138,90,.12)}
+body.theme-midnight .inv-status.on-target{color:#5adb8a;background:rgba(90,219,138,.1)}
+body.theme-ember .inv-status.on-target{color:#7aaa60;background:rgba(122,170,96,.1)}
+.inv-status.over{color:#d97706;background:rgba(217,119,6,.12)}
+body.theme-midnight .inv-status.over,body.theme-ember .inv-status.over{color:#fbbf24;background:rgba(251,191,36,.1)}
+.inv-status.under{color:#dc2626;background:rgba(220,38,38,.1)}
+body.theme-midnight .inv-status.under,body.theme-ember .inv-status.under{color:#f87171;background:rgba(248,113,113,.1)}
+.inv-gap{font-family:'Courier New',monospace;font-weight:800;font-size:13px}
 .inv-gap.pos{color:#d97706}
-.inv-gap.neg{color:var(--red)}
-.inv-gap.zero{color:var(--green)}
+.inv-gap.neg{color:#dc2626}
+.inv-gap.zero{color:#1a8a5a}
+body.theme-midnight .inv-gap.pos,body.theme-ember .inv-gap.pos{color:#fbbf24}
+body.theme-midnight .inv-gap.neg,body.theme-ember .inv-gap.neg{color:#f87171}
+body.theme-midnight .inv-gap.zero,body.theme-ember .inv-gap.zero{color:#5adb8a}
 .inv-actions{display:flex;gap:4px;justify-content:flex-end;opacity:0;transition:opacity .15s}
 .inv-table tbody tr:hover .inv-actions{opacity:1}
-.inv-abtn{background:none;border:none;cursor:pointer;font-size:13px;padding:4px 6px;border-radius:6px;color:var(--muted);transition:all .12s;line-height:1}
+.inv-abtn{background:none;border:none;cursor:pointer;font-size:14px;padding:5px 7px;border-radius:7px;color:var(--muted);transition:all .12s;line-height:1}
 .inv-abtn:hover{color:var(--text);background:var(--s2)}
-.inv-abtn.del:hover{color:var(--red);background:rgba(192,64,64,.1)}
-.inv-edit-input{background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:5px 8px;font-size:13px;color:var(--text);font-family:'Inter',sans-serif;outline:none;width:100%;transition:border-color .2s}
-.inv-edit-input:focus{border-color:var(--accent)}
-.inv-edit-input.num{text-align:right;width:100px;font-family:'Courier New',monospace}
-.inv-tfoot td{padding:12px 14px!important;font-weight:700;font-size:14px;border-top:2px solid var(--accent);background:var(--s2)}
-.inv-tfoot .inv-val{font-size:15px}
-.inv-rebalance{color:var(--red);font-size:11px;font-weight:600;display:flex;align-items:center;gap:4px}
-.inv-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:60px 20px;color:var(--muted);gap:8px;flex:1}
-.inv-empty-icon{font-size:40px;opacity:.3}
-.inv-empty-text{font-size:14px}
+.inv-abtn.del:hover{color:#dc2626;background:rgba(220,38,38,.1)}
+.inv-edit-input{background:var(--bg);border:1.5px solid var(--border);border-radius:8px;padding:7px 10px;font-size:13px;color:var(--text);font-family:'Inter',sans-serif;outline:none;width:100%;transition:all .2s}
+.inv-edit-input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(139,94,42,.12)}
+.inv-edit-input.num{text-align:right;width:110px;font-family:'Courier New',monospace;font-weight:600}
+.inv-tfoot td{
+  padding:14px 14px!important;font-weight:800;font-size:15px;
+  background:linear-gradient(135deg,#1a8a5a,#2ecc71);color:#fff!important;
+  border-top:none
+}
+body.theme-midnight .inv-tfoot td{background:linear-gradient(135deg,#1a3a2a,#2a5a3a);color:#c8e8d8!important}
+body.theme-ember .inv-tfoot td{background:linear-gradient(135deg,#1a2a18,#2a4020);color:#a8c890!important}
+body.theme-beige .inv-tfoot td{background:linear-gradient(135deg,#5a4a9a,#7c5cbf);color:#fff!important}
+.inv-tfoot .inv-val{font-size:16px;color:#fff!important;font-weight:800}
+body.theme-midnight .inv-tfoot .inv-val{color:#a0f0c0!important}
+body.theme-ember .inv-tfoot .inv-val{color:#a8c890!important}
+body.theme-beige .inv-tfoot .inv-val{color:#e8e0f8!important}
+.inv-tfoot .inv-pct{color:rgba(255,255,255,.85)!important;font-weight:700}
+.inv-rebalance{color:#fef3c7;font-size:12px;font-weight:700;display:flex;align-items:center;gap:5px;text-shadow:0 1px 2px rgba(0,0,0,.15)}
+body.theme-midnight .inv-rebalance{color:#fbbf24}
+.inv-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:60px 20px;color:var(--muted);gap:10px;flex:1}
+.inv-empty-icon{font-size:48px;opacity:.4}
+.inv-empty-text{font-size:15px}
+/* Alternating row tint */
+.inv-table tbody tr:nth-child(even){background:rgba(0,0,0,.015)}
+body.theme-midnight .inv-table tbody tr:nth-child(even){background:rgba(255,255,255,.015)}
+body.theme-ember .inv-table tbody tr:nth-child(even){background:rgba(255,255,255,.012)}
 @media(max-width:640px){
   .inv-header{padding:14px 14px 10px}
   .inv-summary{padding:0 14px 12px}
-  .inv-sum-card{min-width:140px;padding:10px 14px}
+  .inv-sum-card{min-width:140px;padding:12px 14px}
   .inv-table-wrap{padding:0 10px 16px}
-  .inv-table thead th{padding:9px 10px;font-size:9px}
-  .inv-table tbody td{padding:8px 10px;font-size:12px}
+  .inv-table thead th{padding:10px 10px;font-size:9px;letter-spacing:1.2px}
+  .inv-table tbody td{padding:9px 10px;font-size:12px}
   .inv-actions{opacity:1}
-  .inv-bar-wrap{min-width:40px}
-  .inv-sum-val{font-size:18px}
+  .inv-bar-wrap{min-width:50px;height:10px}
+  .inv-sum-val{font-size:20px}
+  .inv-asset-name{font-size:12px}
 }
 
 </style>
@@ -10472,6 +10517,14 @@ let INVESTMENTS = [];
 let _invEditId = null;
 let _invAdding = false;
 
+// Vibrant unique colors for each asset's allocation bar (matching Excel style)
+const INV_BAR_COLORS = [
+  '#1abc9c','#27ae60','#2ecc71','#e74c3c','#9b59b6',
+  '#e67e22','#3498db','#8B4513','#f1c40f','#1abc9c',
+  '#2980b9','#e91e63','#00bcd4','#ff5722','#4caf50',
+  '#ff9800','#673ab7','#009688','#795548','#607d8b'
+];
+
 function invGetData(){ if(!DATA.investments) DATA.investments=[]; INVESTMENTS=DATA.investments; return INVESTMENTS; }
 
 function invFormatINR(v){
@@ -10511,7 +10564,7 @@ function invRender(){
   document.getElementById('inv-sum-total').textContent = invFormatINR(total);
   document.getElementById('inv-sum-total-sub').textContent = assets.length + ' asset' + (assets.length!==1?'s':'');
   document.getElementById('inv-sum-target').textContent = totalTarget + '%';
-  document.getElementById('inv-sum-target-sub').textContent = totalTarget===100 ? 'Perfectly balanced' : (totalTarget<100?'Under-allocated by '+(100-totalTarget)+'%':'Over-allocated by '+(totalTarget-100)+'%');
+  document.getElementById('inv-sum-target-sub').textContent = totalTarget===100 ? '✓ Perfectly balanced' : (totalTarget<100?'Under-allocated by '+(100-totalTarget)+'%':'Over-allocated by '+(totalTarget-100)+'%');
 
   if(assets.length){
     const top = [...assets].sort((a,b)=>b.value-a.value)[0];
@@ -10536,6 +10589,7 @@ function invRender(){
     const status = invGetStatus(gap);
     const gapNum = parseFloat(gap);
     const gapCls = gapNum>0?'pos':gapNum<0?'neg':'zero';
+    const barColor = INV_BAR_COLORS[i % INV_BAR_COLORS.length];
     const isEditing = _invEditId===a.id;
 
     if(isEditing){
@@ -10544,23 +10598,23 @@ function invRender(){
         <td class="r"><input class="inv-edit-input num" id="inv-e-value" type="number" value="${a.value}" placeholder="0"></td>
         <td class="r"><span class="inv-pct">${pct}%</span></td>
         <td class="r"><input class="inv-edit-input num" id="inv-e-target" type="number" value="${a.target}" step="0.5" placeholder="0"></td>
-        <td><div class="inv-bar-wrap"><div class="inv-bar-fill" style="width:${Math.min(pct,100)}%"></div></div></td>
+        <td><div class="inv-bar-wrap"><div class="inv-bar-fill" style="width:${Math.min(pct,100)}%;background:${barColor}"></div></div></td>
         <td><span class="inv-status ${status.cls}">${status.icon} ${status.text}</span></td>
         <td class="r"><span class="inv-gap ${gapCls}">${gapNum>0?'+':''}${gap}%</span></td>
         <td class="r">
           <div style="display:flex;gap:4px;justify-content:flex-end">
-            <button class="inv-abtn" onclick="invSaveEdit()" title="Save" style="color:var(--green)">✓</button>
-            <button class="inv-abtn" onclick="invCancelEdit()" title="Cancel">✕</button>
+            <button class="inv-abtn" onclick="invSaveEdit()" title="Save" style="color:#1a8a5a;font-size:16px">✓</button>
+            <button class="inv-abtn" onclick="invCancelEdit()" title="Cancel" style="font-size:16px">✕</button>
           </div>
         </td>
       </tr>`;
     } else {
       rows += `<tr>
-        <td><span style="font-weight:600">${esc(a.name)}</span></td>
+        <td><span class="inv-asset-name">${esc(a.name)}</span></td>
         <td class="r"><span class="inv-val">${invFormatINR(a.value)}</span></td>
         <td class="r"><span class="inv-pct">${pct}%</span></td>
-        <td class="r"><span class="inv-pct">${a.target}%</span></td>
-        <td><div class="inv-bar-wrap"><div class="inv-bar-fill" style="width:${Math.min(pct,100)}%"></div></div></td>
+        <td class="r"><span class="inv-pct" style="font-weight:700">${a.target}%</span></td>
+        <td><div class="inv-bar-wrap"><div class="inv-bar-fill" style="width:${Math.min(pct,100)}%;background:${barColor}"></div></div></td>
         <td><span class="inv-status ${status.cls}">${status.icon} ${status.text}</span></td>
         <td class="r"><span class="inv-gap ${gapCls}">${gapNum>0?'+':''}${gap}%</span></td>
         <td class="r">
@@ -10576,34 +10630,34 @@ function invRender(){
   // Add row (inline)
   let addRow = '';
   if(_invAdding){
-    addRow = `<tr style="background:rgba(42,122,64,.05)">
+    addRow = `<tr style="background:rgba(42,122,64,.06)">
       <td><input class="inv-edit-input" id="inv-a-name" placeholder="e.g. Fixed Deposit" autofocus></td>
       <td class="r"><input class="inv-edit-input num" id="inv-a-value" type="number" placeholder="0"></td>
       <td class="r"><span class="inv-pct">—</span></td>
       <td class="r"><input class="inv-edit-input num" id="inv-a-target" type="number" placeholder="0" step="0.5"></td>
-      <td colspan="3"><span style="font-size:11px;color:var(--muted)">Fill in details and save</span></td>
+      <td colspan="3"><span style="font-size:12px;color:var(--muted);font-style:italic">Fill in details and save</span></td>
       <td class="r">
         <div style="display:flex;gap:4px;justify-content:flex-end">
-          <button class="inv-abtn" onclick="invSaveNew()" title="Save" style="color:var(--green);opacity:1">✓</button>
-          <button class="inv-abtn" onclick="invCancelAdd()" title="Cancel" style="opacity:1">✕</button>
+          <button class="inv-abtn" onclick="invSaveNew()" title="Save" style="color:#1a8a5a;opacity:1;font-size:16px">✓</button>
+          <button class="inv-abtn" onclick="invCancelAdd()" title="Cancel" style="opacity:1;font-size:16px">✕</button>
         </div>
       </td>
     </tr>`;
   }
 
-  // Footer
+  // Footer — bold green row
   const footerHtml = `<tr class="inv-tfoot">
-    <td style="font-size:14px">TOTAL PORTFOLIO</td>
+    <td style="font-size:15px;font-weight:800;letter-spacing:.3px">TOTAL PORTFOLIO</td>
     <td class="r"><span class="inv-val">${invFormatINR(total)}</span></td>
-    <td class="r"><span class="inv-pct" style="font-weight:700">100.00%</span></td>
-    <td class="r"><span class="inv-pct" style="font-weight:700">${totalTarget}%</span></td>
-    <td colspan="4">${totalTarget!==100?'<div class="inv-rebalance">⚠ Rebalance needed — targets sum to '+totalTarget+'%</div>':''}</td>
+    <td class="r"><span class="inv-pct">100.00%</span></td>
+    <td class="r"><span class="inv-pct">${totalTarget}%</span></td>
+    <td colspan="4">${totalTarget!==100?'<div class="inv-rebalance">← Rebalance needed</div>':''}</td>
   </tr>`;
 
   container.innerHTML = `<table class="inv-table">
     <thead><tr>
       <th>Asset</th><th class="r">Value (INR)</th><th class="r">% Portfolio</th><th class="r">Target %</th>
-      <th>Allocation</th><th>Status</th><th class="r">Gap</th><th class="r">Actions</th>
+      <th>Allocation</th><th>Status</th><th class="r">Gap vs Target</th><th class="r">Actions</th>
     </tr></thead>
     <tbody>${rows}${addRow}</tbody>
     <tfoot>${footerHtml}</tfoot>
