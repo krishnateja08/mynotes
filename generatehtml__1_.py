@@ -5700,13 +5700,18 @@ body.theme-beige .inv-mcard-total{background:linear-gradient(135deg,#5a4a9a,#7c5
   </div>
 
   <!-- DAYBOOK PIN -->
-  <div class="settings-section-title" style="margin-top:24px">🔐 Daybook & Investments PIN Lock</div>
+  <div class="settings-section-title" style="margin-top:24px">🔐 Daybook, Investments & Important Dates PIN Lock</div>
   <p style="font-size:12px;color:var(--muted);margin-bottom:14px;line-height:1.6">
-    Set a 4-digit PIN to lock your Daybook and Investments. Leave blank to disable the lock. PIN is stored only in your browser.
+    Set a 4-digit PIN to lock your Daybook, Investments, and Important Dates. Leave blank to disable the lock. PIN is stored only in your browser.
   </p>
+  <!-- Current PIN (only shown when a PIN is already set) -->
+  <div id="cfg-db-pin-current-row" class="frow" style="display:none;margin-bottom:12px">
+    <label>Current PIN (required to change or remove)</label>
+    <input id="cfg-db-pin-current" type="password" maxlength="4" pattern="[0-9]*" inputmode="numeric" placeholder="enter current PIN" style="letter-spacing:6px;font-size:18px;max-width:200px">
+  </div>
   <div style="display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap">
     <div class="frow" style="flex:1;min-width:140px;margin-bottom:0">
-      <label>New PIN (4 digits)</label>
+      <label id="cfg-db-pin-label">New PIN (4 digits)</label>
       <input id="cfg-db-pin" type="password" maxlength="4" pattern="[0-9]*" inputmode="numeric" placeholder="e.g. 1234" style="letter-spacing:6px;font-size:18px">
     </div>
     <div class="frow" style="flex:1;min-width:140px;margin-bottom:0">
@@ -5797,6 +5802,9 @@ async function firebaseSignOut(){
 function openSettings(){
   updateAuthUI(fbAuth.currentUser);
   document.getElementById('settings-panel').classList.add('open');
+  // Refresh PIN lock UI — shows/hides the "Current PIN" field based on whether a PIN is set,
+  // and clears any stale values from a previous session.
+  if(typeof dbRefreshPinSettingsUI === 'function') dbRefreshPinSettingsUI();
 }
 function closeSettings(){document.getElementById('settings-panel').classList.remove('open')}
 
@@ -10811,11 +10819,47 @@ const DB_TAGS = ['trade','personal','idea','health','work','family'];
 /* ── DAYBOOK PIN ── */
 function dbGetPin(){ return localStorage.getItem('db_pin')||''; }
 
+/* Show/hide the "Current PIN" field based on whether a PIN is set.
+   Called whenever the Settings panel opens. */
+function dbRefreshPinSettingsUI(){
+  const hasPin = !!dbGetPin();
+  const row = document.getElementById('cfg-db-pin-current-row');
+  const label = document.getElementById('cfg-db-pin-label');
+  const newPin = document.getElementById('cfg-db-pin');
+  const newPin2 = document.getElementById('cfg-db-pin2');
+  const curPin = document.getElementById('cfg-db-pin-current');
+  if(row) row.style.display = hasPin ? '' : 'none';
+  if(label) label.textContent = hasPin ? 'New PIN (leave blank to keep current)' : 'New PIN (4 digits)';
+  // Clear any leftover values so the form starts clean every time Settings opens
+  if(newPin) newPin.value='';
+  if(newPin2) newPin2.value='';
+  if(curPin) curPin.value='';
+  const msg = document.getElementById('db-pin-settings-msg');
+  if(msg) msg.textContent='';
+}
+
 function dbSavePin(){
   const p1 = document.getElementById('cfg-db-pin').value.trim();
   const p2 = document.getElementById('cfg-db-pin2').value.trim();
   const msg = document.getElementById('db-pin-settings-msg');
-  if(!p1){ msg.style.color='var(--red)'; msg.textContent='Enter a PIN first.'; return; }
+  const existingPin = dbGetPin();
+
+  // If a PIN already exists, require the current PIN before allowing any change
+  if(existingPin){
+    const cur = document.getElementById('cfg-db-pin-current').value.trim();
+    if(!cur){
+      msg.style.color='var(--red)';
+      msg.textContent='Enter your current PIN to change it.';
+      return;
+    }
+    if(cur !== existingPin){
+      msg.style.color='var(--red)';
+      msg.textContent='Current PIN is incorrect.';
+      return;
+    }
+  }
+
+  if(!p1){ msg.style.color='var(--red)'; msg.textContent='Enter a new PIN.'; return; }
   if(!/^\d{4}$/.test(p1)){ msg.style.color='var(--red)'; msg.textContent='PIN must be exactly 4 digits.'; return; }
   if(p1!==p2){ msg.style.color='var(--red)'; msg.textContent='PINs do not match.'; return; }
   localStorage.setItem('db_pin', p1);
@@ -10824,22 +10868,47 @@ function dbSavePin(){
   _impUnlocked = false; // force re-lock important dates too
   document.getElementById('cfg-db-pin').value='';
   document.getElementById('cfg-db-pin2').value='';
+  const curEl = document.getElementById('cfg-db-pin-current');
+  if(curEl) curEl.value='';
   msg.style.color='var(--green)';
   msg.textContent='✓ PIN saved! Daybook, Investments & Important Dates will be locked next time you open them.';
   setTimeout(()=>{ msg.textContent=''; },3000);
+  // Refresh UI: if we just set a PIN for the first time, show the Current PIN field next time
+  dbRefreshPinSettingsUI();
 }
 
 function dbClearPin(){
+  const msg = document.getElementById('db-pin-settings-msg');
+  const existingPin = dbGetPin();
+
+  // If a PIN is set, require the current PIN before removing
+  if(existingPin){
+    const cur = document.getElementById('cfg-db-pin-current').value.trim();
+    if(!cur){
+      msg.style.color='var(--red)';
+      msg.textContent='Enter your current PIN to remove the lock.';
+      return;
+    }
+    if(cur !== existingPin){
+      msg.style.color='var(--red)';
+      msg.textContent='Current PIN is incorrect.';
+      return;
+    }
+  }
+
   localStorage.removeItem('db_pin');
   _dbUnlocked = true;
   _invUnlocked = true;
   _impUnlocked = true;
   document.getElementById('cfg-db-pin').value='';
   document.getElementById('cfg-db-pin2').value='';
-  const msg = document.getElementById('db-pin-settings-msg');
+  const curEl = document.getElementById('cfg-db-pin-current');
+  if(curEl) curEl.value='';
   msg.style.color='var(--green)';
   msg.textContent='✓ PIN removed. Daybook, Investments & Important Dates are now unlocked.';
   setTimeout(()=>{ msg.textContent=''; },3000);
+  // Refresh UI so the Current PIN field hides now that there's no PIN
+  dbRefreshPinSettingsUI();
 }
 
 function dbShowLock(){
