@@ -865,6 +865,29 @@ body.theme-ember .imp-filter-btn.active{background:rgba(212,114,74,.12);color:va
   grid-template-columns:repeat(auto-fill,minmax(240px,1fr));
   gap:12px;
 }
+.imp-month-section{margin-bottom:22px}
+.imp-month-section:last-child{margin-bottom:0}
+.imp-month-header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:6px 4px 10px 4px;margin-bottom:4px;
+  border-bottom:1px solid var(--border);
+}
+.imp-month-label{
+  font-size:13px;font-weight:800;color:var(--text);
+  letter-spacing:0.8px;text-transform:uppercase;
+}
+.imp-month-header.current .imp-month-label{color:var(--accent)}
+.imp-month-count{
+  font-size:11px;font-weight:600;color:var(--muted);
+  background:var(--s2);padding:3px 10px;border-radius:20px;
+}
+.imp-month-header.current .imp-month-count{
+  background:rgba(37,99,235,.12);color:var(--accent);
+}
+body.theme-rose .imp-month-header.current .imp-month-count{background:rgba(176,96,144,.14)}
+body.theme-ocean .imp-month-header.current .imp-month-count{background:rgba(0,210,180,.14)}
+body.theme-midnight .imp-month-header.current .imp-month-count{background:rgba(232,168,74,.14)}
+body.theme-ember .imp-month-header.current .imp-month-count{background:rgba(212,114,74,.14)}
 .imp-card{
   display:flex;align-items:stretch;gap:12px;
   padding:12px 12px 12px 14px;
@@ -11777,15 +11800,9 @@ function impRenderPage(){
   else if(_impFilter==='today')   filtered=all.filter(e=>e.date === todayStr);
   else if(_impFilter==='past')    filtered=all.filter(e=>e.date <  todayStr);
 
-  // Sort: upcoming first (ascending), past last (most recent first)
-  filtered.sort((a,b)=>{
-    const aDays=impDaysUntil(a.date), bDays=impDaysUntil(b.date);
-    const aPast=aDays<0, bPast=bDays<0;
-    if(aPast && !bPast) return 1;
-    if(!aPast && bPast) return -1;
-    if(aPast && bPast)  return bDays-aDays; // most recent past first
-    return aDays-bDays; // soonest upcoming first
-  });
+  // Sort month-wise: chronological (oldest to newest).
+  // Entries with same date stay together; grouping happens after sort.
+  filtered.sort((a,b)=>(a.date||'').localeCompare(b.date||''));
 
   if(hdrCount) hdrCount.textContent = all.length===1 ? '1 date' : all.length+' dates';
 
@@ -11797,7 +11814,22 @@ function impRenderPage(){
     return;
   }
 
-  wrap.innerHTML = '<div class="imp-grid">' + filtered.map(e=>{
+  // Group by YYYY-MM
+  const groups={}; // key -> { label, items: [] }
+  const order=[];
+  filtered.forEach(e=>{
+    if(!e.date){ return; }
+    const key = e.date.slice(0,7); // YYYY-MM
+    if(!groups[key]){
+      const d=new Date(e.date+'T00:00:00');
+      const monthName = d.toLocaleString('en-US',{month:'long'}).toUpperCase();
+      groups[key] = { label: monthName + ' ' + d.getFullYear(), items: [] };
+      order.push(key);
+    }
+    groups[key].items.push(e);
+  });
+
+  const renderCard = (e)=>{
     const days=impDaysUntil(e.date);
     const badge=impFormatBadge(e.date);
     let cardCls='imp-card';
@@ -11823,7 +11855,23 @@ function impRenderPage(){
         <button class="imp-card-btn del" onclick="impDelete('${e.id}')" title="Delete">🗑</button>
       </div>
     </div>`;
-  }).join('') + '</div>';
+  };
+
+  // Determine current month for highlighting
+  const curMonthKey = todayStr.slice(0,7);
+
+  wrap.innerHTML = order.map(key=>{
+    const g = groups[key];
+    const isCurrent = key === curMonthKey;
+    const cntText = g.items.length===1 ? '1 date' : g.items.length+' dates';
+    return `<div class="imp-month-section">
+      <div class="imp-month-header${isCurrent?' current':''}">
+        <span class="imp-month-label">📅 ${g.label}</span>
+        <span class="imp-month-count">${cntText}</span>
+      </div>
+      <div class="imp-grid">${g.items.map(renderCard).join('')}</div>
+    </div>`;
+  }).join('');
 }
 
 function impRenderDashboard(){
@@ -11832,13 +11880,32 @@ function impRenderDashboard(){
   const all=impGetData().slice();
   const todayStr=impTodayStr();
 
-  // Show today + upcoming (next 30 days priority), then any future, limit 4
-  const relevant=all.filter(e=>e.date>=todayStr)
-    .sort((a,b)=>a.date.localeCompare(b.date))
+  // Compute current month + determine if we're in the last 7 days (then include next month too)
+  const today = new Date(); today.setHours(0,0,0,0);
+  const curYear = today.getFullYear();
+  const curMonth = today.getMonth(); // 0-indexed
+  const lastDayOfMonth = new Date(curYear, curMonth+1, 0).getDate();
+  const daysLeftInMonth = lastDayOfMonth - today.getDate();
+  const includeNextMonth = daysLeftInMonth <= 7;
+
+  // Build allowed YYYY-MM keys
+  const curKey = curYear + '-' + String(curMonth+1).padStart(2,'0');
+  let nextKey = null;
+  if(includeNextMonth){
+    const nd = new Date(curYear, curMonth+1, 1);
+    nextKey = nd.getFullYear() + '-' + String(nd.getMonth()+1).padStart(2,'0');
+  }
+
+  // Filter: only dates in current month (and next month if rolling over), and not in the past
+  const relevant = all.filter(e=>{
+    if(!e.date || e.date < todayStr) return false;
+    const mk = e.date.slice(0,7);
+    return mk === curKey || (nextKey && mk === nextKey);
+  }).sort((a,b)=>a.date.localeCompare(b.date))
     .slice(0,4);
 
   if(!relevant.length){
-    el.innerHTML='<div class="dash-empty">No important dates added yet.</div>';
+    el.innerHTML='<div class="dash-empty">No important dates this month.</div>';
     return;
   }
 
