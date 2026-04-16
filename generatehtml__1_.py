@@ -2047,28 +2047,50 @@ body.theme-ember .rem-badge-today{background:rgba(212,114,74,.12);color:var(--ac
 /* Compact add row */
 .rem-add-row{
   display:flex;align-items:center;gap:8px;
-  padding:6px 8px;border-radius:6px;margin-top:8px;
-  border:1px dashed var(--border);background:transparent;
+  padding:10px 12px;border-radius:10px;margin-top:8px;
+  border:1px solid var(--border2);background:var(--sidebar);
+  box-shadow:0 1px 3px rgba(0,0,0,.04);
   transition:all 0.15s
 }
-.rem-add-row:hover{background:var(--sidebar);border-color:var(--border2)}
+.rem-add-row:hover{background:var(--s2);border-color:var(--accent)}
+.rem-add-row:focus-within{background:var(--s2);border-color:var(--accent);box-shadow:0 2px 8px rgba(0,0,0,.08)}
+/* Per-theme tuning so the "new reminder" bar is clearly visible on every theme */
+body.theme-rose     .rem-add-row{background:#ecd9e3;border-color:#c89ab0}
+body.theme-rose     .rem-add-row:hover,body.theme-rose .rem-add-row:focus-within{background:#e5cbd8;border-color:#b06090}
+body.theme-arctic   .rem-add-row{background:#d8dde8;border-color:#a8b0c0}
+body.theme-arctic   .rem-add-row:hover,body.theme-arctic .rem-add-row:focus-within{background:#ced4e0;border-color:#384870}
+body.theme-beige    .rem-add-row{background:#e4dcc8;border-color:#b8a888}
+body.theme-cream    .rem-add-row{background:#d6c9b0;border-color:#b8a070}
+body.theme-midnight .rem-add-row{background:#222c3e;border-color:#3a4a68}
+body.theme-midnight .rem-add-row:hover,body.theme-midnight .rem-add-row:focus-within{background:#2a3448;border-color:var(--accent)}
+body.theme-ember    .rem-add-row{background:#241d16;border-color:#4a3620}
+body.theme-ember    .rem-add-row:hover,body.theme-ember .rem-add-row:focus-within{background:#2c241a;border-color:var(--accent)}
+body.theme-ocean    .rem-add-row{background:#0f2630;border-color:#1a4050}
+body.theme-ocean    .rem-add-row:hover,body.theme-ocean .rem-add-row:focus-within{background:#133040;border-color:#00d2b4}
 .rem-add-plus{
-  width:20px;height:20px;border-radius:50%;
+  width:22px;height:22px;border-radius:50%;
   flex-shrink:0;display:flex;align-items:center;justify-content:center;
-  font-size:16px;color:var(--muted);cursor:pointer
+  font-size:16px;color:var(--accent);cursor:pointer;font-weight:700;
+  background:var(--bg);border:1px solid var(--border)
 }
 .rem-add-input{
   flex:1;border:none;outline:none;background:transparent;
-  font-size:14px;font-weight:400;color:var(--text);
+  font-size:14px;font-weight:500;color:var(--text);
   font-family:'Inter',sans-serif;caret-color:var(--accent)
 }
 .rem-add-input::placeholder{color:var(--muted);font-weight:400}
 .rem-add-due-input{
-  border:1px solid var(--border);border-radius:6px;background:transparent;
-  font-size:12px;color:var(--text2);padding:4px 8px;outline:none;
-  font-family:'Inter',sans-serif;cursor:pointer;transition:border-color 0.15s
+  border:1px solid var(--border);border-radius:6px;
+  background:var(--bg);
+  font-size:12px;color:var(--text2);padding:5px 8px;outline:none;
+  font-family:'Inter',sans-serif;cursor:pointer;transition:all 0.15s;
+  font-weight:500
 }
-.rem-add-due-input:hover{border-color:var(--accent)}
+.rem-add-due-input:hover{border-color:var(--accent);background:var(--s2)}
+.rem-add-due-input:focus{border-color:var(--accent);box-shadow:0 0 0 2px rgba(0,0,0,.04)}
+body.theme-midnight .rem-add-due-input,body.theme-ember .rem-add-due-input,body.theme-ocean .rem-add-due-input{
+  background:var(--bg);color-scheme:dark
+}
 
 /* Completed section */
 .rem-completed-section{margin-top:32px;padding-top:20px;border-top:1px solid var(--border)}
@@ -7407,7 +7429,7 @@ function _renderRemChecklist(){
   // Add new reminder row at TOP (only when not in completed view)
   if(_remPageFilter!=='completed'){
     const listId = _remListId || 'personal';
-    html = `<div class="rem-add-row" style="position:sticky;top:0;z-index:3;background:var(--bg);padding-bottom:4px">
+    html = `<div class="rem-add-row" style="position:sticky;top:0;z-index:3;padding-bottom:4px">
       <div class="rem-add-plus" onclick="document.getElementById('rem-add-input').focus()">＋</div>
       <input class="rem-add-input" id="rem-add-input" placeholder="New reminder… (press Enter to add)"
         onkeydown="remAddKeydown(event,'${listId}')">
