@@ -746,7 +746,8 @@ body.theme-ember .stat-card.sc-missed::before{background:#c04030}
 .dash-progress-fill{height:100%;border-radius:10px;background:linear-gradient(90deg,#3b82f6 0%,#06b6d4 100%);transition:width 0.6s ease}
 body.theme-midnight .dash-progress-fill{background:linear-gradient(90deg,#e8a84a 0%,#d4724a 100%)}
 body.theme-ember .dash-progress-fill{background:linear-gradient(90deg,#d4724a 0%,#e8a84a 100%)}
-.dash-bottom{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.dash-bottom{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+@media(max-width:1100px){.dash-bottom{grid-template-columns:1fr 1fr}}
 .dash-widget{
   background:var(--sidebar);border:1px solid rgba(200,180,138,.15);
   border-radius:14px;padding:18px 20px;
@@ -793,6 +794,149 @@ body.theme-ember .badge-done{background:rgba(90,128,64,.12);color:#5a8040}
 .mi-name{font-size:13px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .mi-meta{font-size:11px;color:var(--muted);margin-top:1px}
 .mi-age{font-size:10px;font-weight:700;color:#dc2626;background:rgba(220,38,38,.1);padding:2px 7px;border-radius:20px;white-space:nowrap;flex-shrink:0}
+
+/* -- IMPORTANT DATES (dashboard widget) -- */
+.dwt-blue{background:#2563eb}
+body.theme-rose .dwt-blue{background:#b06090}
+body.theme-ocean .dwt-blue{background:#00d2b4}
+body.theme-midnight .dwt-blue{background:#5a8abf}
+body.theme-ember .dwt-blue{background:#6080a0}
+.imp-items{display:flex;flex-direction:column;gap:8px}
+.ii{
+  display:flex;align-items:center;gap:10px;
+  padding:9px 12px;border-radius:8px;
+  background:var(--s2);border-left:3px solid #2563eb;border-radius:0 8px 8px 0;
+  transition:background 0.15s;
+}
+body.theme-rose .ii{border-left-color:#b06090}
+body.theme-ocean .ii{border-left-color:#00d2b4}
+body.theme-midnight .ii{border-left-color:#e8a84a}
+body.theme-ember .ii{border-left-color:#d4724a}
+.ii.ii-today{background:rgba(37,99,235,.1);border-left-color:#059669}
+body.theme-rose .ii.ii-today{background:rgba(176,96,144,.12);border-left-color:#1a7a40}
+body.theme-ocean .ii.ii-today{background:rgba(0,210,180,.12);border-left-color:#00dc8c}
+.ii-date{
+  min-width:44px;text-align:center;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  font-variant-numeric:tabular-nums;line-height:1;
+}
+.ii-day{font-size:18px;font-weight:800;color:var(--text)}
+.ii-mon{font-size:9px;font-weight:700;letter-spacing:0.8px;text-transform:uppercase;color:var(--muted);margin-top:2px}
+.ii-info{flex:1;min-width:0}
+.ii-title{font-size:13px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ii-note{font-size:11px;color:var(--muted);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ii-badge{font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;white-space:nowrap;flex-shrink:0;background:rgba(37,99,235,.12);color:#2563eb}
+.ii-badge.today{background:rgba(5,150,105,.14);color:#047857}
+.ii-badge.overdue{background:rgba(220,38,38,.12);color:#dc2626}
+body.theme-midnight .ii-badge{background:rgba(90,138,191,.18);color:#9bb8d8}
+body.theme-ember .ii-badge{background:rgba(96,128,160,.18);color:#8aa0c0}
+body.theme-rose .ii-badge{background:rgba(176,96,144,.14);color:#b06090}
+body.theme-ocean .ii-badge{background:rgba(0,210,180,.14);color:#00d2b4}
+
+/* -- IMPORTANT DATES (full page) -- */
+.imp-header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:18px 28px;background:var(--sidebar);
+  border-bottom:1px solid rgba(200,180,138,.15);
+  flex-wrap:wrap;gap:10px;
+}
+.imp-title{font-size:15px;font-weight:700;color:var(--text);letter-spacing:0.2px}
+.imp-filters{display:flex;gap:8px;flex-wrap:wrap;padding:14px 28px 0}
+.imp-filter-btn{
+  padding:6px 14px;border-radius:20px;cursor:pointer;
+  font-size:12px;font-weight:600;
+  background:var(--s2);color:var(--muted);border:1px solid transparent;
+  transition:all 0.15s;
+}
+.imp-filter-btn:hover{background:var(--border);color:var(--text)}
+.imp-filter-btn.active{background:rgba(37,99,235,.12);color:var(--accent);border-color:rgba(37,99,235,.25)}
+body.theme-rose .imp-filter-btn.active{background:rgba(176,96,144,.12);color:var(--accent);border-color:rgba(176,96,144,.3)}
+body.theme-ocean .imp-filter-btn.active{background:rgba(0,210,180,.12);color:var(--accent);border-color:rgba(0,210,180,.3)}
+body.theme-midnight .imp-filter-btn.active{background:rgba(232,168,74,.12);color:var(--accent);border-color:rgba(232,168,74,.3)}
+body.theme-ember .imp-filter-btn.active{background:rgba(212,114,74,.12);color:var(--accent);border-color:rgba(212,114,74,.3)}
+.imp-list-wrap{padding:18px 28px 40px}
+.imp-empty{
+  padding:40px 20px;text-align:center;
+  color:var(--muted);font-style:italic;font-size:14px;
+  background:var(--sidebar);border:1px dashed var(--border);border-radius:12px;
+}
+.imp-card{
+  display:flex;align-items:center;gap:16px;
+  padding:14px 18px;margin-bottom:10px;
+  background:var(--sidebar);border:1px solid rgba(200,180,138,.15);
+  border-radius:12px;transition:all 0.15s;
+  border-left:4px solid #2563eb;
+}
+body.theme-rose .imp-card{border-left-color:#b06090}
+body.theme-ocean .imp-card{border-left-color:#00d2b4}
+body.theme-midnight .imp-card{border-left-color:#e8a84a}
+body.theme-ember .imp-card{border-left-color:#d4724a}
+.imp-card:hover{box-shadow:0 4px 16px rgba(0,0,0,.06)}
+.imp-card.overdue{border-left-color:#dc2626;opacity:0.75}
+.imp-card.today{border-left-color:#059669;background:rgba(5,150,105,.04)}
+.imp-card-date{
+  min-width:64px;text-align:center;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:8px 10px;border-radius:10px;background:var(--s2);
+  font-variant-numeric:tabular-nums;
+}
+.imp-card-day{font-size:22px;font-weight:800;color:var(--text);line-height:1}
+.imp-card-mon{font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-top:3px}
+.imp-card-yr{font-size:10px;color:var(--muted);margin-top:2px}
+.imp-card-body{flex:1;min-width:0}
+.imp-card-title{font-size:15px;font-weight:700;color:var(--text);margin-bottom:3px}
+.imp-card-note{font-size:12px;color:var(--muted);white-space:pre-wrap;word-break:break-word}
+.imp-card-meta{display:flex;align-items:center;gap:8px;margin-top:6px;flex-wrap:wrap}
+.imp-card-badge{font-size:10px;font-weight:700;padding:3px 9px;border-radius:20px;background:rgba(37,99,235,.12);color:#2563eb}
+.imp-card-badge.today{background:rgba(5,150,105,.14);color:#047857}
+.imp-card-badge.overdue{background:rgba(220,38,38,.12);color:#dc2626}
+.imp-card-badge.cat{background:rgba(124,92,191,.14);color:#7c5cbf}
+.imp-card-actions{display:flex;gap:6px;flex-shrink:0}
+.imp-card-btn{
+  background:transparent;border:1px solid var(--border);
+  color:var(--muted);padding:6px 10px;border-radius:8px;
+  font-size:12px;cursor:pointer;transition:all 0.15s;
+}
+.imp-card-btn:hover{background:var(--s2);color:var(--text)}
+.imp-card-btn.del:hover{background:rgba(220,38,38,.1);color:#dc2626;border-color:rgba(220,38,38,.3)}
+
+/* Important Dates modal */
+.imp-modal-backdrop{
+  position:fixed;inset:0;background:var(--over-bg);
+  z-index:1000;display:none;align-items:center;justify-content:center;
+  backdrop-filter:blur(4px);
+}
+.imp-modal-backdrop.open{display:flex}
+.imp-modal{
+  background:var(--bg);border:1px solid var(--border);
+  border-radius:16px;padding:24px;width:92%;max-width:460px;
+  box-shadow:0 20px 60px rgba(0,0,0,.3);
+}
+.imp-modal-title{font-size:16px;font-weight:700;color:var(--text);margin-bottom:16px}
+.imp-modal label{display:block;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;color:var(--muted);margin-bottom:6px;margin-top:12px}
+.imp-modal label:first-of-type{margin-top:0}
+.imp-modal input,.imp-modal select,.imp-modal textarea{
+  width:100%;padding:10px 12px;border-radius:8px;
+  background:var(--s2);border:1px solid var(--border);
+  color:var(--text);font-size:14px;font-family:inherit;
+}
+.imp-modal textarea{resize:vertical;min-height:70px}
+.imp-modal input:focus,.imp-modal select:focus,.imp-modal textarea:focus{outline:none;border-color:var(--accent)}
+.imp-modal-actions{display:flex;gap:10px;margin-top:20px;justify-content:flex-end}
+.imp-modal-actions .btn-ghost{background:transparent;border:1px solid var(--border);color:var(--muted);padding:9px 16px;border-radius:8px;cursor:pointer;font-weight:600}
+.imp-modal-actions .btn-ghost:hover{background:var(--s2);color:var(--text)}
+.imp-modal-actions .btn{padding:9px 18px}
+
+@media(max-width:640px){
+  .imp-header{padding:14px 16px}
+  .imp-filters{padding:12px 16px 0}
+  .imp-list-wrap{padding:14px 16px 30px}
+  .imp-card{padding:12px;gap:10px}
+  .imp-card-date{min-width:54px;padding:6px}
+  .imp-card-day{font-size:18px}
+  .imp-card-actions{flex-direction:column}
+}
+
 .dash-empty{font-size:13px;color:var(--muted);font-style:italic;padding:10px 0}
 .dash-greeting{
   background:var(--sidebar);border:1px solid var(--border);
@@ -3768,6 +3912,10 @@ body.theme-beige .inv-mcard-total{background:linear-gradient(135deg,#5a4a9a,#7c5
     <span class="nav-icon">✍️</span> Task Notes
     <span class="nav-count" id="nav-tasknotes-count">0</span>
   </button>
+  <button class="nav-item" id="nav-impdates-btn" onclick="showPage('impdates',this)">
+    <span class="nav-icon">🗓️</span> Important Dates
+    <span class="nav-count" id="nav-impdates-count">0</span>
+  </button>
 
   <div class="sidebar-section">Tracking</div>
   <button class="nav-item" id="nav-journal-btn" onclick="showPage('journal',this)">
@@ -3848,6 +3996,10 @@ body.theme-beige .inv-mcard-total{background:linear-gradient(135deg,#5a4a9a,#7c5
         <!-- tasknotes: add note -->
         <div id="ctx-tasknotes" style="display:none;align-items:center;gap:8px">
           <button class="btn" onclick="document.getElementById('tan-quick-input').focus()">+ Quick Note</button>
+        </div>
+        <!-- impdates: add important date -->
+        <div id="ctx-impdates" style="display:none;align-items:center;gap:8px">
+          <button class="btn" onclick="impOpenModal()">+ Add Date</button>
         </div>
         <!-- finance: new entry -->
         <div id="ctx-finance" style="display:none;align-items:center;gap:8px">
@@ -3995,7 +4147,7 @@ body.theme-beige .inv-mcard-total{background:linear-gradient(135deg,#5a4a9a,#7c5
           <div class="dash-upcoming-items" id="dash-upcoming-list"><div class="dash-empty">No upcoming reminders.</div></div>
         </div>
       </div>
-      <!-- Bottom two widgets -->
+      <!-- Bottom three widgets -->
       <div class="dash-bottom">
         <div class="dash-widget">
           <div class="dash-widget-title"><span class="dwt-dot dwt-green"></span>Next Routine</div>
@@ -4004,6 +4156,10 @@ body.theme-beige .inv-mcard-total{background:linear-gradient(135deg,#5a4a9a,#7c5
         <div class="dash-widget" id="dash-missed-widget">
           <div class="dash-widget-title" onclick="toggleMissedWidget()" style="cursor:pointer;user-select:none"><span class="dwt-dot dwt-red"></span>Missed &amp; Overdue <span id="missed-toggle" style="margin-left:auto;font-size:10px;color:var(--muted);transition:transform .2s">▼</span></div>
           <div class="missed-items" id="dash-missed-list"><div class="dash-empty">✨ All clear — you're on top of everything!</div></div>
+        </div>
+        <div class="dash-widget" id="dash-impdates-widget">
+          <div class="dash-widget-title" style="cursor:pointer;user-select:none" onclick="showPage('impdates',document.getElementById('nav-impdates-btn'))"><span class="dwt-dot dwt-blue"></span>Important Dates <span style="margin-left:auto;font-size:10px;color:var(--muted)">View all →</span></div>
+          <div class="imp-items" id="dash-impdates-list"><div class="dash-empty">No important dates added yet.</div></div>
         </div>
       </div>
       <!-- Tasks widget -->
@@ -4445,6 +4601,62 @@ body.theme-beige .inv-mcard-total{background:linear-gradient(135deg,#5a4a9a,#7c5
   <!-- Notes list -->
   <div class="tan-list" id="tan-list"></div>
 
+</div>
+
+<!-- ── IMPORTANT DATES PAGE ───────────────────────── -->
+<div id="page-impdates" style="display:none;flex-direction:column;width:100%;min-height:calc(100vh - 60px);background:var(--bg)">
+
+  <div class="imp-header">
+    <span class="imp-title">🗓️ Important Dates</span>
+    <div style="display:flex;align-items:center;gap:10px">
+      <span style="font-size:12px;color:var(--muted)" id="imp-hdr-count">0 dates</span>
+      <button class="btn" onclick="impOpenModal()">+ Add Date</button>
+    </div>
+  </div>
+
+  <div class="imp-filters">
+    <button class="imp-filter-btn active" id="imp-f-all"      onclick="impSetFilter('all',this)">All</button>
+    <button class="imp-filter-btn"        id="imp-f-upcoming" onclick="impSetFilter('upcoming',this)">📅 Upcoming</button>
+    <button class="imp-filter-btn"        id="imp-f-today"    onclick="impSetFilter('today',this)">⭐ Today</button>
+    <button class="imp-filter-btn"        id="imp-f-past"     onclick="impSetFilter('past',this)">⏳ Past</button>
+  </div>
+
+  <div class="imp-list-wrap" id="imp-list-wrap">
+    <div class="imp-empty">No important dates yet. Click "+ Add Date" to add your first one.</div>
+  </div>
+
+</div>
+
+<!-- Important Dates modal -->
+<div class="imp-modal-backdrop" id="imp-modal-backdrop">
+  <div class="imp-modal">
+    <div class="imp-modal-title" id="imp-modal-title">Add Important Date</div>
+    <input type="hidden" id="imp-edit-id" value="">
+
+    <label for="imp-input-date">Date *</label>
+    <input type="date" id="imp-input-date">
+
+    <label for="imp-input-title">Title *</label>
+    <input type="text" id="imp-input-title" placeholder="e.g. Anniversary, Doctor appointment, Exam">
+
+    <label for="imp-input-cat">Category</label>
+    <select id="imp-input-cat">
+      <option value="personal">👤 Personal</option>
+      <option value="official">💼 Official</option>
+      <option value="family">👨‍👩‍👧 Family</option>
+      <option value="health">❤️ Health</option>
+      <option value="finance">💰 Finance</option>
+      <option value="other">📌 Other</option>
+    </select>
+
+    <label for="imp-input-note">Notes (optional)</label>
+    <textarea id="imp-input-note" placeholder="Extra details..."></textarea>
+
+    <div class="imp-modal-actions">
+      <button class="btn-ghost" onclick="impCloseModal()">Cancel</button>
+      <button class="btn" onclick="impSaveEntry()">Save</button>
+    </div>
+  </div>
 </div>
 
 <!-- ── FINANCE TRACKER PAGE ───────────────────────── -->
@@ -5312,7 +5524,7 @@ body.theme-beige .inv-mcard-total{background:linear-gradient(135deg,#5a4a9a,#7c5
 <div id="toast"></div>
 
 <script>
-let DATA={notes:[],reminders:[],stickies:[],archived:[],trades:[],routines:[],routine_logs:[],tasknotes:[],finance:[],note_folders:[],rem_lists:[],daybook:[],shopping:[],investments:[]};
+let DATA={notes:[],reminders:[],stickies:[],archived:[],trades:[],routines:[],routine_logs:[],tasknotes:[],finance:[],note_folders:[],rem_lists:[],daybook:[],shopping:[],investments:[],important_dates:[]};
 let dataLoaded=false; // guard: prevents any save before data is fully loaded
 let currentType='note';
 
@@ -5377,7 +5589,7 @@ async function firebaseSignIn(){
 async function firebaseSignOut(){
   if(!confirm('Sign out? Local unsaved changes will be lost.')) return;
   await fbAuth.signOut();
-  DATA={notes:[],reminders:[],stickies:[],archived:[],trades:[],routines:[],routine_logs:[],tasknotes:[],finance:[],note_folders:[],rem_lists:[],daybook:[],shopping:[],investments:[]};
+  DATA={notes:[],reminders:[],stickies:[],archived:[],trades:[],routines:[],routine_logs:[],tasknotes:[],finance:[],note_folders:[],rem_lists:[],daybook:[],shopping:[],investments:[],important_dates:[]};
   dataLoaded=false;
   renderAll();
   toast('Signed out','success');
@@ -5420,6 +5632,7 @@ async function loadFromFirebase(){
     if(!DATA.investments)   DATA.investments   = [];
     if(!DATA.notes)         DATA.notes         = [];
     if(!DATA.reminders)     DATA.reminders     = [];
+    if(!DATA.important_dates) DATA.important_dates = [];
 
     // ── EMOJI SANITIZER ──
     function isValidStr(s){ return typeof s==='string' && !/[\u0080-\u00ff]{2,}/.test(s); }
@@ -5473,6 +5686,9 @@ async function loadFromFirebase(){
     dbRender();
     shopRender();
     invRender();
+    impRenderDashboard();
+    impRenderPage();
+    updateImpDatesCount();
 
     if(needsRepair && JSON.stringify(DATA) !== _beforeRepair){
       await saveToFirebase();
@@ -5565,6 +5781,7 @@ function renderAll(){
   updateTaskNotesCount();
   updateFinanceCount();
   updateInvestmentsCount();
+  updateImpDatesCount();
   const now=new Date();
   const todayStr=localToday();
   const pending=reminders.filter(r=>!r.sent).length;
@@ -7175,8 +7392,8 @@ function showPage(page, btn){
   if(page !== 'daybook' && dbGetPin()) _dbUnlocked = false;
   // Lock investments when navigating away (uses same PIN)
   if(page !== 'investments' && dbGetPin()) _invUnlocked = false;
-  const pages = ['dashboard','notes','reminders','sticky','journal','routine','tasknotes','finance','daybook','shopping','investments'];
-  const displayMap = {dashboard:'',notes:'flex',reminders:'flex',sticky:'flex',journal:'flex',routine:'flex',tasknotes:'flex',finance:'flex',daybook:'flex',shopping:'flex',investments:'flex'};
+  const pages = ['dashboard','notes','reminders','sticky','journal','routine','tasknotes','finance','daybook','shopping','investments','impdates'];
+  const displayMap = {dashboard:'',notes:'flex',reminders:'flex',sticky:'flex',journal:'flex',routine:'flex',tasknotes:'flex',finance:'flex',daybook:'flex',shopping:'flex',investments:'flex',impdates:'flex'};
   pages.forEach(p=>{
     const el=document.getElementById('page-'+p);
     if(el){
@@ -7208,12 +7425,13 @@ function showPage(page, btn){
     finance:'💰 Finance Tracker',
     daybook:'📖 Daybook',
     shopping:'🛒 Shopping',
-    investments:'📊 Investments'
+    investments:'📊 Investments',
+    impdates:'🗓️ Important Dates'
   };
   document.getElementById('page-title').textContent = titles[page]||'📋 Dashboard';
 
   // 5. Context-aware actions
-  ['dashboard','notes','reminders','sticky','journal','routine','tasknotes','finance','daybook','shopping','investments'].forEach(p=>{
+  ['dashboard','notes','reminders','sticky','journal','routine','tasknotes','finance','daybook','shopping','investments','impdates'].forEach(p=>{
     const el=document.getElementById('ctx-'+p);
     if(el) el.style.display=p===page?'flex':'none';
   });
@@ -7270,6 +7488,7 @@ function showPage(page, btn){
     }
   }
   if(page==='shopping') shopRender();
+  if(page==='impdates') impRenderPage();
   if(page==='investments'){
     const pin = dbGetPin();
     if(pin && !_invUnlocked){
@@ -9713,6 +9932,9 @@ function updateDashboardWidgets(){
 
   // -- TASKS WIDGET --
   renderDashTasks();
+
+  // -- IMPORTANT DATES --
+  impRenderDashboard();
 }
 
 function renderDashTasks(){
@@ -11380,6 +11602,265 @@ async function invDelete(id){
   toast('Asset deleted','success');
   await saveToFirebase();
 }
+
+/* ==================== IMPORTANT DATES ==================== */
+let _impFilter = 'all';
+const IMP_CAT_LABEL = {
+  personal:'👤 Personal',
+  official:'💼 Official',
+  family:'👨‍👩‍👧 Family',
+  health:'❤️ Health',
+  finance:'💰 Finance',
+  other:'📌 Other'
+};
+
+function impGetData(){ return Array.isArray(DATA.important_dates) ? DATA.important_dates : []; }
+
+function impTodayStr(){
+  const d=new Date();
+  const y=d.getFullYear(), m=String(d.getMonth()+1).padStart(2,'0'), dd=String(d.getDate()).padStart(2,'0');
+  return y+'-'+m+'-'+dd;
+}
+
+function impDaysUntil(dateStr){
+  if(!dateStr) return 0;
+  const today=new Date(); today.setHours(0,0,0,0);
+  const target=new Date(dateStr+'T00:00:00');
+  return Math.round((target-today)/(1000*60*60*24));
+}
+
+function impFormatBadge(dateStr){
+  const days=impDaysUntil(dateStr);
+  if(days===0) return {text:'Today', cls:'today'};
+  if(days===1) return {text:'Tomorrow', cls:''};
+  if(days>0 && days<=7) return {text:'In '+days+' days', cls:''};
+  if(days>0) return {text:'In '+days+' days', cls:''};
+  if(days===-1) return {text:'Yesterday', cls:'overdue'};
+  return {text:Math.abs(days)+'d ago', cls:'overdue'};
+}
+
+function impMonthShort(dateStr){
+  if(!dateStr) return '';
+  const d=new Date(dateStr+'T00:00:00');
+  return d.toLocaleString('en-US',{month:'short'}).toUpperCase();
+}
+
+function impDayNum(dateStr){
+  if(!dateStr) return '';
+  const d=new Date(dateStr+'T00:00:00');
+  return d.getDate();
+}
+
+function impYear(dateStr){
+  if(!dateStr) return '';
+  const d=new Date(dateStr+'T00:00:00');
+  return d.getFullYear();
+}
+
+function impEscape(s){
+  return String(s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+function impOpenModal(id){
+  const bd=document.getElementById('imp-modal-backdrop');
+  const titleEl=document.getElementById('imp-modal-title');
+  const idEl=document.getElementById('imp-edit-id');
+  const dateEl=document.getElementById('imp-input-date');
+  const titleInput=document.getElementById('imp-input-title');
+  const catEl=document.getElementById('imp-input-cat');
+  const noteEl=document.getElementById('imp-input-note');
+  if(id){
+    const entry=impGetData().find(e=>e.id===id);
+    if(!entry){ toast('Entry not found','error'); return; }
+    titleEl.textContent='Edit Important Date';
+    idEl.value=id;
+    dateEl.value=entry.date||'';
+    titleInput.value=entry.title||'';
+    catEl.value=entry.category||'personal';
+    noteEl.value=entry.note||'';
+  } else {
+    titleEl.textContent='Add Important Date';
+    idEl.value='';
+    dateEl.value=impTodayStr();
+    titleInput.value='';
+    catEl.value='personal';
+    noteEl.value='';
+  }
+  bd.classList.add('open');
+  setTimeout(()=>titleInput.focus(),100);
+}
+
+function impCloseModal(){
+  document.getElementById('imp-modal-backdrop').classList.remove('open');
+}
+
+async function impSaveEntry(){
+  const id=document.getElementById('imp-edit-id').value;
+  const date=document.getElementById('imp-input-date').value;
+  const title=document.getElementById('imp-input-title').value.trim();
+  const category=document.getElementById('imp-input-cat').value;
+  const note=document.getElementById('imp-input-note').value.trim();
+
+  if(!date){ toast('Please pick a date','error'); return; }
+  if(!title){ toast('Please enter a title','error'); return; }
+
+  if(!Array.isArray(DATA.important_dates)) DATA.important_dates=[];
+
+  if(id){
+    const entry=DATA.important_dates.find(e=>e.id===id);
+    if(entry){
+      entry.date=date; entry.title=title; entry.category=category; entry.note=note;
+      entry.updatedAt=Date.now();
+    }
+    toast('Important date updated ✓','success');
+  } else {
+    DATA.important_dates.push({
+      id:'imp_'+Date.now()+'_'+Math.random().toString(36).slice(2,7),
+      date, title, category, note,
+      createdAt:Date.now(), updatedAt:Date.now()
+    });
+    toast('Important date added ✓','success');
+  }
+
+  impCloseModal();
+  impRenderPage();
+  impRenderDashboard();
+  updateImpDatesCount();
+  await saveToFirebase();
+}
+
+async function impDelete(id){
+  if(!confirm('Delete this important date?')) return;
+  DATA.important_dates=impGetData().filter(e=>e.id!==id);
+  impRenderPage();
+  impRenderDashboard();
+  updateImpDatesCount();
+  toast('Deleted','success');
+  await saveToFirebase();
+}
+
+function impSetFilter(f, btn){
+  _impFilter=f;
+  document.querySelectorAll('.imp-filter-btn').forEach(b=>b.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+  impRenderPage();
+}
+
+function impRenderPage(){
+  const wrap=document.getElementById('imp-list-wrap');
+  const hdrCount=document.getElementById('imp-hdr-count');
+  if(!wrap) return;
+
+  const all=impGetData().slice();
+  const todayStr=impTodayStr();
+
+  let filtered=all;
+  if(_impFilter==='upcoming')     filtered=all.filter(e=>e.date >  todayStr);
+  else if(_impFilter==='today')   filtered=all.filter(e=>e.date === todayStr);
+  else if(_impFilter==='past')    filtered=all.filter(e=>e.date <  todayStr);
+
+  // Sort: upcoming first (ascending), past last (most recent first)
+  filtered.sort((a,b)=>{
+    const aDays=impDaysUntil(a.date), bDays=impDaysUntil(b.date);
+    const aPast=aDays<0, bPast=bDays<0;
+    if(aPast && !bPast) return 1;
+    if(!aPast && bPast) return -1;
+    if(aPast && bPast)  return bDays-aDays; // most recent past first
+    return aDays-bDays; // soonest upcoming first
+  });
+
+  if(hdrCount) hdrCount.textContent = all.length===1 ? '1 date' : all.length+' dates';
+
+  if(!filtered.length){
+    const msg = _impFilter==='all'
+      ? 'No important dates yet. Click "+ Add Date" to add your first one.'
+      : 'No dates match this filter.';
+    wrap.innerHTML='<div class="imp-empty">'+msg+'</div>';
+    return;
+  }
+
+  wrap.innerHTML = filtered.map(e=>{
+    const days=impDaysUntil(e.date);
+    const badge=impFormatBadge(e.date);
+    let cardCls='imp-card';
+    if(days===0) cardCls+=' today';
+    else if(days<0) cardCls+=' overdue';
+
+    return `<div class="${cardCls}">
+      <div class="imp-card-date">
+        <div class="imp-card-day">${impDayNum(e.date)}</div>
+        <div class="imp-card-mon">${impMonthShort(e.date)}</div>
+        <div class="imp-card-yr">${impYear(e.date)}</div>
+      </div>
+      <div class="imp-card-body">
+        <div class="imp-card-title">${impEscape(e.title)}</div>
+        ${e.note?`<div class="imp-card-note">${impEscape(e.note)}</div>`:''}
+        <div class="imp-card-meta">
+          <span class="imp-card-badge ${badge.cls}">${badge.text}</span>
+          <span class="imp-card-badge cat">${IMP_CAT_LABEL[e.category]||'📌 Other'}</span>
+        </div>
+      </div>
+      <div class="imp-card-actions">
+        <button class="imp-card-btn" onclick="impOpenModal('${e.id}')" title="Edit">✎</button>
+        <button class="imp-card-btn del" onclick="impDelete('${e.id}')" title="Delete">🗑</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function impRenderDashboard(){
+  const el=document.getElementById('dash-impdates-list');
+  if(!el) return;
+  const all=impGetData().slice();
+  const todayStr=impTodayStr();
+
+  // Show today + upcoming (next 30 days priority), then any future, limit 4
+  const relevant=all.filter(e=>e.date>=todayStr)
+    .sort((a,b)=>a.date.localeCompare(b.date))
+    .slice(0,4);
+
+  if(!relevant.length){
+    el.innerHTML='<div class="dash-empty">No important dates added yet.</div>';
+    return;
+  }
+
+  el.innerHTML=relevant.map(e=>{
+    const days=impDaysUntil(e.date);
+    const badge=impFormatBadge(e.date);
+    const cls = days===0 ? ' ii-today' : '';
+    return `<div class="ii${cls}">
+      <div class="ii-date">
+        <div class="ii-day">${impDayNum(e.date)}</div>
+        <div class="ii-mon">${impMonthShort(e.date)}</div>
+      </div>
+      <div class="ii-info">
+        <div class="ii-title">${impEscape(e.title)}</div>
+        ${e.note?`<div class="ii-note">${impEscape(e.note)}</div>`:''}
+      </div>
+      <span class="ii-badge ${badge.cls}">${badge.text}</span>
+    </div>`;
+  }).join('');
+}
+
+function updateImpDatesCount(){
+  const n=impGetData().length;
+  const el=document.getElementById('nav-impdates-count');
+  if(el) el.textContent=n;
+}
+
+// Close modal on backdrop click
+document.addEventListener('click', function(ev){
+  const bd=document.getElementById('imp-modal-backdrop');
+  if(bd && ev.target===bd) impCloseModal();
+});
+
+// Close modal on Escape key
+document.addEventListener('keydown', function(ev){
+  if(ev.key==='Escape'){
+    const bd=document.getElementById('imp-modal-backdrop');
+    if(bd && bd.classList.contains('open')) impCloseModal();
+  }
+});
 
 window.addEventListener('DOMContentLoaded',()=>{
   const savedTheme=localStorage.getItem('mynotes_theme')||'rose';
