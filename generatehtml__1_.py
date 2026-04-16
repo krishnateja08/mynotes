@@ -893,17 +893,98 @@ body.theme-ember .imp-month-header.current .imp-month-count{background:rgba(212,
   padding:12px 12px 12px 14px;
   background:var(--sidebar);border:1px solid rgba(200,180,138,.15);
   border-radius:12px;transition:all 0.15s;
-  border-left:4px solid #2563eb;
+  border-left:5px solid #7c5cbf;
   min-width:0;
   position:relative;
 }
-body.theme-rose .imp-card{border-left-color:#b06090}
-body.theme-ocean .imp-card{border-left-color:#00d2b4}
-body.theme-midnight .imp-card{border-left-color:#e8a84a}
-body.theme-ember .imp-card{border-left-color:#d4724a}
+/* Category-colored left borders (#4) */
+.imp-card.cat-personal{border-left-color:#3b82f6}
+.imp-card.cat-official{border-left-color:#64748b}
+.imp-card.cat-family{border-left-color:#ec4899}
+.imp-card.cat-health{border-left-color:#ef4444}
+.imp-card.cat-finance{border-left-color:#10b981}
+.imp-card.cat-other{border-left-color:#a78bfa}
 .imp-card:hover{box-shadow:0 4px 16px rgba(0,0,0,.06);transform:translateY(-1px)}
-.imp-card.overdue{border-left-color:#dc2626;opacity:0.75}
-.imp-card.today{border-left-color:#059669;background:rgba(5,150,105,.04)}
+.imp-card.overdue{opacity:0.75}
+.imp-card.today{background:rgba(5,150,105,.04)}
+
+/* Urgency pulse for events within 3 days (#2) */
+@keyframes imp-urgent-pulse{
+  0%,100%{box-shadow:0 0 0 0 rgba(245,158,11,.5)}
+  50%{box-shadow:0 0 0 6px rgba(245,158,11,0)}
+}
+.imp-card-badge.urgent{
+  background:rgba(245,158,11,.18);color:#b45309;
+  animation:imp-urgent-pulse 1.8s ease-in-out infinite;
+}
+.imp-card-badge.today{
+  background:rgba(5,150,105,.18);color:#047857;
+  animation:imp-urgent-pulse 1.8s ease-in-out infinite;
+}
+.imp-card-badge.overdue{
+  background:rgba(220,38,38,.15);color:#dc2626;
+}
+
+/* Hero "Next Up" card (#3) */
+.imp-hero{
+  display:flex;gap:20px;align-items:center;
+  padding:20px 22px;margin-bottom:22px;
+  background:linear-gradient(135deg,var(--sidebar) 0%,var(--s2) 100%);
+  border:1px solid var(--border);border-radius:16px;
+  border-left:6px solid var(--accent);
+  position:relative;overflow:hidden;
+}
+.imp-hero::before{
+  content:'';position:absolute;top:0;right:0;width:180px;height:100%;
+  background:radial-gradient(circle at right,rgba(124,92,191,.08),transparent 70%);
+  pointer-events:none;
+}
+.imp-hero.urgent{border-left-color:#f59e0b}
+.imp-hero.urgent::before{background:radial-gradient(circle at right,rgba(245,158,11,.12),transparent 70%)}
+.imp-hero.today{border-left-color:#059669}
+.imp-hero.today::before{background:radial-gradient(circle at right,rgba(5,150,105,.12),transparent 70%)}
+.imp-hero-label{
+  font-size:10px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;
+  color:var(--accent);margin-bottom:6px;
+}
+.imp-hero.urgent .imp-hero-label{color:#b45309}
+.imp-hero.today .imp-hero-label{color:#047857}
+.imp-hero-date{
+  min-width:78px;width:78px;text-align:center;flex-shrink:0;
+  padding:10px 6px;border-radius:12px;background:var(--bg);
+  border:1px solid var(--border);
+}
+.imp-hero-day{font-size:32px;font-weight:800;color:var(--text);line-height:1;font-variant-numeric:tabular-nums}
+.imp-hero-mon{font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-top:3px}
+.imp-hero-yr{font-size:10px;color:var(--muted);margin-top:2px}
+.imp-hero-body{flex:1;min-width:0;position:relative;z-index:1}
+.imp-hero-title{font-size:20px;font-weight:700;color:var(--text);margin-bottom:4px;line-height:1.25}
+.imp-hero-note{font-size:13px;color:var(--muted);margin-bottom:10px;line-height:1.4}
+.imp-hero-cat{
+  display:inline-block;font-size:10px;font-weight:700;
+  padding:3px 10px;border-radius:20px;
+  background:var(--bg);color:var(--text2);border:1px solid var(--border);
+}
+.imp-hero-countdown{
+  display:flex;gap:10px;flex-shrink:0;position:relative;z-index:1;
+}
+.imp-hero-cdblock{
+  min-width:56px;text-align:center;
+  padding:8px 10px;background:var(--bg);border:1px solid var(--border);
+  border-radius:10px;
+}
+.imp-hero-cdnum{font-size:22px;font-weight:800;color:var(--accent);line-height:1;font-variant-numeric:tabular-nums}
+.imp-hero.urgent .imp-hero-cdnum{color:#b45309}
+.imp-hero.today .imp-hero-cdnum{color:#047857}
+.imp-hero-cdlbl{font-size:9px;font-weight:700;letter-spacing:0.8px;text-transform:uppercase;color:var(--muted);margin-top:4px}
+@media(max-width:640px){
+  .imp-hero{flex-wrap:wrap;gap:14px;padding:16px}
+  .imp-hero-date{min-width:64px;width:64px;padding:8px 4px}
+  .imp-hero-day{font-size:26px}
+  .imp-hero-title{font-size:17px}
+  .imp-hero-countdown{width:100%;justify-content:flex-start}
+  .imp-hero-cdblock{min-width:0;flex:1;max-width:80px}
+}
 .imp-card-date{
   min-width:50px;width:50px;text-align:center;
   display:flex;flex-direction:column;align-items:center;justify-content:center;
@@ -918,8 +999,6 @@ body.theme-ember .imp-card{border-left-color:#d4724a}
 .imp-card-note{font-size:11px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:4px}
 .imp-card-meta{display:flex;align-items:center;gap:5px;flex-wrap:wrap}
 .imp-card-badge{font-size:9px;font-weight:700;padding:2px 7px;border-radius:20px;background:rgba(37,99,235,.12);color:#2563eb;white-space:nowrap}
-.imp-card-badge.today{background:rgba(5,150,105,.14);color:#047857}
-.imp-card-badge.overdue{background:rgba(220,38,38,.12);color:#dc2626}
 .imp-card-badge.cat{background:rgba(124,92,191,.14);color:#7c5cbf}
 .imp-card-actions{
   position:absolute;top:8px;right:8px;
@@ -11833,8 +11912,14 @@ function impRenderPage(){
     const days=impDaysUntil(e.date);
     const badge=impFormatBadge(e.date);
     let cardCls='imp-card';
+    // Category-colored border (#4)
+    cardCls += ' cat-' + (e.category || 'other');
     if(days===0) cardCls+=' today';
     else if(days<0) cardCls+=' overdue';
+
+    // Urgent pulse badge for 1-3 days out (#2). Today/overdue already pulse via their own classes.
+    let badgeCls = badge.cls;
+    if(days>0 && days<=3) badgeCls += ' urgent';
 
     return `<div class="${cardCls}">
       <div class="imp-card-date">
@@ -11846,7 +11931,7 @@ function impRenderPage(){
         <div class="imp-card-title">${impEscape(e.title)}</div>
         ${e.note?`<div class="imp-card-note">${impEscape(e.note)}</div>`:''}
         <div class="imp-card-meta">
-          <span class="imp-card-badge ${badge.cls}">${badge.text}</span>
+          <span class="imp-card-badge ${badgeCls}">${badge.text}</span>
           <span class="imp-card-badge cat">${IMP_CAT_LABEL[e.category]||'📌 Other'}</span>
         </div>
       </div>
@@ -11857,10 +11942,54 @@ function impRenderPage(){
     </div>`;
   };
 
+  // Hero "Next Up" card (#3) — the single next upcoming event (not overdue)
+  const nextUp = filtered.filter(e=>e.date && e.date>=todayStr)
+                         .sort((a,b)=>a.date.localeCompare(b.date))[0];
+  let heroHtml = '';
+  if(nextUp){
+    const d=impDaysUntil(nextUp.date);
+    let heroCls='imp-hero';
+    let heroLabel='Next Up';
+    if(d===0){ heroCls+=' today'; heroLabel='Today'; }
+    else if(d>0 && d<=3){ heroCls+=' urgent'; heroLabel='Coming Up Soon'; }
+
+    // Live countdown: if today, show hours + minutes until end of day; otherwise days + hours
+    const now=new Date();
+    const target=new Date(nextUp.date+'T00:00:00');
+    const msLeft = target - now;
+    const totalHours = Math.max(0, Math.floor(msLeft/(1000*60*60)));
+    const totalMins  = Math.max(0, Math.floor((msLeft%(1000*60*60))/(1000*60)));
+
+    let cdBlocks = '';
+    if(d>0){
+      cdBlocks = `
+        <div class="imp-hero-cdblock"><div class="imp-hero-cdnum">${d}</div><div class="imp-hero-cdlbl">${d===1?'Day':'Days'}</div></div>
+        <div class="imp-hero-cdblock"><div class="imp-hero-cdnum">${totalHours % 24}</div><div class="imp-hero-cdlbl">Hours</div></div>
+        <div class="imp-hero-cdblock"><div class="imp-hero-cdnum">${totalMins}</div><div class="imp-hero-cdlbl">Mins</div></div>`;
+    } else if(d===0){
+      cdBlocks = `<div class="imp-hero-cdblock"><div class="imp-hero-cdnum">🎉</div><div class="imp-hero-cdlbl">Today</div></div>`;
+    }
+
+    heroHtml = `<div class="${heroCls}">
+      <div class="imp-hero-date">
+        <div class="imp-hero-day">${impDayNum(nextUp.date)}</div>
+        <div class="imp-hero-mon">${impMonthShort(nextUp.date)}</div>
+        <div class="imp-hero-yr">${impYear(nextUp.date)}</div>
+      </div>
+      <div class="imp-hero-body">
+        <div class="imp-hero-label">${heroLabel}</div>
+        <div class="imp-hero-title">${impEscape(nextUp.title)}</div>
+        ${nextUp.note?`<div class="imp-hero-note">${impEscape(nextUp.note)}</div>`:''}
+        <span class="imp-hero-cat">${IMP_CAT_LABEL[nextUp.category]||'📌 Other'}</span>
+      </div>
+      ${cdBlocks?`<div class="imp-hero-countdown">${cdBlocks}</div>`:''}
+    </div>`;
+  }
+
   // Determine current month for highlighting
   const curMonthKey = todayStr.slice(0,7);
 
-  wrap.innerHTML = order.map(key=>{
+  wrap.innerHTML = heroHtml + order.map(key=>{
     const g = groups[key];
     const isCurrent = key === curMonthKey;
     const cntText = g.items.length===1 ? '1 date' : g.items.length+' dates';
