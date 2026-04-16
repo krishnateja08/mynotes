@@ -860,42 +860,56 @@ body.theme-ember .imp-filter-btn.active{background:rgba(212,114,74,.12);color:va
   color:var(--muted);font-style:italic;font-size:14px;
   background:var(--sidebar);border:1px dashed var(--border);border-radius:12px;
 }
+.imp-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(240px,1fr));
+  gap:12px;
+}
 .imp-card{
-  display:flex;align-items:center;gap:16px;
-  padding:14px 18px;margin-bottom:10px;
+  display:flex;align-items:stretch;gap:12px;
+  padding:12px 12px 12px 14px;
   background:var(--sidebar);border:1px solid rgba(200,180,138,.15);
   border-radius:12px;transition:all 0.15s;
   border-left:4px solid #2563eb;
+  min-width:0;
+  position:relative;
 }
 body.theme-rose .imp-card{border-left-color:#b06090}
 body.theme-ocean .imp-card{border-left-color:#00d2b4}
 body.theme-midnight .imp-card{border-left-color:#e8a84a}
 body.theme-ember .imp-card{border-left-color:#d4724a}
-.imp-card:hover{box-shadow:0 4px 16px rgba(0,0,0,.06)}
+.imp-card:hover{box-shadow:0 4px 16px rgba(0,0,0,.06);transform:translateY(-1px)}
 .imp-card.overdue{border-left-color:#dc2626;opacity:0.75}
 .imp-card.today{border-left-color:#059669;background:rgba(5,150,105,.04)}
 .imp-card-date{
-  min-width:64px;text-align:center;
+  min-width:50px;width:50px;text-align:center;
   display:flex;flex-direction:column;align-items:center;justify-content:center;
-  padding:8px 10px;border-radius:10px;background:var(--s2);
-  font-variant-numeric:tabular-nums;
+  padding:6px 4px;border-radius:8px;background:var(--s2);
+  font-variant-numeric:tabular-nums;flex-shrink:0;
 }
-.imp-card-day{font-size:22px;font-weight:800;color:var(--text);line-height:1}
-.imp-card-mon{font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-top:3px}
-.imp-card-yr{font-size:10px;color:var(--muted);margin-top:2px}
-.imp-card-body{flex:1;min-width:0}
-.imp-card-title{font-size:15px;font-weight:700;color:var(--text);margin-bottom:3px}
-.imp-card-note{font-size:12px;color:var(--muted);white-space:pre-wrap;word-break:break-word}
-.imp-card-meta{display:flex;align-items:center;gap:8px;margin-top:6px;flex-wrap:wrap}
-.imp-card-badge{font-size:10px;font-weight:700;padding:3px 9px;border-radius:20px;background:rgba(37,99,235,.12);color:#2563eb}
+.imp-card-day{font-size:18px;font-weight:800;color:var(--text);line-height:1}
+.imp-card-mon{font-size:9px;font-weight:700;letter-spacing:0.8px;text-transform:uppercase;color:var(--muted);margin-top:2px}
+.imp-card-yr{font-size:9px;color:var(--muted);margin-top:1px}
+.imp-card-body{flex:1;min-width:0;display:flex;flex-direction:column;justify-content:center;padding-right:40px}
+.imp-card-title{font-size:13px;font-weight:700;color:var(--text);margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.imp-card-note{font-size:11px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:4px}
+.imp-card-meta{display:flex;align-items:center;gap:5px;flex-wrap:wrap}
+.imp-card-badge{font-size:9px;font-weight:700;padding:2px 7px;border-radius:20px;background:rgba(37,99,235,.12);color:#2563eb;white-space:nowrap}
 .imp-card-badge.today{background:rgba(5,150,105,.14);color:#047857}
 .imp-card-badge.overdue{background:rgba(220,38,38,.12);color:#dc2626}
 .imp-card-badge.cat{background:rgba(124,92,191,.14);color:#7c5cbf}
-.imp-card-actions{display:flex;gap:6px;flex-shrink:0}
+.imp-card-actions{
+  position:absolute;top:8px;right:8px;
+  display:flex;gap:3px;flex-shrink:0;
+  opacity:0;transition:opacity 0.15s;
+}
+.imp-card:hover .imp-card-actions{opacity:1}
+@media(hover:none){.imp-card-actions{opacity:1}}
 .imp-card-btn{
-  background:transparent;border:1px solid var(--border);
-  color:var(--muted);padding:6px 10px;border-radius:8px;
-  font-size:12px;cursor:pointer;transition:all 0.15s;
+  background:var(--bg);border:1px solid var(--border);
+  color:var(--muted);padding:3px 7px;border-radius:6px;
+  font-size:11px;cursor:pointer;transition:all 0.15s;
+  line-height:1;
 }
 .imp-card-btn:hover{background:var(--s2);color:var(--text)}
 .imp-card-btn.del:hover{background:rgba(220,38,38,.1);color:#dc2626;border-color:rgba(220,38,38,.3)}
@@ -931,10 +945,14 @@ body.theme-ember .imp-card{border-left-color:#d4724a}
   .imp-header{padding:14px 16px}
   .imp-filters{padding:12px 16px 0}
   .imp-list-wrap{padding:14px 16px 30px}
-  .imp-card{padding:12px;gap:10px}
-  .imp-card-date{min-width:54px;padding:6px}
-  .imp-card-day{font-size:18px}
-  .imp-card-actions{flex-direction:column}
+  .imp-grid{grid-template-columns:1fr;gap:10px}
+  .imp-card{padding:10px 12px}
+  .imp-card-date{min-width:46px;width:46px;padding:5px 3px}
+  .imp-card-day{font-size:16px}
+  .imp-card-actions{opacity:1}
+}
+@media(min-width:641px) and (max-width:900px){
+  .imp-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
 
 .dash-empty{font-size:13px;color:var(--muted);font-style:italic;padding:10px 0}
@@ -11779,7 +11797,7 @@ function impRenderPage(){
     return;
   }
 
-  wrap.innerHTML = filtered.map(e=>{
+  wrap.innerHTML = '<div class="imp-grid">' + filtered.map(e=>{
     const days=impDaysUntil(e.date);
     const badge=impFormatBadge(e.date);
     let cardCls='imp-card';
@@ -11805,7 +11823,7 @@ function impRenderPage(){
         <button class="imp-card-btn del" onclick="impDelete('${e.id}')" title="Delete">🗑</button>
       </div>
     </div>`;
-  }).join('');
+  }).join('') + '</div>';
 }
 
 function impRenderDashboard(){
