@@ -2581,12 +2581,13 @@ body.theme-beige .nav-item.active{color:#7c5cbf}
 .tj-stat-num.r{color:#dc2626}
 .tj-stat-num.b{color:#3b5bdb}
 .tj-stat-lbl{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;color:#8898c0}
-.tj-table-wrap{flex:1;padding:24px 28px;background:var(--bg)}
+.tj-table-wrap{flex:1;padding:24px 28px;background:var(--bg);overflow-x:auto;-webkit-overflow-scrolling:touch}
 .tj-table{
   width:100%;border-collapse:collapse;
   background:#fff;border-radius:12px;
   overflow:hidden;border:1px solid #dde4f5;
-  box-shadow:0 2px 8px rgba(59,91,219,.06)
+  box-shadow:0 2px 8px rgba(59,91,219,.06);
+  min-width:640px
 }
 .tj-table th{
   background:#f0f4ff;color:#3b5bdb;font-weight:700;
@@ -3405,9 +3406,16 @@ body.theme-ember .fin-vtbtn.active{color:#0f0d0b}
   }
   .sidebar-overlay.open{display:block}
   .topbar{padding:0}
-  /* hide clocks entirely on mobile */
-  .clock-bar .clock-block{display:none}
-  .clock-bar{gap:6px}
+  /* hide clocks entirely on mobile — remove the whole bar from layout, not just its children */
+  .clock-bar{display:none!important}
+  /* Compact the sync pill — show only the dot, hide the text on small screens */
+  .topbar-sync{padding:4px 8px!important;gap:0!important}
+  .topbar-sync-text,.topbar-sync span:not(.topbar-sync-dot){display:none!important}
+  /* Hide topbar search on narrow screens — the primary action buttons matter more */
+  #topbar-search{display:none!important}
+  /* Shrink topbar action buttons so everything fits */
+  .topbar-ctx .btn{padding:6px 10px;font-size:11px}
+  #topbar-add-btn{padding:6px 10px;font-size:11px}
   .hamburger{
     display:flex!important;align-items:center;justify-content:center;
     background:var(--s2);border:1px solid var(--border2);
@@ -3424,8 +3432,6 @@ body.theme-ember .fin-vtbtn.active{color:#0f0d0b}
   .dash-bottom{grid-template-columns:1fr}
   .cards-grid{grid-template-columns:1fr}
   .sec-header{flex-wrap:wrap;gap:8px}
-  .search-wrap input{width:140px}
-  .search-wrap input:focus{width:160px}
   .theme-grid{grid-template-columns:1fr 1fr}
   .settings-modal{padding:20px}
   .sp-board{padding:14px}
