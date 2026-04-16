@@ -665,6 +665,55 @@ body.theme-ocean .inv-pin-dot.filled{background:#00d2b4;border-color:#00d2b4}
   80%{transform:translateX(6px)}
 }
 
+/* -- IMPORTANT DATES PIN LOCK (uses same Daybook PIN) ----------- */
+.imp-lock-overlay{
+  position:absolute;inset:0;
+  background:var(--bg);
+  display:flex;align-items:center;justify-content:center;
+  z-index:100;flex-direction:column;gap:0
+}
+.imp-lock-box{
+  background:var(--sidebar);border:1px solid var(--border);
+  border-radius:16px;padding:36px 40px;
+  display:flex;flex-direction:column;align-items:center;gap:18px;
+  min-width:300px;max-width:360px;width:90%
+}
+.imp-lock-icon{font-size:40px;line-height:1;margin-bottom:4px}
+.imp-lock-title{font-family:'Inter',sans-serif;font-size:20px;font-weight:700;color:var(--text);text-align:center}
+.imp-lock-sub{font-size:12px;color:var(--muted);text-align:center;line-height:1.5}
+.imp-pin-dots{display:flex;gap:12px;margin:6px 0}
+.imp-pin-dot{
+  width:14px;height:14px;border-radius:50%;
+  border:2px solid var(--border2);background:transparent;
+  transition:all .15s
+}
+.imp-pin-dot.filled{background:#1a9a6c;border-color:#1a9a6c}
+body.theme-beige .imp-pin-dot.filled{background:var(--accent);border-color:var(--accent)}
+body.theme-midnight .imp-pin-dot.filled{background:var(--accent);border-color:var(--accent)}
+body.theme-ember .imp-pin-dot.filled{background:var(--accent);border-color:var(--accent)}
+body.theme-rose .imp-pin-dot.filled{background:#b06090;border-color:#b06090}
+body.theme-ocean .imp-pin-dot.filled{background:#00d2b4;border-color:#00d2b4}
+.imp-pin-error{font-size:12px;color:var(--red);font-weight:600;min-height:16px;text-align:center}
+.imp-numpad{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;width:100%}
+.imp-num-btn{
+  background:var(--bg);border:1px solid var(--border);
+  border-radius:10px;padding:14px 0;
+  font-size:18px;font-weight:600;color:var(--text);
+  cursor:pointer;font-family:'Inter',sans-serif;
+  transition:all .12s;text-align:center;line-height:1
+}
+.imp-num-btn:hover{background:var(--s2);border-color:var(--border2)}
+.imp-num-btn:active{transform:scale(.94)}
+.imp-num-btn.del{font-size:16px;color:var(--muted)}
+.imp-num-btn.clear{font-size:13px;color:var(--muted)}
+@keyframes imp-shake{
+  0%,100%{transform:translateX(0)}
+  20%{transform:translateX(-8px)}
+  40%{transform:translateX(8px)}
+  60%{transform:translateX(-6px)}
+  80%{transform:translateX(6px)}
+}
+
 /* -- RICH DASHBOARD -------------------------------- */
 .dash-wrap{padding:20px 28px;display:flex;flex-direction:column;gap:16px}
 /* Quick Capture */
@@ -4724,7 +4773,37 @@ body.theme-beige .inv-mcard-total{background:linear-gradient(135deg,#5a4a9a,#7c5
 </div>
 
 <!-- ── IMPORTANT DATES PAGE ───────────────────────── -->
-<div id="page-impdates" style="display:none;flex-direction:column;width:100%;min-height:calc(100vh - 60px);background:var(--bg)">
+<div id="page-impdates" style="display:none;flex-direction:column;width:100%;min-height:calc(100vh - 60px);background:var(--bg);position:relative">
+
+  <!-- PIN LOCK OVERLAY (uses same PIN as Daybook & Investments) -->
+  <div class="imp-lock-overlay" id="imp-lock-overlay" style="display:none">
+    <div class="imp-lock-box">
+      <div class="imp-lock-icon">🔐</div>
+      <div class="imp-lock-title">Important Dates is Locked</div>
+      <div class="imp-lock-sub" id="imp-lock-sub">Enter your PIN to view your important dates</div>
+      <div class="imp-pin-dots" id="imp-pin-dots">
+        <div class="imp-pin-dot" id="imp-dot-0"></div>
+        <div class="imp-pin-dot" id="imp-dot-1"></div>
+        <div class="imp-pin-dot" id="imp-dot-2"></div>
+        <div class="imp-pin-dot" id="imp-dot-3"></div>
+      </div>
+      <div class="imp-pin-error" id="imp-pin-error"></div>
+      <div class="imp-numpad">
+        <button class="imp-num-btn" onclick="impPinPress('1')">1</button>
+        <button class="imp-num-btn" onclick="impPinPress('2')">2</button>
+        <button class="imp-num-btn" onclick="impPinPress('3')">3</button>
+        <button class="imp-num-btn" onclick="impPinPress('4')">4</button>
+        <button class="imp-num-btn" onclick="impPinPress('5')">5</button>
+        <button class="imp-num-btn" onclick="impPinPress('6')">6</button>
+        <button class="imp-num-btn" onclick="impPinPress('7')">7</button>
+        <button class="imp-num-btn" onclick="impPinPress('8')">8</button>
+        <button class="imp-num-btn" onclick="impPinPress('9')">9</button>
+        <button class="imp-num-btn clear" onclick="impPinClear()">CLR</button>
+        <button class="imp-num-btn" onclick="impPinPress('0')">0</button>
+        <button class="imp-num-btn del" onclick="impPinBack()">⌫</button>
+      </div>
+    </div>
+  </div>
 
   <div class="imp-header">
     <span class="imp-title">🗓️ Important Dates</span>
@@ -7512,6 +7591,8 @@ function showPage(page, btn){
   if(page !== 'daybook' && dbGetPin()) _dbUnlocked = false;
   // Lock investments when navigating away (uses same PIN)
   if(page !== 'investments' && dbGetPin()) _invUnlocked = false;
+  // Lock important dates when navigating away (uses same PIN)
+  if(page !== 'impdates' && dbGetPin()) _impUnlocked = false;
   const pages = ['dashboard','notes','reminders','sticky','journal','routine','tasknotes','finance','daybook','shopping','investments','impdates'];
   const displayMap = {dashboard:'',notes:'flex',reminders:'flex',sticky:'flex',journal:'flex',routine:'flex',tasknotes:'flex',finance:'flex',daybook:'flex',shopping:'flex',investments:'flex',impdates:'flex'};
   pages.forEach(p=>{
@@ -7608,7 +7689,15 @@ function showPage(page, btn){
     }
   }
   if(page==='shopping') shopRender();
-  if(page==='impdates') impRenderPage();
+  if(page==='impdates'){
+    const pin = dbGetPin();
+    if(pin && !_impUnlocked){
+      impShowLockScreen();
+    } else {
+      impHideLockScreen();
+      impRenderPage();
+    }
+  }
   if(page==='investments'){
     const pin = dbGetPin();
     if(pin && !_invUnlocked){
@@ -10732,10 +10821,11 @@ function dbSavePin(){
   localStorage.setItem('db_pin', p1);
   _dbUnlocked = false; // force re-lock on next visit
   _invUnlocked = false; // force re-lock investments too
+  _impUnlocked = false; // force re-lock important dates too
   document.getElementById('cfg-db-pin').value='';
   document.getElementById('cfg-db-pin2').value='';
   msg.style.color='var(--green)';
-  msg.textContent='✓ PIN saved! Daybook & Investments will be locked next time you open them.';
+  msg.textContent='✓ PIN saved! Daybook, Investments & Important Dates will be locked next time you open them.';
   setTimeout(()=>{ msg.textContent=''; },3000);
 }
 
@@ -10743,11 +10833,12 @@ function dbClearPin(){
   localStorage.removeItem('db_pin');
   _dbUnlocked = true;
   _invUnlocked = true;
+  _impUnlocked = true;
   document.getElementById('cfg-db-pin').value='';
   document.getElementById('cfg-db-pin2').value='';
   const msg = document.getElementById('db-pin-settings-msg');
   msg.style.color='var(--green)';
-  msg.textContent='✓ PIN removed. Daybook & Investments are now unlocked.';
+  msg.textContent='✓ PIN removed. Daybook, Investments & Important Dates are now unlocked.';
   setTimeout(()=>{ msg.textContent=''; },3000);
 }
 
@@ -10877,6 +10968,71 @@ document.addEventListener('keydown', e=>{
   if(/^[0-9]$/.test(e.key)) invPinPress(e.key);
   else if(e.key==='Backspace') invPinBack();
   else if(e.key==='Escape') invPinClear();
+});
+
+/* ── IMPORTANT DATES PIN LOCK (uses same Daybook PIN) ── */
+let _impUnlocked = false;
+let _impPinEntry = '';
+
+function impShowLockScreen(){
+  _impPinEntry = '';
+  impUpdatePinDots();
+  document.getElementById('imp-pin-error').textContent='';
+  document.getElementById('imp-lock-sub').textContent='Enter your PIN to view your important dates';
+  document.getElementById('imp-lock-overlay').style.display='flex';
+}
+
+function impHideLockScreen(){
+  document.getElementById('imp-lock-overlay').style.display='none';
+}
+
+function impUpdatePinDots(){
+  for(let i=0;i<4;i++){
+    const dot = document.getElementById('imp-dot-'+i);
+    if(dot) dot.classList.toggle('filled', i < _impPinEntry.length);
+  }
+}
+
+function impPinPress(digit){
+  if(_impPinEntry.length >= 4) return;
+  _impPinEntry += digit;
+  impUpdatePinDots();
+  document.getElementById('imp-pin-error').textContent='';
+  if(_impPinEntry.length === 4) setTimeout(impCheckPin, 120);
+}
+
+function impPinBack(){
+  _impPinEntry = _impPinEntry.slice(0,-1);
+  impUpdatePinDots();
+}
+
+function impPinClear(){
+  _impPinEntry = '';
+  impUpdatePinDots();
+  document.getElementById('imp-pin-error').textContent='';
+}
+
+function impCheckPin(){
+  const stored = dbGetPin(); // same PIN as Daybook & Investments
+  if(_impPinEntry === stored){
+    _impUnlocked = true;
+    impHideLockScreen();
+    impRenderPage();
+  } else {
+    document.getElementById('imp-pin-error').textContent='Wrong PIN. Try again.';
+    const box = document.querySelector('.imp-lock-box');
+    if(box){ box.style.animation='none'; void box.offsetWidth; box.style.animation='imp-shake .35s ease'; }
+    setTimeout(()=>{ _impPinEntry=''; impUpdatePinDots(); },600);
+  }
+}
+
+// keyboard support on important dates lock screen
+document.addEventListener('keydown', e=>{
+  const overlay = document.getElementById('imp-lock-overlay');
+  if(!overlay || overlay.style.display==='none') return;
+  if(/^[0-9]$/.test(e.key)) impPinPress(e.key);
+  else if(e.key==='Backspace') impPinBack();
+  else if(e.key==='Escape') impPinClear();
 });
 
 function dbGetEntries(){ return DATA.daybook || []; }
