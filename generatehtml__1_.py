@@ -10053,14 +10053,9 @@ function dashCalSelectDay(ds){
 }
 
 /* ── Dashboard click-through helpers ─────────────────── */
-function dashGoToRoutineTask(groupId, taskId){
-  // Navigate to Routine page, open Manage view, then open task edit modal
-  const btn = document.querySelector('.nav-item[onclick*="routine"]');
-  showPage('routine', btn);
-  setTimeout(()=>{
-    showRoutineView('manage');
-    setTimeout(()=>{ openRoutineTaskModal(groupId, taskId); }, 150);
-  }, 100);
+async function dashToggleRoutineTask(groupId, taskId){
+  await toggleTask(taskId, groupId);
+  updateDashboardWidgets();
 }
 
 function dashGoToImpDate(id){
@@ -10224,7 +10219,7 @@ function updateDashboardWidgets(){
         } else {
           badge='<span class="ri-badge badge-soon">Soon</span>';
         }
-        return `<div class="ri${cls}" onclick="dashGoToRoutineTask('${it.groupId}','${it.id}')" style="cursor:pointer" title="Click to edit">
+        return `<div class="ri${cls}" onclick="dashToggleRoutineTask('${it.groupId}','${it.id}')" style="cursor:pointer" title="Click to mark complete">
           <div class="ri-time">${it.time}</div>
           <div class="ri-info"><div class="ri-name">${it.name}</div>${countdown}</div>
           ${badge}
