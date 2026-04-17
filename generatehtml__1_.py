@@ -1738,6 +1738,20 @@ body.theme-arctic .notes-list-item.active{background:rgba(56,72,112,.1)}
 .notes-md-preview .md-tag-green{color:var(--green);font-weight:700}
 .notes-md-preview .md-tag-red{color:var(--red);font-weight:700}
 .notes-md-preview .md-tag-blue{color:var(--blue);font-weight:700}
+/* Markdown pasted images */
+.notes-md-preview .md-img-wrap{margin:12px 0;text-align:left}
+.notes-md-preview .md-img{
+  max-width:100%;max-height:480px;border-radius:8px;
+  border:1px solid var(--border);box-shadow:0 2px 12px rgba(0,0,0,.12);
+  display:block;cursor:zoom-in;transition:box-shadow .2s
+}
+.notes-md-preview .md-img:hover{box-shadow:0 4px 24px rgba(0,0,0,.22)}
+#md-img-lightbox{
+  display:none;position:fixed;inset:0;z-index:9999;
+  background:rgba(0,0,0,.88);align-items:center;justify-content:center;cursor:zoom-out
+}
+#md-img-lightbox.open{display:flex}
+#md-img-lightbox img{max-width:92vw;max-height:92vh;border-radius:10px;box-shadow:0 8px 48px rgba(0,0,0,.5)}
 /* Markdown rendered tables */
 .notes-md-preview .md-table-wrap{position:relative;margin:12px 0;overflow-x:auto}
 .notes-md-preview .md-table-copy-btn{
@@ -10702,6 +10716,15 @@ document.addEventListener('click',()=>{
 function renderMarkdown(text){
   if(!text) return '<p style="color:var(--muted);font-style:italic">Nothing to preview yet…</p>';
 
+  // ── PRE-PASS: extract image syntax before escaping (base64 data URLs must not be escaped) ──
+  const imgPlaceholders = [];
+  text = text.replace(/!\[([^\]]*)\]\(((?:data:image\/[^)]+)|(?:https?:\/\/[^)]+))\)/g, (match, alt, src) => {
+    const safeAlt = alt.replace(/"/g,'&quot;');
+    const key = `%%IMG_${imgPlaceholders.length}%%`;
+    imgPlaceholders.push(`<div class="md-img-wrap"><img class="md-img" src="${src}" alt="${safeAlt}" loading="lazy" onclick="mdImgZoom(this)"></div>`);
+    return key;
+  });
+
   // ── PRE-PASS: extract markdown table blocks before escaping ──
   // Replace table blocks with unique placeholders so they survive the escape pass
   const tablePlaceholders = [];
@@ -10762,7 +10785,7 @@ function renderMarkdown(text){
 
   // Paragraphs — wrap non-block lines
   const lines = html.split('\n');
-  const blocks = ['<h1','<h2','<h3','<ul','<ol','<li','<hr','<blockquote','%%TABLE_'];
+  const blocks = ['<h1','<h2','<h3','<ul','<ol','<li','<hr','<blockquote','%%TABLE_','%%IMG_'];
   const result = [];
   let buf = [];
   for(const line of lines){
@@ -10782,6 +10805,10 @@ function renderMarkdown(text){
   let final = result.join('\n');
   tablePlaceholders.forEach((tbl, i) => {
     final = final.replace(`%%TABLE_${i}%%`, tbl);
+  });
+  // Restore image placeholders
+  imgPlaceholders.forEach((img, i) => {
+    final = final.replace(`%%IMG_${i}%%`, img);
   });
   return final;
 }
@@ -11370,6 +11397,36 @@ function initNotesPasteHandler(){
   document.addEventListener('paste', function(e){
     const ta = document.getElementById('notes-editor-body');
     if(!ta || document.activeElement !== ta) return;
+
+    // ── IMAGE PASTE ──────────────────────────────────────────
+    const items = e.clipboardData && e.clipboardData.items;
+    if(items){
+      for(const item of items){
+        if(item.type.startsWith('image/')){
+          e.preventDefault();
+          const blob = item.getAsFile();
+          if(!blob) return;
+          const kb = (blob.size/1024).toFixed(0);
+          if(blob.size > 700*1024){
+            toast(`⚠️ Image is ${kb} KB — Firestore docs cap at ~1 MB. Consider smaller images.`, 'warn');
+          }
+          const reader = new FileReader();
+          reader.onload = function(ev){
+            const dataUrl = ev.target.result;
+            const mdImg = `\n![pasted image](${dataUrl})\n`;
+            const start = ta.selectionStart;
+            const end   = ta.selectionEnd;
+            ta.value = ta.value.slice(0, start) + mdImg + ta.value.slice(end);
+            ta.selectionStart = ta.selectionEnd = start + mdImg.length;
+            ta.dispatchEvent(new Event('input'));
+            toast(`Image pasted (${kb} KB) ✓`, 'success');
+          };
+          reader.readAsDataURL(blob);
+          return;
+        }
+      }
+    }
+    // ── END IMAGE PASTE ──────────────────────────────────────
 
     const html = e.clipboardData.getData('text/html');
     if(!html) return; // no HTML on clipboard, let default paste happen
@@ -12398,6 +12455,25 @@ window.addEventListener('DOMContentLoaded',()=>{
 });
 </script>
 
+<!-- Image lightbox -->
+<div id="md-img-lightbox" onclick="this.classList.remove('open')">
+  <img id="md-img-lightbox-img" src="" alt="">
+</div>
+<script>
+function mdImgZoom(img){
+  const lb=document.getElementById('md-img-lightbox');
+  const li=document.getElementById('md-img-lightbox-img');
+  if(!lb||!li) return;
+  li.src=img.src; li.alt=img.alt;
+  lb.classList.add('open');
+}
+document.addEventListener('keydown',function(e){
+  if(e.key==='Escape'){
+    const lb=document.getElementById('md-img-lightbox');
+    if(lb) lb.classList.remove('open');
+  }
+});
+</script>
 </body>
 </html>"""
 
