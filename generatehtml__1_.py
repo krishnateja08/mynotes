@@ -9655,7 +9655,12 @@ function renderTodayChecklist(){
 
   let html = '';
   ROUTINES.forEach(group=>{
-    const todayTasks = (group.tasks||[]).filter(isTaskForToday);
+    const todayTasks = (group.tasks||[]).filter(isTaskForToday).sort((a,b)=>{
+        if(!a.time && !b.time) return 0;
+        if(!a.time) return 1;
+        if(!b.time) return -1;
+        return a.time.localeCompare(b.time);
+      });
     if(!todayTasks.length){
       // Still show the routine card but with an "add tasks" prompt
       const colorClass = 'c-'+(group.color||'blue');
@@ -9823,7 +9828,7 @@ function renderManageView(){
         <button class="rt-mg-btn del" onclick="deleteRoutineGroup('${group.id}')">Delete</button>
       </div>
       <div class="rt-manage-tasks" data-group-id="${group.id}">
-        ${(group.tasks||[]).map((t,ti)=>`
+        ${(group.tasks||[]).slice().sort((a,b)=>{if(!a.time&&!b.time)return 0;if(!a.time)return 1;if(!b.time)return -1;return a.time.localeCompare(b.time);}).map((t,ti)=>`
         <div class="rt-manage-task-row" draggable="true" data-task-id="${t.id}" data-task-idx="${ti}" data-task-group="${group.id}">
           <span class="rt-drag-handle" title="Drag to reorder">⠿</span>
           <div class="rt-mtr-info">
