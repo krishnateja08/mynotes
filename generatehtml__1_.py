@@ -6097,10 +6097,13 @@ function renderNoteCard(n){
   const pinBadge=n.pinned?'<span class="pinned-badge">📌 Pinned</span>':'';
   const updatedLine=n.updated&&n.updated!==n.created
     ?`<span class="cdate" style="margin-left:8px;opacity:.7">✏️ ${fd(n.updated)}</span>`:'';
+  const bodyPreview=(n.body||'')
+    .replace(/!\[[^\]]*\]\((?:data:image\/[^)]+|%%IMGDATA:[^)]+%%)\)/g,'📷 image')
+    .slice(0,120);
   return`<div class="ncard${cl}${pinCls}" data-type="note" data-id="${n.id}" onclick="handleCardClick(event,'${n.id}')">
     <div class="ceyebrow"><span class="ctype">📝 Note</span>${pinBadge}</div>
     <div class="ctitle">${esc(n.title)}</div>
-    ${n.body?`<div class="cbody" style="font-family:'Inter',sans-serif">${esc(n.body)}</div>`:''}
+    ${bodyPreview?`<div class="cbody" style="font-family:'Inter',sans-serif">${esc(bodyPreview)}</div>`:''}
     ${tags?`<div class="tags-row">${tags}</div>`:''}
     <div class="cmeta">
       <span style="display:flex;align-items:center;gap:4px">
@@ -6113,7 +6116,6 @@ function renderNoteCard(n){
     </div>
   </div>`;
 }
-
 function renderReminderCard(r){
   const now=new Date();
   let sc='pending',sl='🔔 Pending';
@@ -6833,7 +6835,9 @@ function renderNotesList(){
   function noteItemHTML(n){
     const cl  = n.color&&n.color!=='default' ? ' cl-'+n.color : '';
     const dateStr = (n.updated||n.created||'').slice(0,10);
-    const snippet = (n.body||'').replace(/\n/g,' ').slice(0,72);
+    const snippet = (n.body||'')
+      .replace(/!\[[^\]]*\]\((?:data:image\/[^)]+|%%IMGDATA:[^)]+%%)\)/g,'📷')
+      .replace(/\n/g,' ').slice(0,72);
     const isActive = n.id===_selectedNoteId ? ' active' : '';
     return `<div class="notes-list-item${isActive}" onclick="selectNote('${n.id}')" id="nli-${n.id}">
       <div class="notes-list-item-accent${cl}"></div>
@@ -6908,7 +6912,17 @@ function showNoteEditor(id, focusBody=false){
   const bodyEl  = document.getElementById('notes-editor-body');
   const metaEl  = document.getElementById('notes-editor-meta');
   if(titleEl) titleEl.value = n.title||'';
-  if(bodyEl)  bodyEl.value  = n.body||'';
+  if(bodyEl){
+    // Replace any saved data:image base64 URLs with compact in-memory tokens
+    // so the textarea stays clean and readable
+    let bodyText = n.body||'';
+    bodyText = bodyText.replace(/!\[([^\]]*)\]\((data:image\/[^)]{20,})\)/g, (match, alt, dataUrl) => {
+      const token = 'img_' + (++window._imgTokenCounter);
+      window._imgDataStore[token] = dataUrl;
+      return `![${alt||'pasted image'}](%%IMGDATA:${token}%%)`;
+    });
+    bodyEl.value = bodyText;
+  }
   if(metaEl)  metaEl.textContent = n.updated||n.created||'';
   hideSavedIndicator();
   if(focusBody && bodyEl) setTimeout(()=>bodyEl.focus(),50);
@@ -6952,7 +6966,9 @@ async function saveCurrentNoteInline(){
   if(li){
     const n = DATA.notes.find(x=>x.id===_selectedNoteId);
     if(n){
-      const snippet = (n.body||'').replace(/\n/g,' ').slice(0,72);
+      const snippet = (n.body||'')
+        .replace(/!\[[^\]]*\]\((?:data:image\/[^)]+|%%IMGDATA:[^)]+%%)\)/g,'📷')
+        .replace(/\n/g,' ').slice(0,72);
       const titleDiv = li.querySelector('.notes-list-item-title');
       const snippetDiv = li.querySelector('.notes-list-item-snippet');
       const dateDiv = li.querySelector('.notes-list-item-date');
