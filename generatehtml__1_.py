@@ -6937,7 +6937,11 @@ async function saveCurrentNoteInline(){
   const titleEl = document.getElementById('notes-editor-title');
   const bodyEl  = document.getElementById('notes-editor-body');
   const title   = titleEl?.value.trim()||'';
-  const body    = bodyEl?.value||'';
+  const rawBody = bodyEl?.value||'';
+  // Resolve any in-memory image tokens back to full data URLs before persisting
+  const body = rawBody.replace(/%%IMGDATA:(img_\d+)%%/g, (match, token) => {
+    return (window._imgDataStore && window._imgDataStore[token]) ? window._imgDataStore[token] : match;
+  });
   const now=localNow();
   DATA.notes = (DATA.notes||[]).map(n=>{
     if(n.id!==_selectedNoteId) return n;
@@ -10716,6 +10720,11 @@ document.addEventListener('click',()=>{
 function renderMarkdown(text){
   if(!text) return '<p style="color:var(--muted);font-style:italic">Nothing to preview yet…</p>';
 
+  // ── TOKEN RESOLUTION: replace %%IMGDATA:token%% with actual base64 data URLs ──
+  text = text.replace(/%%IMGDATA:(img_\d+)%%/g, (match, token) => {
+    return window._imgDataStore && window._imgDataStore[token] ? window._imgDataStore[token] : match;
+  });
+
   // ── PRE-PASS: extract image syntax before escaping (base64 data URLs must not be escaped) ──
   const imgPlaceholders = [];
   text = text.replace(/!\[([^\]]*)\]\(((?:data:image\/[^)]+)|(?:https?:\/\/[^)]+))\)/g, (match, alt, src) => {
@@ -11412,14 +11421,18 @@ function initNotesPasteHandler(){
           }
           const reader = new FileReader();
           reader.onload = function(ev){
-            const dataUrl = ev.target.result;
-            const mdImg = `\n![pasted image](${dataUrl})\n`;
+            // Store base64 under a short token to keep the textarea readable
+            const token = 'img_' + (++window._imgTokenCounter);
+            window._imgDataStore[token] = ev.target.result;
+            const mdImg = `\n![pasted image](%%IMGDATA:${token}%%)\n`;
             const start = ta.selectionStart;
             const end   = ta.selectionEnd;
             ta.value = ta.value.slice(0, start) + mdImg + ta.value.slice(end);
             ta.selectionStart = ta.selectionEnd = start + mdImg.length;
             ta.dispatchEvent(new Event('input'));
-            toast(`Image pasted (${kb} KB) ✓`, 'success');
+            // Auto-switch to preview so the image is visible immediately
+            setNoteViewMode('preview');
+            toast(`Image pasted (${kb} KB) ✓ — showing preview`, 'success');
           };
           reader.readAsDataURL(blob);
           return;
@@ -12413,6 +12426,10 @@ document.addEventListener('keydown', function(ev){
     if(bd && bd.classList.contains('open')) impCloseModal();
   }
 });
+
+// ── Global in-memory store for pasted image data URLs (keyed by short token) ──
+window._imgDataStore = {};
+window._imgTokenCounter = 0;
 
 window.addEventListener('DOMContentLoaded',()=>{
   const savedTheme=localStorage.getItem('mynotes_theme')||'rose';
