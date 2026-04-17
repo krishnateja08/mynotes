@@ -10052,6 +10052,30 @@ function dashCalSelectDay(ds){
   renderDashCal();
 }
 
+/* ── Dashboard click-through helpers ─────────────────── */
+function dashGoToRoutineTask(groupId, taskId){
+  // Navigate to Routine page, open Manage view, then open task edit modal
+  const btn = document.querySelector('.nav-item[onclick*="routine"]');
+  showPage('routine', btn);
+  setTimeout(()=>{
+    showRoutineView('manage');
+    setTimeout(()=>{ openRoutineTaskModal(groupId, taskId); }, 150);
+  }, 100);
+}
+
+function dashGoToImpDate(id){
+  const pin = dbGetPin();
+  const btn = document.querySelector('.nav-item[onclick*="impdates"]');
+  showPage('impdates', btn);
+  if(pin && !_impUnlocked){
+    // PIN protected — just navigate, user must unlock first
+    toast('Unlock Important Dates to edit this entry.', 'info');
+  } else {
+    setTimeout(()=>{ impOpenModal(id); }, 200);
+  }
+}
+/* ────────────────────────────────────────────────────── */
+
 function renderDashUpcomingList(remDates, todayStr, reminders){
   const upcomingEl = document.getElementById('dash-upcoming-list');
   if(!upcomingEl) return;
@@ -10169,7 +10193,7 @@ function updateDashboardWidgets(){
     const allItems = [];
     (ROUTINES||[]).forEach(group=>{
       (group.tasks||[]).filter(isTaskForToday).forEach(task=>{
-        if(task.time) allItems.push({name:task.name||'Routine',time:task.time,id:task.id,group:group.name||''});
+        if(task.time) allItems.push({name:task.name||'Routine',time:task.time,id:task.id,groupId:group.id,group:group.name||''});
       });
     });
     allItems.sort((a,b)=>a.time.localeCompare(b.time));
@@ -10200,7 +10224,7 @@ function updateDashboardWidgets(){
         } else {
           badge='<span class="ri-badge badge-soon">Soon</span>';
         }
-        return `<div class="ri${cls}">
+        return `<div class="ri${cls}" onclick="dashGoToRoutineTask('${it.groupId}','${it.id}')" style="cursor:pointer" title="Click to edit">
           <div class="ri-time">${it.time}</div>
           <div class="ri-info"><div class="ri-name">${it.name}</div>${countdown}</div>
           ${badge}
@@ -12427,7 +12451,7 @@ function impRenderDashboard(){
     const days=impDaysUntil(e.date);
     const badge=impFormatBadge(e.date);
     const cls = days===0 ? ' ii-today' : '';
-    return `<div class="ii${cls}">
+    return `<div class="ii${cls}" onclick="dashGoToImpDate('${e.id}')" style="cursor:pointer" title="Click to edit">
       <div class="ii-date">
         <div class="ii-day">${impDayNum(e.date)}</div>
         <div class="ii-mon">${impMonthShort(e.date)}</div>
