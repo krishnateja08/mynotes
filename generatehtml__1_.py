@@ -10197,13 +10197,20 @@ function updateDashboardWidgets(){
       routineEl.innerHTML='<div class="dash-empty">No routines set up yet.</div>';
     } else {
       const nowMins = now.getHours()*60+now.getMinutes();
-      // Find upcoming (not yet passed) tasks
+      // Find upcoming tasks that are not yet done
       const upcoming = allItems.filter(it=>{
         const [h,m] = it.time.split(':').map(Number);
-        return (h*60+m) >= nowMins;
+        return (h*60+m) >= nowMins && !isTaskDoneToday(it.id);
       });
-      // If nothing upcoming today, show first 2 of the day
-      const toShow = (upcoming.length ? upcoming : allItems).slice(0,2);
+      // Fallback: any undone tasks today regardless of time
+      const undone = allItems.filter(it=>!isTaskDoneToday(it.id));
+      const toShow = (upcoming.length ? upcoming : undone).slice(0,2);
+
+      if(!toShow.length){
+        routineEl.innerHTML='<div class="dash-empty" style="color:var(--green);font-style:normal">✅ All routines done for now!</div>';
+        return;
+      }
+
       let nextMarked = false;
       const html = toShow.map(it=>{
         const [h,m] = it.time.split(':').map(Number);
