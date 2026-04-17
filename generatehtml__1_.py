@@ -6042,7 +6042,7 @@ function renderAll(){
   updateImpDatesCount();
   const now=new Date();
   const todayStr=localToday();
-  const pending=reminders.filter(r=>!r.sent).length;
+  const pending=reminders.filter(r=>!r.sent && !isOverdue(r)).length;
   const overdue=reminders.filter(r=>isOverdue(r)).length;
   const sent=reminders.filter(r=>r.sent).length;
 
@@ -7308,7 +7308,8 @@ function _getFilteredRems(){
   } else if(_remPageFilter==='overdue-only'){
     filtered = rems.filter(r=>isOverdue(r));
   } else {
-    filtered = rems.filter(r=>!r.sent);
+    // "all" / pending = not sent AND not overdue (overdue has its own bucket)
+    filtered = rems.filter(r=>!r.sent && !isOverdue(r));
   }
   return filtered;
 }
@@ -10139,7 +10140,7 @@ function updateDashboardWidgets(){
 
   // -- STAT CARDS --
   const totalItems  = notes.length + reminders.length;
-  const pending     = reminders.filter(r=>!r.sent).length;
+  const pending     = reminders.filter(r=>!r.sent && !isOverdue(r)).length;
   const completed   = reminders.filter(r=>r.sent).length;
   const missed      = reminders.filter(r=>isOverdue(r)).length;
 
