@@ -11468,8 +11468,15 @@ function initNotesPasteHandler(){
     if(!ta || document.activeElement !== ta) return;
 
     // ── IMAGE PASTE ──────────────────────────────────────────
+    // Only treat as image if there is NO plain text on the clipboard.
+    // When copying text from terminals/browsers the clipboard often also
+    // carries a rendered image — we must prefer text in that case.
     const items = e.clipboardData && e.clipboardData.items;
-    if(items){
+    const hasText = e.clipboardData && (
+      e.clipboardData.getData('text/plain').trim().length > 0 ||
+      e.clipboardData.getData('text/html').trim().length > 0
+    );
+    if(items && !hasText){
       for(const item of items){
         if(item.type.startsWith('image/')){
           e.preventDefault();
