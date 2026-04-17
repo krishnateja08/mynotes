@@ -1739,13 +1739,22 @@ body.theme-arctic .notes-list-item.active{background:rgba(56,72,112,.1)}
 .notes-md-preview .md-tag-red{color:var(--red);font-weight:700}
 .notes-md-preview .md-tag-blue{color:var(--blue);font-weight:700}
 /* Markdown pasted images */
-.notes-md-preview .md-img-wrap{margin:12px 0;text-align:left}
+.notes-md-preview .md-img-wrap{margin:12px 0;text-align:left;position:relative;display:inline-block;max-width:100%}
 .notes-md-preview .md-img{
   max-width:100%;max-height:480px;border-radius:8px;
   border:1px solid var(--border);box-shadow:0 2px 12px rgba(0,0,0,.12);
   display:block;cursor:zoom-in;transition:box-shadow .2s
 }
 .notes-md-preview .md-img:hover{box-shadow:0 4px 24px rgba(0,0,0,.22)}
+.notes-md-preview .md-img-del-btn{
+  position:absolute;top:8px;right:8px;
+  background:rgba(180,30,30,.82);color:#fff;border:none;border-radius:6px;
+  width:30px;height:30px;font-size:15px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  opacity:0;transition:opacity .15s;backdrop-filter:blur(4px)
+}
+.notes-md-preview .md-img-wrap:hover .md-img-del-btn{opacity:1}
+.notes-md-preview .md-img-del-btn:hover{background:rgba(200,30,30,1)}
 #md-img-lightbox{
   display:none;position:fixed;inset:0;z-index:9999;
   background:rgba(0,0,0,.88);align-items:center;justify-content:center;cursor:zoom-out
@@ -10736,17 +10745,21 @@ document.addEventListener('click',()=>{
 function renderMarkdown(text){
   if(!text) return '<p style="color:var(--muted);font-style:italic">Nothing to preview yet…</p>';
 
-  // ── TOKEN RESOLUTION: replace %%IMGDATA:token%% with actual base64 data URLs ──
-  text = text.replace(/%%IMGDATA:(img_\d+)%%/g, (match, token) => {
-    return window._imgDataStore && window._imgDataStore[token] ? window._imgDataStore[token] : match;
-  });
-
   // ── PRE-PASS: extract image syntax before escaping (base64 data URLs must not be escaped) ──
+  // Also resolves %%IMGDATA:token%% here so we can attach the token to the delete button
   const imgPlaceholders = [];
-  text = text.replace(/!\[([^\]]*)\]\(((?:data:image\/[^)]+)|(?:https?:\/\/[^)]+))\)/g, (match, alt, src) => {
+  text = text.replace(/!\[([^\]]*)\]\((%%IMGDATA:(img_\d+)%%|(?:data:image\/[^)]+)|(?:https?:\/\/[^)]+))\)/g, (match, alt, src, token) => {
     const safeAlt = alt.replace(/"/g,'&quot;');
     const key = `%%IMG_${imgPlaceholders.length}%%`;
-    imgPlaceholders.push(`<div class="md-img-wrap"><img class="md-img" src="${src}" alt="${safeAlt}" loading="lazy" onclick="mdImgZoom(this)"></div>`);
+    const resolvedSrc = token && window._imgDataStore && window._imgDataStore[token]
+      ? window._imgDataStore[token] : src;
+    const tokenAttr = token ? ` data-token="${token}"` : '';
+    imgPlaceholders.push(
+      `<div class="md-img-wrap"${tokenAttr}>` +
+      `<img class="md-img" src="${resolvedSrc}" alt="${safeAlt}" loading="lazy" onclick="mdImgZoom(this)">` +
+      `<button class="md-img-del-btn" onclick="mdImgDelete(this)" title="Remove image">🗑</button>` +
+      `</div>`
+    );
     return key;
   });
 
@@ -12499,6 +12512,26 @@ function mdImgZoom(img){
   if(!lb||!li) return;
   li.src=img.src; li.alt=img.alt;
   lb.classList.add('open');
+}
+function mdImgDelete(btn){
+  const wrap = btn.closest('.md-img-wrap');
+  const token = wrap ? wrap.getAttribute('data-token') : null;
+  const ta = document.getElementById('notes-editor-body');
+  if(ta){
+    if(token){
+      // Remove the token-based markdown line
+      ta.value = ta.value.replace(new RegExp('\\n?!\\[[^\\]]*\\]\\(%%IMGDATA:'+token+'%%\\)\\n?','g'), '\n').trim();
+      // Clean up memory store
+      if(window._imgDataStore) delete window._imgDataStore[token];
+    } else {
+      // Fallback: remove any data:image line matching this img src (external URLs etc.)
+      const src = wrap ? (wrap.querySelector('img')||{}).src : '';
+      if(src) ta.value = ta.value.replace(new RegExp('\\n?!\\[[^\\]]*\\]\\('+src.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+'\\)\\n?','g'),'\n').trim();
+    }
+    ta.dispatchEvent(new Event('input'));
+  }
+  // Remove from preview immediately
+  if(wrap) wrap.remove();
 }
 document.addEventListener('keydown',function(e){
   if(e.key==='Escape'){
