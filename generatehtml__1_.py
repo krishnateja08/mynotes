@@ -7515,7 +7515,30 @@ function _doAddReminder(listId){
 async function toggleRemDone(id){
   const rem = (DATA.reminders||[]).find(r=>r.id===id);
   if(!rem) return;
-  rem.sent = !rem.sent;
+
+  // If it's a repeating reminder being marked done → reschedule instead of completing
+  if(!rem.sent && rem.repeat && rem.repeat !== 'none' && rem.due){
+    const base = new Date(rem.due.slice(0,10) + 'T00:00:00');
+    let next = new Date(base);
+    if(rem.repeat === 'daily'){
+      next.setDate(next.getDate() + 1);
+    } else if(rem.repeat === 'weekly'){
+      next.setDate(next.getDate() + 7);
+    } else if(rem.repeat === 'monthly'){
+      next.setMonth(next.getMonth() + 1);
+    }
+    // Build new due string preserving original time (HH:MM)
+    const timePart = rem.due.length > 10 ? rem.due.slice(10) : 'T09:00';
+    const yyyy = next.getFullYear();
+    const mm   = String(next.getMonth()+1).padStart(2,'0');
+    const dd   = String(next.getDate()).padStart(2,'0');
+    rem.due  = yyyy + '-' + mm + '-' + dd + timePart;
+    rem.sent = false; // stays active, rescheduled to next occurrence
+  } else {
+    // Non-repeating → normal toggle done/undone
+    rem.sent = !rem.sent;
+  }
+
   renderAll();
   renderRemindersPage();
   await saveToFirebase();
