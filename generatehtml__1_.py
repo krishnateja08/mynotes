@@ -8662,9 +8662,11 @@ function saveTanEdit(id){
   const prioEl = document.getElementById('tan-edit-prio-'+id);
   const tagEl  = document.getElementById('tan-edit-tag-'+id);
   const catEl  = document.getElementById('tan-edit-cat-'+id);
+  const dateEl = document.getElementById('tan-edit-date-'+id);
   if(textEl) n.text     = textEl.value.trim() || n.text;
   if(prioEl) n.priority = prioEl.value;
   if(catEl)  n.category = catEl.value;
+  if(dateEl && dateEl.value) n.date = dateEl.value;
   // 5. parse tags from comma-separated input into array
   if(tagEl){
     const raw = tagEl.value.trim();
@@ -8782,6 +8784,9 @@ function renderTaskNotes(){
             <input class="tan-tag-input" id="tan-edit-tag-${n.id}"
               placeholder="Tags (comma separated)"
               value="${esc(tagArr.join(', '))}">
+            <input type="date" id="tan-edit-date-${n.id}"
+              style="padding:5px 10px;font-size:12px;border:1px solid var(--border);border-radius:6px;background:var(--bg);color:var(--text);cursor:pointer"
+              value="${n.date||''}">
             <button class="tan-save-btn" onclick="saveTanEdit('${n.id}')">Save</button>
           </div>
         </div>
