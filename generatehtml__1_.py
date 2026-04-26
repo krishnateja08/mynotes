@@ -18,17 +18,40 @@ HTML = r"""<!DOCTYPE html>
 <script>const GOOGLE_CLIENT_ID = 'GOOGLE_CLIENT_ID_PLACEHOLDER';</script>
 <script>
 // ── Google Calendar Integration ──────────────────────────────────────────────
-// Cached token for silent re-use
 let _gcalToken = null;
 let _gcalTokenExpiry = 0;
+// Maps reminder app id → Google Calendar event id
+const _gcalEventMap = JSON.parse(localStorage.getItem('_gcalEventMap')||'{}');
+
+function _gcalSaveMap(){ try{ localStorage.setItem('_gcalEventMap', JSON.stringify(_gcalEventMap)); }catch(e){} }
 
 function _gcalToast(msg, type='success'){
-  // Re-use existing toast() if available, else fallback to console
   if(typeof toast === 'function') toast(msg, type);
   else console.log('[GCal]', msg);
 }
 
-async function _gcalCreateEvent(accessToken, title, startDateTime, endDateTime, description, remindMinutes){
+// Get or refresh access token, then run callback(token)
+function _gcalWithToken(callback){
+  if(!GOOGLE_CLIENT_ID) return;
+  if(_gcalToken && Date.now() < _gcalTokenExpiry){
+    callback(_gcalToken);
+    return;
+  }
+  const tokenClient = google.accounts.oauth2.initTokenClient({
+    client_id: GOOGLE_CLIENT_ID,
+    scope: 'https://www.googleapis.com/auth/calendar.events',
+    callback: (response) => {
+      if(response.error){ console.warn('GCal auth error:', response.error); return; }
+      _gcalToken = response.access_token;
+      _gcalTokenExpiry = Date.now() + 55 * 60 * 1000;
+      callback(_gcalToken);
+    }
+  });
+  tokenClient.requestAccessToken({ prompt: '' });
+}
+
+// Create a calendar event and store the event id mapped to reminder id
+async function _gcalCreateEvent(accessToken, remId, title, startDateTime, endDateTime, description, remindMinutes){
   const overrides = [];
   if(remindMinutes > 0){
     overrides.push({ method: 'email', minutes: remindMinutes });
@@ -43,46 +66,72 @@ async function _gcalCreateEvent(accessToken, title, startDateTime, endDateTime, 
   };
   const res = await fetch('https://www.googleapis.com/calendar/v3/calendars/primary/events', {
     method: 'POST',
-    headers: {
-      'Authorization': 'Bearer ' + accessToken,
-      'Content-Type': 'application/json'
-    },
+    headers: { 'Authorization': 'Bearer ' + accessToken, 'Content-Type': 'application/json' },
     body: JSON.stringify(event)
   });
   const data = await res.json();
   if(data.id){
-    _gcalToast('📅 Synced to Google Calendar', 'success');
+    if(remId){ _gcalEventMap[remId] = data.id; _gcalSaveMap(); }
+    return data.id;
   } else {
-    console.warn('GCal error:', data.error?.message);
+    console.warn('GCal create error:', data.error?.message);
+    return null;
   }
 }
 
-function addReminderToGoogleCalendar(title, startDateTime, endDateTime, description, remindMinutes) {
-  if (!GOOGLE_CLIENT_ID) return;
-  // Default remind time = 30 mins if not provided
-  const mins = (remindMinutes !== undefined && remindMinutes !== null) ? parseInt(remindMinutes) : 30;
-
-  // If we have a valid cached token, use it silently
-  if(_gcalToken && Date.now() < _gcalTokenExpiry){
-    _gcalCreateEvent(_gcalToken, title, startDateTime, endDateTime, description, mins).catch(console.warn);
-    return;
-  }
-  // Otherwise request a new token (shows Google login popup once)
-  const tokenClient = google.accounts.oauth2.initTokenClient({
-    client_id: GOOGLE_CLIENT_ID,
-    scope: 'https://www.googleapis.com/auth/calendar.events',
-    callback: async (response) => {
-      if (response.error) {
-        console.warn('Google auth error:', response.error);
-        return;
-      }
-      // Cache token for 55 minutes
-      _gcalToken = response.access_token;
-      _gcalTokenExpiry = Date.now() + 55 * 60 * 1000;
-      _gcalCreateEvent(_gcalToken, title, startDateTime, endDateTime, description, mins).catch(console.warn);
-    }
+// Delete a calendar event by reminder id
+async function _gcalDeleteEvent(accessToken, remId){
+  const eventId = _gcalEventMap[remId];
+  if(!eventId) return; // not synced, nothing to delete
+  await fetch('https://www.googleapis.com/calendar/v3/calendars/primary/events/' + eventId, {
+    method: 'DELETE',
+    headers: { 'Authorization': 'Bearer ' + accessToken }
   });
-  tokenClient.requestAccessToken({ prompt: '' }); // prompt:'' = silent if already authorized
+  delete _gcalEventMap[remId];
+  _gcalSaveMap();
+}
+
+// PUBLIC: Add reminder to Google Calendar (called on save)
+function addReminderToGoogleCalendar(remId, title, startDateTime, endDateTime, description, remindMinutes){
+  if(!GOOGLE_CLIENT_ID) return;
+  const mins = (remindMinutes !== undefined && remindMinutes !== null) ? parseInt(remindMinutes) : 30;
+  _gcalWithToken(token => {
+    _gcalCreateEvent(token, remId, title, startDateTime, endDateTime, description, mins)
+      .then(id => { if(id) _gcalToast('📅 Synced to Google Calendar','success'); })
+      .catch(console.warn);
+  });
+}
+
+// PUBLIC: Delete reminder from Google Calendar (called on delete)
+function deleteReminderFromGoogleCalendar(remId){
+  if(!GOOGLE_CLIENT_ID) return;
+  _gcalWithToken(token => {
+    _gcalDeleteEvent(token, remId).catch(console.warn);
+  });
+}
+
+// PUBLIC: Sync ALL existing reminders to Google Calendar at once
+function syncAllRemindersToGoogleCalendar(){
+  if(!GOOGLE_CLIENT_ID){ _gcalToast('Google Calendar not configured','error'); return; }
+  const all = (window.DATA?.reminders||[]).filter(r=>r.due && !r.sent);
+  if(!all.length){ _gcalToast('No active reminders to sync','error'); return; }
+  _gcalWithToken(async token => {
+    let count = 0;
+    for(const r of all){
+      try{
+        if(_gcalEventMap[r.id]) continue; // already synced, skip
+        const [dp,tp] = r.due.split(' ');
+        const sISO = dp+'T'+(tp||'09:00')+':00';
+        const eD = new Date(sISO); eD.setHours(eD.getHours()+1);
+        const pd = n=>String(n).padStart(2,'0');
+        const eISO = eD.getFullYear()+'-'+pd(eD.getMonth()+1)+'-'+pd(eD.getDate())+'T'+pd(eD.getHours())+':'+pd(eD.getMinutes())+':00';
+        const id = await _gcalCreateEvent(token, r.id, r.title||r.text||'Reminder', sISO, eISO, r.body||'', 30);
+        if(id) count++;
+        await new Promise(res=>setTimeout(res,300)); // small delay to avoid rate limit
+      }catch(e){ console.warn('Sync error for',r.id,e); }
+    }
+    _gcalToast('📅 Synced '+count+' reminder'+(count!==1?'s':'')+' to Google Calendar','success');
+  });
 }
 </script>
 <style>
@@ -4574,10 +4623,15 @@ body.theme-beige .inv-mcard-total{background:linear-gradient(135deg,#5a4a9a,#7c5
   <div id="page-reminders" style="display:none;flex-direction:column;height:calc(100vh - 58px)">
     <div class="rem-page-wrap" style="width:100%">
       <!-- View toggle: List vs Calendar -->
-      <div class="rem-view-toggle">
-        <span>View</span>
-        <button class="tan-filter-btn active" id="rem-view-list-btn" onclick="setRemView('list',this)">📋 List</button>
-        <button class="tan-filter-btn" id="rem-view-cal-btn" onclick="setRemView('cal',this)">📅 Calendar</button>
+      <div class="rem-view-toggle" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
+        <div style="display:flex;align-items:center;gap:8px">
+          <span>View</span>
+          <button class="tan-filter-btn active" id="rem-view-list-btn" onclick="setRemView('list',this)">📋 List</button>
+          <button class="tan-filter-btn" id="rem-view-cal-btn" onclick="setRemView('cal',this)">📅 Calendar</button>
+        </div>
+        <button onclick="syncAllRemindersToGoogleCalendar()" title="Sync all existing reminders to Google Calendar" style="display:flex;align-items:center;gap:6px;padding:7px 14px;background:var(--accent);color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;opacity:0.92;transition:opacity 0.2s" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.92'">
+          🔄 Sync All to Google Calendar
+        </button>
       </div>
 
       <!-- Full Monthly Calendar -->
@@ -6601,7 +6655,7 @@ async function saveItem(){
         const pad2 = n=>String(n).padStart(2,'0');
         const endISO2 = endDate2.getFullYear()+'-'+pad2(endDate2.getMonth()+1)+'-'+pad2(endDate2.getDate())+'T'+pad2(endDate2.getHours())+':'+pad2(endDate2.getMinutes())+':00';
         const remindMins = parseInt(document.getElementById('f-remind-before')?.value||'30');
-        addReminderToGoogleCalendar(title, startISO2, endISO2, rem.body||'', remindMins);
+        addReminderToGoogleCalendar(rem.id, title, startISO2, endISO2, rem.body||'', remindMins);
       }catch(gcErr){ console.warn('GCal sync skipped:',gcErr); }
     }
   }
@@ -7657,7 +7711,7 @@ function _doAddReminder(listId){
       const eD=new Date(sISO); eD.setHours(eD.getHours()+1);
       const pd=n=>String(n).padStart(2,'0');
       const eISO=eD.getFullYear()+'-'+pd(eD.getMonth()+1)+'-'+pd(eD.getDate())+'T'+pd(eD.getHours())+':'+pd(eD.getMinutes())+':00';
-      addReminderToGoogleCalendar(rem.title, sISO, eISO, '', 30);
+      addReminderToGoogleCalendar(rem.id, rem.title, sISO, eISO, '', 30);
     }catch(gcErr){ console.warn('GCal sync skipped:',gcErr); }
   }
   renderAll();
@@ -7701,6 +7755,8 @@ async function toggleRemDone(id){
 
 async function deleteReminder(id){
   if(!confirm('Delete this reminder?')) return;
+  // ── Delete from Google Calendar first ─────────────────────────────────────
+  deleteReminderFromGoogleCalendar(id);
   DATA.reminders = (DATA.reminders||[]).filter(r=>r.id!==id);
   renderAll();
   renderRemindersPage();
