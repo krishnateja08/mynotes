@@ -13,6 +13,61 @@ HTML = r"""<!DOCTYPE html>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<!-- Google Identity Services for Calendar integration -->
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+<script>const GOOGLE_CLIENT_ID = 'GOOGLE_CLIENT_ID_PLACEHOLDER';</script>
+<script>
+// ── Google Calendar Integration ──────────────────────────────────────────────
+function addReminderToGoogleCalendar(title, startDateTime, endDateTime, description) {
+  if (!GOOGLE_CLIENT_ID) {
+    alert('Google Calendar integration is not configured.');
+    return;
+  }
+  const tokenClient = google.accounts.oauth2.initTokenClient({
+    client_id: GOOGLE_CLIENT_ID,
+    scope: 'https://www.googleapis.com/auth/calendar.events https://www.googleapis.com/auth/gmail.send',
+    callback: async (response) => {
+      if (response.error) {
+        alert('Google auth failed: ' + response.error);
+        return;
+      }
+      // Create Calendar Event
+      const event = {
+        summary: title,
+        description: description || '',
+        start: { dateTime: startDateTime, timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone },
+        end:   { dateTime: endDateTime,   timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone },
+        reminders: {
+          useDefault: false,
+          overrides: [
+            { method: 'email',  minutes: 30 },
+            { method: 'popup',  minutes: 10 }
+          ]
+        }
+      };
+      try {
+        const res = await fetch('https://www.googleapis.com/calendar/v3/calendars/primary/events', {
+          method: 'POST',
+          headers: {
+            'Authorization': 'Bearer ' + response.access_token,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(event)
+        });
+        const data = await res.json();
+        if (data.id) {
+          alert('✅ Reminder added to Google Calendar!\n\nYou will receive an email reminder 30 minutes before.');
+        } else {
+          alert('❌ Failed to add event: ' + (data.error?.message || 'Unknown error'));
+        }
+      } catch (err) {
+        alert('❌ Error: ' + err.message);
+      }
+    }
+  });
+  tokenClient.requestAccessToken();
+}
+</script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 html{scroll-behavior:smooth}
@@ -12588,7 +12643,7 @@ def main():
     html = HTML.replace('HOUR_OPTIONS_PLACEHOLDER', hour_opts)
     html = html.replace('MIN_OPTIONS_PLACEHOLDER',  min_opts)
 
-    # Inject Firebase config from environment variables
+    # Inject Firebase config and Google credentials from environment variables
     firebase_replacements = {
         'FIREBASE_API_KEY_PLACEHOLDER':              os.environ.get('FIREBASE_API_KEY', ''),
         'FIREBASE_AUTH_DOMAIN_PLACEHOLDER':           os.environ.get('FIREBASE_AUTH_DOMAIN', ''),
@@ -12596,6 +12651,7 @@ def main():
         'FIREBASE_STORAGE_BUCKET_PLACEHOLDER':        os.environ.get('FIREBASE_STORAGE_BUCKET', ''),
         'FIREBASE_MESSAGING_SENDER_ID_PLACEHOLDER':   os.environ.get('FIREBASE_MESSAGING_SENDER_ID', ''),
         'FIREBASE_APP_ID_PLACEHOLDER':                os.environ.get('FIREBASE_APP_ID', ''),
+        'GOOGLE_CLIENT_ID_PLACEHOLDER':               os.environ.get('GOOGLE_CLIENT_ID', ''),
     }
     for placeholder, value in firebase_replacements.items():
         html = html.replace(placeholder, value)
