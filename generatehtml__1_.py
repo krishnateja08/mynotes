@@ -161,34 +161,149 @@ function syncAllRemindersToGoogleCalendar(){
   });
 }
 
+// Create an all-day Google Calendar event (used for Tasks & Important Dates which have no time)
+async function _gcalCreateAllDayEvent(accessToken, entryId, title, dateStr, description){
+  // GCal all-day events need end = day after start
+  const startD = new Date(dateStr + 'T00:00:00');
+  const endD   = new Date(startD); endD.setDate(endD.getDate()+1);
+  const pd = n=>String(n).padStart(2,'0');
+  const endStr = endD.getFullYear()+'-'+pd(endD.getMonth()+1)+'-'+pd(endD.getDate());
+  const event = {
+    summary: title,
+    description: description || '',
+    start: { date: dateStr },
+    end:   { date: endStr },
+    reminders: { useDefault: false, overrides: [
+      { method: 'popup', minutes: 60 },
+      { method: 'email', minutes: 60 }
+    ]}
+  };
+  const res = await fetch('https://www.googleapis.com/calendar/v3/calendars/primary/events', {
+    method: 'POST',
+    headers: { 'Authorization': 'Bearer ' + accessToken, 'Content-Type': 'application/json' },
+    body: JSON.stringify(event)
+  });
+  const data = await res.json();
+  if(data.id){
+    if(entryId){ _gcalEventMap[entryId] = data.id; _gcalSaveMap(); }
+    return data.id;
+  } else {
+    console.warn('GCal all-day create error:', data.error?.message);
+    return null;
+  }
+}
+
+// PUBLIC: Add important date to Google Calendar
+function addImpDateToGoogleCalendar(entryId, title, dateStr, note){
+  if(!GOOGLE_CLIENT_ID) return;
+  _gcalWithToken(token => {
+    _gcalCreateAllDayEvent(token, entryId, '📅 ' + title, dateStr, note || '')
+      .then(id => { if(id) _gcalToast('📅 Important date synced to Google Calendar','success'); })
+      .catch(console.warn);
+  });
+}
+
+// PUBLIC: Delete important date from Google Calendar
+function deleteImpDateFromGoogleCalendar(entryId){
+  if(!GOOGLE_CLIENT_ID) return;
+  _gcalWithToken(token => {
+    _gcalDeleteEvent(token, entryId)
+      .then(() => _gcalToast('🗑️ Important date removed from Google Calendar','success'))
+      .catch(e => console.warn('GCal imp delete error:', e));
+  });
+}
+
+// PUBLIC: Add task to Google Calendar as all-day event
+function addTaskToGoogleCalendar(taskId, text, dateStr, priority){
+  if(!GOOGLE_CLIENT_ID) return;
+  const label = priority === 'high' ? '🔴 ' : priority === 'low' ? '🟢 ' : '🟡 ';
+  _gcalWithToken(token => {
+    _gcalCreateAllDayEvent(token, taskId, label + text, dateStr, 'Priority: ' + (priority||'medium'))
+      .then(id => { if(id) _gcalToast('✅ Task synced to Google Calendar','success'); })
+      .catch(console.warn);
+  });
+}
+
+// PUBLIC: Delete task from Google Calendar
+function deleteTaskFromGoogleCalendar(taskId){
+  if(!GOOGLE_CLIENT_ID) return;
+  _gcalWithToken(token => {
+    _gcalDeleteEvent(token, taskId)
+      .then(() => _gcalToast('🗑️ Task removed from Google Calendar','success'))
+      .catch(e => console.warn('GCal task delete error:', e));
+  });
+}
+
 // AUTO-SYNC: Called after Firebase data loads — syncs any existing unsynced future reminders
 function _gcalAutoSyncOnLoad(){
   if(!GOOGLE_CLIENT_ID) return;
   // Wait for Firebase data to fully populate window.DATA
   setTimeout(()=>{
     const today = new Date().toISOString().slice(0,10);
-    const unsynced = (window.DATA?.reminders||[]).filter(r=>{
+
+    // ── Reminders ──────────────────────────────────────────
+    const unsyncedRem = (window.DATA?.reminders||[]).filter(r=>{
       if(!r.due) return false;
-      if(_gcalEventMap[r.id]) return false;  // already synced
+      if(_gcalEventMap[r.id]) return false;
       const dueDate = r.due.split(' ')[0];
-      return dueDate >= today;               // only future/today reminders
+      return dueDate >= today;
     });
-    if(!unsynced.length) return;
+
+    // ── Important Dates ────────────────────────────────────
+    const unsyncedImp = (window.DATA?.important_dates||[]).filter(e=>{
+      if(!e.date) return false;
+      if(_gcalEventMap[e.id]) return false;
+      return e.date >= today;
+    });
+
+    // ── Tasks (non-done, future/today date) ────────────────
+    const unsyncedTasks = (window.DATA?.tasknotes||[]).filter(t=>{
+      if(!t.date) return false;
+      if(t.done) return false;
+      if(_gcalEventMap[t.id]) return false;
+      return t.date >= today;
+    });
+
+    const totalUnsynced = unsyncedRem.length + unsyncedImp.length + unsyncedTasks.length;
+    if(!totalUnsynced) return;
+
     _gcalWithToken(async token=>{
       let count = 0;
-      for(const r of unsynced){
+      const pd = n=>String(n).padStart(2,'0');
+
+      // Sync reminders
+      for(const r of unsyncedRem){
         try{
           const [dp,tp] = r.due.split(' ');
           const sISO = dp+'T'+(tp||'09:00')+':00';
           const eD = new Date(sISO); eD.setHours(eD.getHours()+1);
-          const pd = n=>String(n).padStart(2,'0');
           const eISO = eD.getFullYear()+'-'+pd(eD.getMonth()+1)+'-'+pd(eD.getDate())+'T'+pd(eD.getHours())+':'+pd(eD.getMinutes())+':00';
           const id = await _gcalCreateEvent(token, r.id, r.title||r.text||'Reminder', sISO, eISO, r.body||'', 30);
           if(id) count++;
           await new Promise(res=>setTimeout(res,300));
-        }catch(e){ console.warn('Auto-sync error for',r.id,e); }
+        }catch(e){ console.warn('Auto-sync reminder error for',r.id,e); }
       }
-      if(count>0) _gcalToast('📅 Auto-synced '+count+' existing reminder'+(count!==1?'s':'')+' to Google Calendar','success');
+
+      // Sync important dates
+      for(const e of unsyncedImp){
+        try{
+          const id = await _gcalCreateAllDayEvent(token, e.id, '📅 '+e.title, e.date, e.note||'');
+          if(id) count++;
+          await new Promise(res=>setTimeout(res,300));
+        }catch(err){ console.warn('Auto-sync imp date error for',e.id,err); }
+      }
+
+      // Sync tasks
+      for(const t of unsyncedTasks){
+        try{
+          const label = t.priority==='high'?'🔴 ':t.priority==='low'?'🟢 ':'🟡 ';
+          const id = await _gcalCreateAllDayEvent(token, t.id, label+(t.text||'Task'), t.date, 'Priority: '+(t.priority||'medium'));
+          if(id) count++;
+          await new Promise(res=>setTimeout(res,300));
+        }catch(err){ console.warn('Auto-sync task error for',t.id,err); }
+      }
+
+      if(count>0) _gcalToast('📅 Auto-synced '+count+' item'+(count!==1?'s':'')+' to Google Calendar','success');
     });
   }, 1500); // 1.5s delay to let Firebase data settle
 }
@@ -8873,6 +8988,7 @@ function addTaskNote(){
   input.style.height = '';
   saveTaskNotes();
   renderTaskNotes();
+  addTaskToGoogleCalendar(note.id, note.text, note.date, note.priority);
   toast('Note added \u2713','success');
 }
 
@@ -8894,6 +9010,7 @@ function toggleTanDone(id){
 
 function deleteTanNote(id){
   if(!confirm('Delete this note?')) return;
+  deleteTaskFromGoogleCalendar(id);
   const el = document.getElementById('tan-item-'+id);
   if(el){ el.classList.add('fading-out'); setTimeout(()=>{ TASKNOTES=TASKNOTES.filter(n=>n.id!==id); saveTaskNotes(); renderTaskNotes(); },260); }
   else  { TASKNOTES=TASKNOTES.filter(n=>n.id!==id); saveTaskNotes(); renderTaskNotes(); }
@@ -8943,6 +9060,15 @@ function saveTanEdit(id){
     n.tags = raw ? raw.split(',').map(t=>t.trim()).filter(Boolean) : [];
   }
   saveTaskNotes(); renderTaskNotes();
+  // Re-sync to GCal: delete old event and create updated one
+  if(GOOGLE_CLIENT_ID){
+    _gcalWithToken(async token=>{
+      await _gcalDeleteEvent(token, id).catch(console.warn);
+      const label = n.priority==='high'?'🔴 ':n.priority==='low'?'🟢 ':'🟡 ';
+      await _gcalCreateAllDayEvent(token, n.id, label+(n.text||'Task'), n.date, 'Priority: '+(n.priority||'medium')).catch(console.warn);
+      _gcalToast('✅ Task updated in Google Calendar','success');
+    });
+  }
   toast('Saved \u2713','success');
 }
 
@@ -12476,14 +12602,26 @@ async function impSaveEntry(){
     if(entry){
       entry.date=date; entry.title=title; entry.category=category; entry.note=note;
       entry.updatedAt=Date.now();
+      // Re-sync to GCal on edit: delete old event then create updated one
+      if(_gcalEventMap[id]){
+        _gcalWithToken(async token=>{
+          await _gcalDeleteEvent(token, id).catch(console.warn);
+          await _gcalCreateAllDayEvent(token, id, '📅 '+title, date, note||'').catch(console.warn);
+          _gcalToast('📅 Important date updated in Google Calendar','success');
+        });
+      } else {
+        addImpDateToGoogleCalendar(id, title, date, note);
+      }
     }
     toast('Important date updated ✓','success');
   } else {
+    const newId='imp_'+Date.now()+'_'+Math.random().toString(36).slice(2,7);
     DATA.important_dates.push({
-      id:'imp_'+Date.now()+'_'+Math.random().toString(36).slice(2,7),
+      id:newId,
       date, title, category, note,
       createdAt:Date.now(), updatedAt:Date.now()
     });
+    addImpDateToGoogleCalendar(newId, title, date, note);
     toast('Important date added ✓','success');
   }
 
@@ -12496,6 +12634,7 @@ async function impSaveEntry(){
 
 async function impDelete(id){
   if(!confirm('Delete this important date?')) return;
+  deleteImpDateFromGoogleCalendar(id);
   DATA.important_dates=impGetData().filter(e=>e.id!==id);
   impRenderPage();
   impRenderDashboard();
