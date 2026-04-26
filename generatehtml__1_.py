@@ -6559,6 +6559,18 @@ async function saveItem(){
     const priority = selPrio ? selPrio.value : 'medium';
     const rem={id:id||uid(),type:'reminder',category:document.getElementById('f-category').value||'personal',title,body:document.getElementById('f-body').value.trim(),tags,due:dueStr,repeat:document.getElementById('f-repeat').value,priority,sent:ex?ex.sent||false:false,created:ex?ex.created:now,updated:now,attachments:ex?ex.attachments||[]:[]};
     if(id)DATA.reminders=DATA.reminders.map(r=>r.id===id?rem:r);else DATA.reminders.push(rem);
+    // ── Auto-sync to Google Calendar ─────────────────────────────────────────
+    if(dueStr){
+      try{
+        const [datePart, timePart] = dueStr.split(' ');
+        const startISO = datePart + 'T' + (timePart||'09:00') + ':00';
+        const endDate = new Date(startISO);
+        endDate.setHours(endDate.getHours() + 1);
+        const pad = n => String(n).padStart(2,'0');
+        const endISO = endDate.getFullYear()+'-'+pad(endDate.getMonth()+1)+'-'+pad(endDate.getDate())+'T'+pad(endDate.getHours())+':'+pad(endDate.getMinutes())+':00';
+        addReminderToGoogleCalendar(title, startISO, endISO, rem.body||'');
+      }catch(gcErr){ console.warn('Google Calendar sync skipped:', gcErr); }
+    }
   }
   const lbl=document.getElementById('autosave-lbl');
   if(lbl){lbl.classList.add('show');setTimeout(()=>lbl.classList.remove('show'),2500);}
@@ -7604,6 +7616,18 @@ function _doAddReminder(listId){
   };
   if(!DATA.reminders) DATA.reminders=[];
   DATA.reminders.push(rem);
+  // ── Auto-sync to Google Calendar ─────────────────────────────────────────
+  if(rem.due){
+    try{
+      const [datePart, timePart] = rem.due.split(' ');
+      const startISO = datePart + 'T' + (timePart||'09:00') + ':00';
+      const endDate = new Date(startISO);
+      endDate.setHours(endDate.getHours() + 1);
+      const pad = n => String(n).padStart(2,'0');
+      const endISO = endDate.getFullYear()+'-'+pad(endDate.getMonth()+1)+'-'+pad(endDate.getDate())+'T'+pad(endDate.getHours())+':'+pad(endDate.getMinutes())+':00';
+      addReminderToGoogleCalendar(rem.title, startISO, endISO, '');
+    }catch(gcErr){ console.warn('Google Calendar sync skipped:', gcErr); }
+  }
   renderAll();
   renderRemindersPage();
   saveToFirebase();
