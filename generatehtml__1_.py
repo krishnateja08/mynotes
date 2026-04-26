@@ -18,54 +18,71 @@ HTML = r"""<!DOCTYPE html>
 <script>const GOOGLE_CLIENT_ID = 'GOOGLE_CLIENT_ID_PLACEHOLDER';</script>
 <script>
 // ── Google Calendar Integration ──────────────────────────────────────────────
-function addReminderToGoogleCalendar(title, startDateTime, endDateTime, description) {
-  if (!GOOGLE_CLIENT_ID) {
-    alert('Google Calendar integration is not configured.');
+// Cached token for silent re-use
+let _gcalToken = null;
+let _gcalTokenExpiry = 0;
+
+function _gcalToast(msg, type='success'){
+  // Re-use existing toast() if available, else fallback to console
+  if(typeof toast === 'function') toast(msg, type);
+  else console.log('[GCal]', msg);
+}
+
+async function _gcalCreateEvent(accessToken, title, startDateTime, endDateTime, description, remindMinutes){
+  const overrides = [];
+  if(remindMinutes > 0){
+    overrides.push({ method: 'email', minutes: remindMinutes });
+    overrides.push({ method: 'popup', minutes: Math.min(remindMinutes, 30) });
+  }
+  const event = {
+    summary: title,
+    description: description || '',
+    start: { dateTime: startDateTime, timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone },
+    end:   { dateTime: endDateTime,   timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone },
+    reminders: { useDefault: false, overrides }
+  };
+  const res = await fetch('https://www.googleapis.com/calendar/v3/calendars/primary/events', {
+    method: 'POST',
+    headers: {
+      'Authorization': 'Bearer ' + accessToken,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(event)
+  });
+  const data = await res.json();
+  if(data.id){
+    _gcalToast('📅 Synced to Google Calendar', 'success');
+  } else {
+    console.warn('GCal error:', data.error?.message);
+  }
+}
+
+function addReminderToGoogleCalendar(title, startDateTime, endDateTime, description, remindMinutes) {
+  if (!GOOGLE_CLIENT_ID) return;
+  // Default remind time = 30 mins if not provided
+  const mins = (remindMinutes !== undefined && remindMinutes !== null) ? parseInt(remindMinutes) : 30;
+
+  // If we have a valid cached token, use it silently
+  if(_gcalToken && Date.now() < _gcalTokenExpiry){
+    _gcalCreateEvent(_gcalToken, title, startDateTime, endDateTime, description, mins).catch(console.warn);
     return;
   }
+  // Otherwise request a new token (shows Google login popup once)
   const tokenClient = google.accounts.oauth2.initTokenClient({
     client_id: GOOGLE_CLIENT_ID,
-    scope: 'https://www.googleapis.com/auth/calendar.events https://www.googleapis.com/auth/gmail.send',
+    scope: 'https://www.googleapis.com/auth/calendar.events',
     callback: async (response) => {
       if (response.error) {
-        alert('Google auth failed: ' + response.error);
+        console.warn('Google auth error:', response.error);
         return;
       }
-      // Create Calendar Event
-      const event = {
-        summary: title,
-        description: description || '',
-        start: { dateTime: startDateTime, timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone },
-        end:   { dateTime: endDateTime,   timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone },
-        reminders: {
-          useDefault: false,
-          overrides: [
-            { method: 'email',  minutes: 30 },
-            { method: 'popup',  minutes: 10 }
-          ]
-        }
-      };
-      try {
-        const res = await fetch('https://www.googleapis.com/calendar/v3/calendars/primary/events', {
-          method: 'POST',
-          headers: {
-            'Authorization': 'Bearer ' + response.access_token,
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify(event)
-        });
-        const data = await res.json();
-        if (data.id) {
-          alert('✅ Reminder added to Google Calendar!\n\nYou will receive an email reminder 30 minutes before.');
-        } else {
-          alert('❌ Failed to add event: ' + (data.error?.message || 'Unknown error'));
-        }
-      } catch (err) {
-        alert('❌ Error: ' + err.message);
-      }
+      // Cache token for 55 minutes
+      _gcalToken = response.access_token;
+      _gcalTokenExpiry = Date.now() + 55 * 60 * 1000;
+      _gcalCreateEvent(_gcalToken, title, startDateTime, endDateTime, description, mins).catch(console.warn);
     }
   });
-  tokenClient.requestAccessToken();
+  tokenClient.requestAccessToken({ prompt: '' }); // prompt:'' = silent if already authorized
 }
 </script>
 <style>
@@ -5608,6 +5625,19 @@ body.theme-beige .inv-mcard-total{background:linear-gradient(135deg,#5a4a9a,#7c5
         <option value="monthly">Monthly</option>
       </select>
     </div>
+    <div id="row-remind-before" class="frow" style="display:none">
+      <label>🔔 Remind me before</label>
+      <select id="f-remind-before" style="padding:9px 8px;background:var(--bg);border:1px solid var(--border2);border-radius:8px;color:var(--text);font-family:'Inter',sans-serif;font-size:13px;outline:none;cursor:pointer;width:100%">
+        <option value="10">10 minutes before</option>
+        <option value="30" selected>30 minutes before</option>
+        <option value="60">1 hour before</option>
+        <option value="120">2 hours before</option>
+        <option value="480">8 hours before</option>
+        <option value="1440">1 day before</option>
+        <option value="2880">2 days before</option>
+        <option value="10080">1 week before</option>
+      </select>
+    </div>
     <div id="row-priority" class="frow" style="display:none">
       <label>⭐ Priority</label>
       <div style="display:flex;gap:8px">
@@ -6288,6 +6318,7 @@ function openModal(type='note'){
   document.getElementById('f-due-hour').value='09';
   document.getElementById('f-due-min').value='00';
   document.getElementById('f-repeat').value='none';
+  const rbEl = document.getElementById('f-remind-before'); if(rbEl) rbEl.value='30';
   document.getElementById('f-pinned').value='false';
   document.getElementById('pin-btn').className='pin-btn';
   document.getElementById('pin-btn').textContent='📌 Pin';
@@ -6486,6 +6517,8 @@ function switchType(t){
   document.getElementById('type-desc-note').style.display     = t==='note'     ? '' : 'none';
   document.getElementById('type-desc-reminder').style.display = t==='reminder' ? '' : 'none';
   document.getElementById('modal-save-btn').textContent  = t==='note' ? '💾 Save Note' : '⏰ Save Reminder';
+  const remindRow = document.getElementById('row-remind-before');
+  if(remindRow) remindRow.style.display = t==='reminder' ? '' : 'none';
   const previewCol = document.getElementById('modal-preview-col');
   const modal      = document.getElementById('main-modal');
   if(previewCol) previewCol.style.display = t==='note' ? '' : 'none';
@@ -6559,17 +6592,17 @@ async function saveItem(){
     const priority = selPrio ? selPrio.value : 'medium';
     const rem={id:id||uid(),type:'reminder',category:document.getElementById('f-category').value||'personal',title,body:document.getElementById('f-body').value.trim(),tags,due:dueStr,repeat:document.getElementById('f-repeat').value,priority,sent:ex?ex.sent||false:false,created:ex?ex.created:now,updated:now,attachments:ex?ex.attachments||[]:[]};
     if(id)DATA.reminders=DATA.reminders.map(r=>r.id===id?rem:r);else DATA.reminders.push(rem);
-    // ── Auto-sync to Google Calendar ─────────────────────────────────────────
+    // ── Auto-sync to Google Calendar ──────────────────────────────────────
     if(dueStr){
       try{
-        const [datePart, timePart] = dueStr.split(' ');
-        const startISO = datePart + 'T' + (timePart||'09:00') + ':00';
-        const endDate = new Date(startISO);
-        endDate.setHours(endDate.getHours() + 1);
-        const pad = n => String(n).padStart(2,'0');
-        const endISO = endDate.getFullYear()+'-'+pad(endDate.getMonth()+1)+'-'+pad(endDate.getDate())+'T'+pad(endDate.getHours())+':'+pad(endDate.getMinutes())+':00';
-        addReminderToGoogleCalendar(title, startISO, endISO, rem.body||'');
-      }catch(gcErr){ console.warn('Google Calendar sync skipped:', gcErr); }
+        const [datePart2, timePart2] = dueStr.split(' ');
+        const startISO2 = datePart2 + 'T' + (timePart2||'09:00') + ':00';
+        const endDate2 = new Date(startISO2); endDate2.setHours(endDate2.getHours()+1);
+        const pad2 = n=>String(n).padStart(2,'0');
+        const endISO2 = endDate2.getFullYear()+'-'+pad2(endDate2.getMonth()+1)+'-'+pad2(endDate2.getDate())+'T'+pad2(endDate2.getHours())+':'+pad2(endDate2.getMinutes())+':00';
+        const remindMins = parseInt(document.getElementById('f-remind-before')?.value||'30');
+        addReminderToGoogleCalendar(title, startISO2, endISO2, rem.body||'', remindMins);
+      }catch(gcErr){ console.warn('GCal sync skipped:',gcErr); }
     }
   }
   const lbl=document.getElementById('autosave-lbl');
@@ -7616,17 +7649,16 @@ function _doAddReminder(listId){
   };
   if(!DATA.reminders) DATA.reminders=[];
   DATA.reminders.push(rem);
-  // ── Auto-sync to Google Calendar ─────────────────────────────────────────
+  // ── Auto-sync to Google Calendar (quick add, default 30 min reminder) ──
   if(rem.due){
     try{
-      const [datePart, timePart] = rem.due.split(' ');
-      const startISO = datePart + 'T' + (timePart||'09:00') + ':00';
-      const endDate = new Date(startISO);
-      endDate.setHours(endDate.getHours() + 1);
-      const pad = n => String(n).padStart(2,'0');
-      const endISO = endDate.getFullYear()+'-'+pad(endDate.getMonth()+1)+'-'+pad(endDate.getDate())+'T'+pad(endDate.getHours())+':'+pad(endDate.getMinutes())+':00';
-      addReminderToGoogleCalendar(rem.title, startISO, endISO, '');
-    }catch(gcErr){ console.warn('Google Calendar sync skipped:', gcErr); }
+      const [dp,tp]=rem.due.split(' ');
+      const sISO=dp+'T'+(tp||'09:00')+':00';
+      const eD=new Date(sISO); eD.setHours(eD.getHours()+1);
+      const pd=n=>String(n).padStart(2,'0');
+      const eISO=eD.getFullYear()+'-'+pd(eD.getMonth()+1)+'-'+pd(eD.getDate())+'T'+pd(eD.getHours())+':'+pd(eD.getMinutes())+':00';
+      addReminderToGoogleCalendar(rem.title, sISO, eISO, '', 30);
+    }catch(gcErr){ console.warn('GCal sync skipped:',gcErr); }
   }
   renderAll();
   renderRemindersPage();
