@@ -425,6 +425,22 @@ body.theme-arctic {
   --blue:     #285898;
   --over-bg:  rgba(20,24,40,.6);
 }
+body.theme-facebook {
+  --bg:       #f0f2f5;
+  --sidebar:  #ffffff;
+  --s2:       #e4e6eb;
+  --border:   #dadde1;
+  --border2:  #b0b3b8;
+  --text:     #050505;
+  --text2:    #1c1e21;
+  --muted:    #65676b;
+  --accent:   #1877f2;
+  --accent2:  #166fe5;
+  --green:    #31a24c;
+  --red:      #f02849;
+  --blue:     #1877f2;
+  --over-bg:  rgba(0,0,0,.65);
+}
 
 body{
   font-family:'Inter',sans-serif;
@@ -530,6 +546,46 @@ body.theme-arctic .db-entry-time{color:var(--accent)}
 body.theme-arctic .db-compose-dt{color:var(--accent);background:rgba(74,90,128,.08)}
 body.theme-arctic .ncard.pinned-card{border-top:3px solid #4a5a80}
 body.theme-arctic .shop-folder.active{background:rgba(74,90,128,.08);color:var(--accent)}
+
+/* Facebook Blue overrides */
+body.theme-facebook aside{background:rgba(255,255,255,.97);border-right:1px solid rgba(218,221,225,.8);box-shadow:3px 0 20px rgba(0,0,0,.08)}
+body.theme-facebook .topbar{background:rgba(255,255,255,.95);border-bottom:1px solid rgba(218,221,225,.8);box-shadow:0 1px 12px rgba(0,0,0,.08)}
+body.theme-facebook .nav-item.active{background:rgba(24,119,242,.1);color:#1877f2;font-weight:600}
+body.theme-facebook .nav-item:hover{background:rgba(24,119,242,.06);color:#1877f2}
+body.theme-facebook .btn{color:#fff;background:#1877f2}
+body.theme-facebook .btn:hover{background:#166fe5}
+body.theme-facebook .page-title{color:#050505}
+body.theme-facebook .clock-block{background:rgba(24,119,242,.05);border-color:rgba(24,119,242,.12)}
+body.theme-facebook .clock-block:hover{background:rgba(24,119,242,.09)}
+body.theme-facebook .clock-time{color:#1c1e21}
+body.theme-facebook .clock-zone{color:#65676b}
+body.theme-facebook .topbar-sync{background:rgba(24,119,242,.05);border-color:rgba(24,119,242,.1)}
+body.theme-facebook .topbar-avatar{background:rgba(24,119,242,.1);border-color:rgba(24,119,242,.2);color:#1877f2}
+body.theme-facebook .ctitle{color:#1877f2}
+body.theme-facebook .stat-num{color:#1877f2}
+body.theme-facebook .ncard,body.theme-facebook .fin-card,body.theme-facebook .tan-item,body.theme-facebook .fin-sum-card,body.theme-facebook .stat-card{background:#ffffff;border-color:rgba(218,221,225,.9);box-shadow:0 1px 4px rgba(0,0,0,.06)}
+body.theme-facebook .ncard:hover,body.theme-facebook .fin-card:hover,body.theme-facebook .tan-item:hover{border-color:rgba(24,119,242,.35);box-shadow:0 2px 10px rgba(24,119,242,.12)}
+body.theme-facebook .ncard.pinned-card{border-top:3px solid #1877f2}
+body.theme-facebook .db-new-btn{background:#1877f2}
+body.theme-facebook .db-new-btn:hover{background:#166fe5}
+body.theme-facebook .db-filter-btn.active{background:rgba(24,119,242,.1);color:#1877f2;font-weight:600}
+body.theme-facebook .db-filter-btn.active .db-filter-count{background:rgba(24,119,242,.1);color:#1877f2}
+body.theme-facebook .db-date-header{background:#f0f2f5;border-bottom-color:rgba(218,221,225,.7)}
+body.theme-facebook .dh-day{color:#1877f2}
+body.theme-facebook .dh-mon{color:#1877f2}
+body.theme-facebook .dh-ecount{background:rgba(24,119,242,.1);color:#1877f2}
+body.theme-facebook .db-entry-time{color:#1877f2}
+body.theme-facebook .db-entry:hover{background:rgba(24,119,242,.04)}
+body.theme-facebook .db-compose-dt{color:#1877f2;background:rgba(24,119,242,.08)}
+body.theme-facebook .shop-folder.active{background:rgba(24,119,242,.08);color:#1877f2}
+body.theme-facebook .nav-item.active .nav-count{background:rgba(24,119,242,.15);color:#1877f2}
+body.theme-facebook .sidebar-logo{color:#1877f2}
+body.theme-facebook .sync-pill{background:#e4e6eb;border:1px solid rgba(218,221,225,.8)}
+body.theme-facebook .search-wrap input{background:#f0f2f5;border-color:#dadde1}
+body.theme-facebook .search-wrap input:focus{border-color:#1877f2;background:#fff}
+body.theme-facebook .btn-ghost{border-color:#dadde1;color:#65676b}
+body.theme-facebook .btn-ghost:hover{border-color:#1877f2;color:#1877f2}
+
 .sidebar-logo{
   padding:22px 20px 18px;
   font-family:'Inter',sans-serif;font-size:18px;color:var(--accent);
@@ -5946,8 +6002,21 @@ body.theme-beige .inv-mcard-total{background:linear-gradient(135deg,#5a4a9a,#7c5
   <div class="settings-section-title">🎨 Theme</div>
   <div class="theme-grid">
 
-    <!-- Rose Quartz (DEFAULT) -->
-    <div class="theme-card selected" id="theme-btn-rose" onclick="applyTheme('rose')">
+    <!-- Facebook Blue (DEFAULT) -->
+    <div class="theme-card selected" id="theme-btn-facebook" onclick="applyTheme('facebook')">
+      <div class="theme-preview">
+        <div class="tp-side" style="background:#ffffff;border-right:1px solid #dadde1"></div>
+        <div class="tp-main" style="background:#f0f2f5">
+          <div class="tp-line" style="background:#1877f2;width:60%"></div>
+          <div class="tp-line" style="background:#dadde1;width:90%"></div>
+          <div class="tp-line" style="background:#b0b3b8;width:70%"></div>
+        </div>
+      </div>
+      <div class="theme-name">&#x1F4D8; Facebook Blue</div>
+    </div>
+
+    <!-- Rose Quartz -->
+    <div class="theme-card" id="theme-btn-rose" onclick="applyTheme('rose')">
       <div class="theme-preview">
         <div class="tp-side" style="background:#f4ecf0;border-right:1px solid #dcc8d4"></div>
         <div class="tp-main" style="background:#fdf8fa">
@@ -6106,7 +6175,7 @@ let _realtimeListenerActive=false; // false on first snapshot, true thereafter
 let currentType='note';
 
 /* -- THEME --------------------------------------- */
-const THEMES=['rose','cream','beige','arctic','ocean','midnight','ember'];
+const THEMES=['facebook','rose','cream','beige','arctic','ocean','midnight','ember'];
 
 function applyTheme(t){
   document.body.className='theme-'+t;
@@ -12921,7 +12990,7 @@ window._imgDataStore = {};
 window._imgTokenCounter = 0;
 
 window.addEventListener('DOMContentLoaded',()=>{
-  const savedTheme=localStorage.getItem('mynotes_theme')||'rose';
+  const savedTheme=localStorage.getItem('mynotes_theme')||'facebook';
   applyTheme(savedTheme);
 
   // restore saved view preferences
