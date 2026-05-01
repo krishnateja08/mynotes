@@ -1420,6 +1420,10 @@ body.theme-ember .imp-month-header.current .imp-month-count{background:rgba(212,
   color:var(--text2);margin-bottom:12px;display:flex;align-items:center;gap:7px;
 }
 .dash-upcoming-items{display:flex;flex-direction:column;gap:7px}
+.upc-dash-check{width:18px;height:18px;min-width:18px;border-radius:50%;border:2px solid var(--muted);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .18s;flex-shrink:0;background:transparent;}
+.upc-dash-check:hover{border-color:var(--primary);background:var(--primary-light,rgba(99,102,241,.12));}
+.upc-dash-check.done{border-color:#22c55e;background:#22c55e;}
+.upc-dash-check.done::after{content:'✓';color:#fff;font-size:11px;font-weight:700;line-height:1;}
 
 /* -- DASHBOARD CALENDAR WIDGET -- */
 .dash-cal-widget{
@@ -10497,12 +10501,20 @@ function renderDashUpcomingList(remDates, todayStr, reminders){
     else if(diffDays<=7){dotCls='upc-dot-soon';dueLabel='In '+diffDays+' days';}
     else{dotCls='upc-dot-future';dueLabel=new Date(dueStr+'T00:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric'});}
     const dueCls = diffDays===0 ? 'upc-due upc-due-today' : 'upc-due';
-    return `<div class="upc-item" onclick="editItem('${r.id}')" style="cursor:pointer">
+    return `<div class="upc-item" style="cursor:pointer">
+      <div class="upc-dash-check" onclick="event.stopPropagation();dashCloseReminder('${r.id}')" title="Mark as done"></div>
       <div class="upc-dot ${dotCls}"></div>
-      <div class="upc-title">${r.title||'Untitled'}</div>
+      <div class="upc-title" onclick="editItem('${r.id}')">${r.title||'Untitled'}</div>
       <div class="${dueCls}">${dueLabel}</div>
     </div>`;
   }).join('');
+}
+
+async function dashCloseReminder(id){
+  const btn = document.querySelector('.upc-dash-check[onclick*="'+id+'"]');
+  if(btn){ btn.classList.add('done'); }
+  await new Promise(res=>setTimeout(res,350));
+  await toggleRemDone(id);
 }
 
 function updateDashboardWidgets(){
