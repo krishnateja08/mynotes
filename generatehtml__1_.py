@@ -6094,6 +6094,11 @@ body.theme-beige .inv-mcard-total{background:linear-gradient(135deg,#5a4a9a,#7c5
 <script>
 let DATA={notes:[],reminders:[],stickies:[],archived:[],trades:[],routines:[],routine_logs:[],tasknotes:[],finance:[],note_folders:[],rem_lists:[],daybook:[],shopping:[],investments:[],important_dates:[]};
 let dataLoaded=false; // guard: prevents any save before data is fully loaded
+// ── Real-time sync state ─────────────────────────────────────────────────────
+let _firestoreUnsubscribe=null;    // unsubscribe fn returned by onSnapshot
+let _isSavingToFirestore=false;    // true while WE are writing (suppress echo)
+let _realtimeListenerActive=false; // false on first snapshot, true thereafter
+// ─────────────────────────────────────────────────────────────────────────────
 let currentType='note';
 
 /* -- THEME --------------------------------------- */
@@ -6156,6 +6161,10 @@ async function firebaseSignIn(){
 }
 async function firebaseSignOut(){
   if(!confirm('Sign out? Local unsaved changes will be lost.')) return;
+  // Stop the real-time listener before signing out
+  if(_firestoreUnsubscribe){ _firestoreUnsubscribe(); _firestoreUnsubscribe=null; }
+  _realtimeListenerActive=false;
+  _isSavingToFirestore=false;
   await fbAuth.signOut();
   DATA={notes:[],reminders:[],stickies:[],archived:[],trades:[],routines:[],routine_logs:[],tasknotes:[],finance:[],note_folders:[],rem_lists:[],daybook:[],shopping:[],investments:[],important_dates:[]};
   dataLoaded=false;
@@ -6179,9 +6188,23 @@ function closeSettings(){document.getElementById('settings-panel').classList.rem
 async function loadFromFirebase(){
   const user=fbAuth.currentUser;
   if(!user){openSettings();return;}
+
+  // Tear down any previous listener (e.g. after sign-out / re-sign-in)
+  if(_firestoreUnsubscribe){ _firestoreUnsubscribe(); _firestoreUnsubscribe=null; }
+  _realtimeListenerActive=false;
+
   setSyncing(true,'Loading...');
-  try{
-    const doc=await fbDb.collection('users').doc(user.uid).get();
+
+  // onSnapshot fires immediately with current data AND every time any device
+  // writes, so all open browsers update without a manual page refresh.
+  _firestoreUnsubscribe = fbDb.collection('users').doc(user.uid).onSnapshot(async (doc)=>{
+
+    // Skip the echo of our own saves to prevent an infinite loop.
+    if(_isSavingToFirestore){ return; }
+
+    setSyncing(true, _realtimeListenerActive ? 'Updating...' : 'Loading...');
+
+    try{
     if(doc.exists){
       const remote=doc.data();
       // Restore DATA from Firestore (each key is stored as a JSON string to avoid Firestore nested-object limits)
@@ -6263,17 +6286,33 @@ async function loadFromFirebase(){
 
     if(needsRepair && JSON.stringify(DATA) !== _beforeRepair){
       await saveToFirebase();
-      toast('Data repaired & synced ✓','success');
+      // saveToFirebase sets _isSavingToFirestore so its echo is skipped
+      if(!_realtimeListenerActive) toast('Data repaired & synced ✓','success');
     } else {
-      toast('Loaded ✓','success');
+      if(!_realtimeListenerActive){
+        toast('Loaded ✓','success');
+      } else {
+        // Change came from another device
+        toast('🔄 Synced from another device','success');
+      }
     }
-  }catch(e){
-    dataLoaded=true;
-    initSticky();
-    renderAll();
-    toast('Load failed: '+e.message,'error');
-  }
-  setSyncing(false,'Synced');
+    _realtimeListenerActive=true;
+
+    }catch(e){
+      dataLoaded=true;
+      initSticky();
+      renderAll();
+      toast('Load failed: '+e.message,'error');
+    }
+    setSyncing(false,'Synced');
+
+  }, (err)=>{
+    // Listener-level error (network lost, permissions revoked, etc.)
+    console.error('Firestore listener error:',err);
+    _isSavingToFirestore=false;
+    setSyncing(false,'Error');
+    toast('Sync error: '+err.message,'error');
+  }); // end onSnapshot
 }
 
 async function saveToFirebase(){
@@ -6290,15 +6329,20 @@ async function saveToFirebase(){
     if(typeof INVESTMENTS !== 'undefined' && INVESTMENTS.length > 0)  DATA.investments  = [...INVESTMENTS];
 
     // Store as a single JSON string payload to avoid Firestore nested object/array depth limits
+    // Suppress the onSnapshot echo of our own write
+    _isSavingToFirestore=true;
     await fbDb.collection('users').doc(user.uid).set({
       payload: JSON.stringify(DATA),
       updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
       email: user.email||''
     });
+    // Release after 3 s — Firestore echoes back within ~1-2 s
+    setTimeout(()=>{ _isSavingToFirestore=false; }, 3000);
     toast('Saved ✓','success');
     setSyncing(false,'Synced');
     return true;
   }catch(e){
+    _isSavingToFirestore=false; // always release on error
     toast('Save failed: '+e.message,'error');
     setSyncing(false,'Error');
     return false;
