@@ -4443,6 +4443,189 @@ body.theme-beige .inv-mcard-total{background:linear-gradient(135deg,#5a4a9a,#7c5
   .inv-chart-section{margin-top:16px;padding-bottom:20px}
 }
 
+/* ═══════════════════════════════════════════════════
+   UI ENHANCEMENTS
+═══════════════════════════════════════════════════ */
+
+/* -- READING PROGRESS BAR ------------------------ */
+#reading-progress-bar{
+  position:fixed;top:0;left:232px;right:0;height:3px;z-index:9999;
+  background:linear-gradient(90deg,var(--accent),var(--accent2));
+  width:0%;transition:width .1s linear;pointer-events:none;
+  border-radius:0 2px 2px 0;
+}
+body.sidebar-collapsed #reading-progress-bar{left:64px}
+
+/* -- COLLAPSIBLE SIDEBAR ------------------------- */
+.sidebar-logo{
+  display:flex;align-items:center;justify-content:space-between;
+}
+.sidebar-logo-text{
+  display:flex;align-items:center;gap:9px;font-weight:800;
+  font-size:18px;color:var(--accent);letter-spacing:-.5px;
+}
+.sidebar-collapse-btn{
+  background:none;border:none;cursor:pointer;
+  color:var(--muted);font-size:18px;font-weight:700;
+  padding:2px 6px;border-radius:6px;line-height:1;
+  transition:all .2s;flex-shrink:0;
+}
+.sidebar-collapse-btn:hover{background:var(--s2);color:var(--accent)}
+
+body.sidebar-collapsed aside{width:64px;overflow:visible}
+body.sidebar-collapsed .main{margin-left:64px}
+body.sidebar-collapsed .sidebar-logo-text{display:none}
+body.sidebar-collapsed .sidebar-section{display:none}
+body.sidebar-collapsed .nav-item{padding:10px;justify-content:center;width:calc(100% - 12px)}
+body.sidebar-collapsed .nav-icon{font-size:16px;width:auto}
+body.sidebar-collapsed .nav-label{display:none}
+body.sidebar-collapsed .nav-count{display:none}
+body.sidebar-collapsed .sidebar-footer{padding:8px 6px}
+body.sidebar-collapsed .sync-pill span{display:none}
+body.sidebar-collapsed .sync-pill{justify-content:center;padding:8px}
+body.sidebar-collapsed .sidebar-footer .btn-ghost{display:none}
+body.sidebar-collapsed .sidebar-collapse-btn{transform:rotate(180deg)}
+
+/* tooltip on collapsed nav items */
+body.sidebar-collapsed .nav-item{position:relative}
+body.sidebar-collapsed .nav-item::after{
+  content:attr(title);
+  position:absolute;left:68px;top:50%;transform:translateY(-50%);
+  background:var(--text);color:var(--bg);
+  font-size:11px;font-weight:600;padding:4px 10px;border-radius:7px;
+  white-space:nowrap;pointer-events:none;opacity:0;
+  transition:opacity .15s;z-index:200;
+  box-shadow:0 2px 10px rgba(0,0,0,.18)
+}
+body.sidebar-collapsed .nav-item:hover::after{opacity:1}
+
+/* -- OVERDUE BADGE on nav ----------------------- */
+.nav-overdue-badge{
+  display:none;width:8px;height:8px;border-radius:50%;
+  background:var(--red);flex-shrink:0;margin-left:2px;
+  animation:pulse-badge 2s infinite;
+}
+.nav-overdue-badge.show{display:inline-block}
+@keyframes pulse-badge{
+  0%,100%{opacity:1;transform:scale(1)}
+  50%{opacity:.6;transform:scale(1.3)}
+}
+
+/* -- FLOATING ACTION BUTTON --------------------- */
+#fab-container{
+  position:fixed;bottom:28px;right:28px;z-index:500;
+  display:flex;flex-direction:column;align-items:flex-end;gap:10px;
+}
+.fab-btn{
+  width:56px;height:56px;border-radius:50%;
+  background:var(--accent);color:#fff;border:none;
+  font-size:24px;cursor:pointer;
+  box-shadow:0 4px 20px rgba(0,0,0,.25);
+  transition:all .25s cubic-bezier(.34,1.56,.64,1);
+  display:flex;align-items:center;justify-content:center;
+  font-weight:300;line-height:1;
+}
+.fab-btn:hover{background:var(--accent2);transform:scale(1.08)}
+.fab-btn.open{transform:rotate(45deg) scale(1.05);background:var(--red)}
+.fab-menu{
+  display:flex;flex-direction:column;align-items:flex-end;gap:8px;
+  pointer-events:none;opacity:0;transform:translateY(10px);
+  transition:all .22s cubic-bezier(.4,0,.2,1);
+}
+.fab-menu.open{opacity:1;transform:translateY(0);pointer-events:all}
+.fab-option{
+  display:flex;align-items:center;gap:9px;
+  background:var(--sidebar);color:var(--text);
+  border:1px solid var(--border);border-radius:28px;
+  padding:9px 16px 9px 12px;font-size:13px;font-weight:600;
+  cursor:pointer;font-family:'Inter',sans-serif;
+  box-shadow:0 2px 12px rgba(0,0,0,.14);
+  transition:all .18s;white-space:nowrap;
+}
+.fab-option:hover{background:var(--accent);color:#fff;border-color:var(--accent);transform:translateX(-4px)}
+.fab-label{font-size:12px}
+
+/* -- CARD ENTRANCE ANIMATIONS ------------------- */
+@keyframes card-in{
+  from{opacity:0;transform:translateY(14px) scale(.98)}
+  to{opacity:1;transform:translateY(0) scale(1)}
+}
+.ncard,.fin-card,.tan-item,.stat-card,.imp-card{
+  animation:card-in .28s cubic-bezier(.4,0,.2,1) both;
+}
+.ncard:nth-child(1),.fin-card:nth-child(1),.tan-item:nth-child(1){animation-delay:.02s}
+.ncard:nth-child(2),.fin-card:nth-child(2),.tan-item:nth-child(2){animation-delay:.05s}
+.ncard:nth-child(3),.fin-card:nth-child(3),.tan-item:nth-child(3){animation-delay:.08s}
+.ncard:nth-child(4),.fin-card:nth-child(4),.tan-item:nth-child(4){animation-delay:.11s}
+.ncard:nth-child(5),.fin-card:nth-child(5),.tan-item:nth-child(5){animation-delay:.14s}
+.ncard:nth-child(n+6),.fin-card:nth-child(n+6),.tan-item:nth-child(n+6){animation-delay:.17s}
+
+/* Frosted glass cards in Facebook theme */
+body.theme-facebook .ncard,
+body.theme-facebook .fin-card,
+body.theme-facebook .stat-card{
+  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+  background:rgba(255,255,255,.92);
+}
+
+/* -- SKELETON LOADERS --------------------------- */
+.skeleton-wrap{padding:20px 28px;display:flex;flex-direction:column;gap:14px}
+.skeleton-card{
+  background:var(--sidebar);border:1px solid var(--border);
+  border-radius:14px;padding:18px 20px;
+  display:flex;flex-direction:column;gap:10px;
+}
+.skeleton-line{
+  height:12px;border-radius:6px;
+  background:linear-gradient(90deg,var(--s2) 25%,var(--border) 50%,var(--s2) 75%);
+  background-size:200% 100%;
+  animation:skeleton-shimmer 1.5s infinite;
+}
+@keyframes skeleton-shimmer{
+  0%{background-position:200% 0}
+  100%{background-position:-200% 0}
+}
+
+/* -- HOVER TOOLTIP on reminder/note cards ------- */
+.ncard{position:relative}
+.card-hover-tip{
+  position:absolute;left:0;right:0;bottom:calc(100% + 8px);
+  background:var(--text);color:var(--bg);
+  font-size:11px;line-height:1.5;padding:8px 12px;
+  border-radius:9px;z-index:100;pointer-events:none;
+  opacity:0;transform:translateY(4px);
+  transition:all .18s;max-width:300px;
+  box-shadow:0 4px 16px rgba(0,0,0,.2);
+  white-space:pre-wrap;word-break:break-word;
+}
+.ncard:hover .card-hover-tip{opacity:1;transform:translateY(0)}
+
+/* -- THEME HOVER PREVIEW ------------------------ */
+.theme-card{transition:transform .18s,box-shadow .18s}
+.theme-card:hover{transform:translateY(-3px);box-shadow:0 8px 24px rgba(0,0,0,.15)}
+
+/* -- KEYBOARD SHORTCUT HINT --------------------- */
+#kbd-hint{
+  position:fixed;bottom:100px;right:28px;z-index:490;
+  background:var(--text);color:var(--bg);
+  font-size:11px;font-weight:600;padding:6px 12px;border-radius:8px;
+  opacity:0;pointer-events:none;transition:opacity .3s;
+  box-shadow:0 2px 12px rgba(0,0,0,.2);
+}
+#kbd-hint.show{opacity:1}
+
+/* -- FONT SIZE SLIDER --------------------------- */
+.font-size-row{display:flex;align-items:center;gap:12px;padding:8px 0}
+.font-size-row label{font-size:12px;font-weight:600;color:var(--text2);min-width:90px}
+.font-size-row input[type=range]{flex:1;accent-color:var(--accent)}
+.font-size-row span{font-size:12px;color:var(--muted);min-width:28px;text-align:right}
+body.fontsize-compact{font-size:12px}
+body.fontsize-large{font-size:15px}
+body.fontsize-large .ncard-title{font-size:16px}
+body.fontsize-large .ncard-body{font-size:14px}
+body.fontsize-compact .ncard-title{font-size:13px}
+body.fontsize-compact .ncard-body{font-size:11px}
+
 </style>
 </head>
 <body class="theme-rose">
@@ -4451,8 +4634,11 @@ body.theme-beige .inv-mcard-total{background:linear-gradient(135deg,#5a4a9a,#7c5
 <div class="layout">
 
 <!-- -- SIDEBAR ----------------------------------- -->
-<aside>
-  <div class="sidebar-logo">📓 MyNotes</div>
+<aside id="main-sidebar">
+  <div class="sidebar-logo">
+    <span class="sidebar-logo-text">📓 MyNotes</span>
+    <button class="sidebar-collapse-btn" id="sidebar-collapse-btn" onclick="toggleSidebar()" title="Collapse sidebar">‹</button>
+  </div>
 
   <div class="sidebar-section">Home</div>
   <button class="nav-item active" id="nav-dashboard" onclick="showPage('dashboard',this)" title="Show everything">
@@ -4537,7 +4723,9 @@ body.theme-beige .inv-mcard-total{background:linear-gradient(135deg,#5a4a9a,#7c5
 </aside>
 
 <!-- -- MAIN --------------------------------------- -->
-<div class="main">
+<div class="main" id="main-content">
+  <!-- Reading progress bar -->
+  <div id="reading-progress-bar"></div>
   <div class="topbar">
     <div class="topbar-left">
       <button class="hamburger" onclick="openSidebar()" title="Menu">☰</button>
@@ -5809,6 +5997,17 @@ body.theme-beige .inv-mcard-total{background:linear-gradient(135deg,#5a4a9a,#7c5
 </div>
 
 <!-- -- FLOATING ACTION BUTTON -------------------- -->
+<div id="fab-container">
+  <div id="fab-menu" class="fab-menu">
+    <button class="fab-option" onclick="openModal();closeFab()" title="Add Note or Reminder"><span>📝</span><span class="fab-label">Note / Reminder</span></button>
+    <button class="fab-option" onclick="addSticky();closeFab()" title="New Sticky"><span>📌</span><span class="fab-label">Sticky Note</span></button>
+    <button class="fab-option" onclick="showPage('tasknotes',document.getElementById('nav-tasknotes-btn'));document.getElementById('tan-quick-input').focus();closeFab()" title="Quick Task"><span>✍️</span><span class="fab-label">Task Note</span></button>
+    <button class="fab-option" onclick="impOpenModal();closeFab()" title="Important Date"><span>🗓️</span><span class="fab-label">Important Date</span></button>
+  </div>
+  <button id="fab-btn" class="fab-btn" onclick="toggleFab()" title="Quick Add">
+    <span id="fab-icon">＋</span>
+  </button>
+</div>
 
 <!-- -- ADD/EDIT MODAL ---------------------------- -->
 <div class="overlay" id="modal-overlay">
@@ -6108,6 +6307,16 @@ body.theme-beige .inv-mcard-total{background:linear-gradient(135deg,#5a4a9a,#7c5
 
   </div>
 
+  <!-- FONT SIZE -->
+  <div class="settings-section-title" style="margin-top:20px">🔠 Text Size</div>
+  <div class="font-size-row">
+    <label>Text Density</label>
+    <input type="range" min="0" max="2" step="1" id="font-size-slider"
+      oninput="const v=['compact','normal','large'][this.value];applyFontSize(v);document.getElementById('font-size-label').textContent=['Compact','Normal','Large'][this.value]"
+      value="1">
+    <span id="font-size-label">Normal</span>
+  </div>
+
   <!-- FIREBASE AUTH -->
   <div class="settings-section-title" style="margin-top:24px">🔗 Cloud Sync</div>
   <div id="auth-section">
@@ -6248,9 +6457,13 @@ async function firebaseSignOut(){
 function openSettings(){
   updateAuthUI(fbAuth.currentUser);
   document.getElementById('settings-panel').classList.add('open');
-  // Refresh PIN lock UI — shows/hides the "Current PIN" field based on whether a PIN is set,
-  // and clears any stale values from a previous session.
   if(typeof dbRefreshPinSettingsUI === 'function') dbRefreshPinSettingsUI();
+  // Sync font size slider
+  const fs = localStorage.getItem('mynotes_fontsize')||'normal';
+  const fsSlider = document.getElementById('font-size-slider');
+  const fsLabel = document.getElementById('font-size-label');
+  if(fsSlider){ fsSlider.value = ['compact','normal','large'].indexOf(fs); }
+  if(fsLabel){ fsLabel.textContent = fs.charAt(0).toUpperCase()+fs.slice(1); }
 }
 function closeSettings(){document.getElementById('settings-panel').classList.remove('open')}
 
@@ -6486,6 +6699,7 @@ function renderAll(){
   document.getElementById('nav-pending').textContent=pending;
   document.getElementById('nav-overdue').textContent=overdue;
   document.getElementById('nav-sent').textContent=sent;
+  if(typeof updateOverdueBadge==='function') updateOverdueBadge();
   const navSticky=document.getElementById('nav-sticky-count');
   if(navSticky) navSticky.textContent=(DATA.stickies||[]).length;
   const remPill=document.getElementById('rem-pill');
@@ -12989,6 +13203,200 @@ document.addEventListener('keydown', function(ev){
 window._imgDataStore = {};
 window._imgTokenCounter = 0;
 
+
+// ══════════════════════════════════════════════════
+// UI ENHANCEMENTS
+// ══════════════════════════════════════════════════
+
+// -- COLLAPSIBLE SIDEBAR --------------------------
+let _sidebarCollapsed = localStorage.getItem('sidebar_collapsed') === '1';
+function toggleSidebar(){
+  _sidebarCollapsed = !_sidebarCollapsed;
+  document.body.classList.toggle('sidebar-collapsed', _sidebarCollapsed);
+  localStorage.setItem('sidebar_collapsed', _sidebarCollapsed ? '1' : '0');
+}
+(function initSidebarCollapse(){
+  if(_sidebarCollapsed) document.body.classList.add('sidebar-collapsed');
+})();
+
+// -- FLOATING ACTION BUTTON -----------------------
+let _fabOpen = false;
+function toggleFab(){
+  _fabOpen = !_fabOpen;
+  document.getElementById('fab-menu').classList.toggle('open', _fabOpen);
+  document.getElementById('fab-btn').classList.toggle('open', _fabOpen);
+  document.getElementById('fab-icon').textContent = _fabOpen ? '✕' : '＋';
+}
+function closeFab(){
+  _fabOpen = false;
+  const m = document.getElementById('fab-menu');
+  const b = document.getElementById('fab-btn');
+  if(m) m.classList.remove('open');
+  if(b) b.classList.remove('open');
+  const ic = document.getElementById('fab-icon');
+  if(ic) ic.textContent = '＋';
+}
+// Close FAB when clicking outside
+document.addEventListener('click', function(e){
+  if(_fabOpen && !e.target.closest('#fab-container')) closeFab();
+});
+
+// -- READING / SCROLL PROGRESS BAR ----------------
+(function initScrollProgress(){
+  const bar = document.getElementById('reading-progress-bar');
+  if(!bar) return;
+  function updateBar(){
+    const area = document.getElementById('page-scroll-area');
+    if(!area){ bar.style.width='0%'; return; }
+    const scrolled = area.scrollTop;
+    const total = area.scrollHeight - area.clientHeight;
+    const pct = total > 0 ? Math.min(100,(scrolled/total)*100) : 0;
+    bar.style.width = pct + '%';
+  }
+  document.addEventListener('DOMContentLoaded',()=>{
+    const area = document.getElementById('page-scroll-area');
+    if(area) area.addEventListener('scroll', updateBar, {passive:true});
+  });
+})();
+
+// -- OVERDUE BADGE ON SIDEBAR ---------------------
+function updateOverdueBadge(){
+  const today = new Date().toISOString().slice(0,10);
+  const overdue = (window.DATA?.reminders||[]).filter(r => {
+    if(!r.due || r.sent) return false;
+    return r.due.split(' ')[0] < today;
+  }).length;
+  // Show red dot on the Reminders nav if any overdue
+  const remBtn = document.getElementById('nav-reminders-btn');
+  if(remBtn){
+    let badge = remBtn.querySelector('.nav-overdue-badge');
+    if(!badge){
+      badge = document.createElement('span');
+      badge.className = 'nav-overdue-badge';
+      badge.title = overdue + ' overdue';
+      remBtn.appendChild(badge);
+    }
+    badge.classList.toggle('show', overdue > 0);
+  }
+}
+
+// -- KEYBOARD SHORTCUTS ---------------------------
+(function initKeyboardShortcuts(){
+  const hint = document.createElement('div');
+  hint.id = 'kbd-hint';
+  document.body.appendChild(hint);
+  let hintTimer;
+  function showHint(msg){
+    hint.textContent = msg;
+    hint.classList.add('show');
+    clearTimeout(hintTimer);
+    hintTimer = setTimeout(()=>hint.classList.remove('show'), 1800);
+  }
+  document.addEventListener('keydown', function(e){
+    const tag = document.activeElement?.tagName?.toLowerCase();
+    const editing = tag==='input'||tag==='textarea'||tag==='select';
+    if(editing) return;
+    if(e.metaKey || e.ctrlKey || e.altKey) return;
+    switch(e.key){
+      case 'n': openModal(); showHint('N — New note'); break;
+      case 'r': openModal(); setTimeout(()=>switchType('reminder'),50); showHint('R — New reminder'); break;
+      case 's': addSticky(); showHint('S — New sticky'); break;
+      case 'd': showPage('dashboard',document.getElementById('nav-dashboard')); showHint('D — Dashboard'); break;
+      case '/': {
+        const si = document.querySelector('.search-wrap input');
+        if(si){ e.preventDefault(); si.focus(); showHint('/ — Search'); }
+        break;
+      }
+      case '?': {
+        showHint('N=Note  R=Reminder  S=Sticky  D=Dash  /=Search');
+        break;
+      }
+    }
+  });
+})();
+
+// -- PERSONALIZED GREETING ------------------------
+(function patchGreeting(){
+  const orig = window.updateGreeting;
+  function smartGreeting(){
+    const el = document.getElementById('dash-greet-text');
+    if(!el) return;
+    const user = fbAuth?.currentUser;
+    const name = user?.displayName ? ' ' + user.displayName.split(' ')[0] : '';
+    const h = new Date().getHours();
+    const greet = h<12 ? 'Good morning' : h<17 ? 'Good afternoon' : 'Good evening';
+    const emoji = h<12 ? '🌅' : h<17 ? '☀️' : '🌙';
+    el.textContent = greet + name + ' 👋';
+    const ee = document.getElementById('dash-greet-emoji');
+    if(ee) ee.textContent = emoji;
+  }
+  // Patch: call after auth loads
+  const origAuth = window.updateAuthUI;
+  window.updateAuthUI = function(user){
+    if(origAuth) origAuth.call(this, user);
+    setTimeout(smartGreeting, 100);
+  };
+  window.smartGreeting = smartGreeting;
+})();
+
+// -- THEME HOVER LIVE PREVIEW ---------------------
+(function initThemeHoverPreview(){
+  let _origTheme = null;
+  document.addEventListener('mouseover', function(e){
+    const card = e.target.closest('.theme-card');
+    if(!card) return;
+    const onclick = card.getAttribute('onclick')||'';
+    const m = onclick.match(/applyTheme\('([^']+)'\)/);
+    if(!m) return;
+    if(_origTheme === null) _origTheme = localStorage.getItem('mynotes_theme')||'facebook';
+    document.body.className = 'theme-' + m[1];
+    if(document.body.classList.contains('sidebar-collapsed')) document.body.classList.add('sidebar-collapsed');
+    if(document.body.classList.contains('fontsize-compact')) document.body.classList.add('fontsize-compact');
+    if(document.body.classList.contains('fontsize-large')) document.body.classList.add('fontsize-large');
+  });
+  document.addEventListener('mouseout', function(e){
+    const card = e.target.closest('.theme-card');
+    if(!card || e.relatedTarget?.closest('.theme-card')) return;
+    if(_origTheme !== null){
+      document.body.className = 'theme-' + _origTheme;
+      if(_sidebarCollapsed) document.body.classList.add('sidebar-collapsed');
+    }
+  });
+  // On actual click, commit
+  document.addEventListener('click', function(e){
+    const card = e.target.closest('.theme-card');
+    if(card) _origTheme = null;
+  });
+})();
+
+// -- FONT SIZE SETTING ----------------------------
+function applyFontSize(val){
+  document.body.classList.remove('fontsize-compact','fontsize-large');
+  if(val=='compact') document.body.classList.add('fontsize-compact');
+  else if(val=='large') document.body.classList.add('fontsize-large');
+  localStorage.setItem('mynotes_fontsize', val);
+}
+(function initFontSize(){
+  const saved = localStorage.getItem('mynotes_fontsize')||'normal';
+  applyFontSize(saved);
+})();
+
+// -- SKELETON LOADER HELPER -----------------------
+function showSkeletonLoader(containerId, count=4){
+  const el = document.getElementById(containerId);
+  if(!el) return;
+  let html = '<div class="skeleton-wrap">';
+  for(let i=0;i<count;i++){
+    html += `<div class="skeleton-card">
+      <div class="skeleton-line" style="width:${40+Math.random()*40}%"></div>
+      <div class="skeleton-line" style="width:${60+Math.random()*30}%"></div>
+      <div class="skeleton-line" style="width:${30+Math.random()*40}%"></div>
+    </div>`;
+  }
+  html += '</div>';
+  el.innerHTML = html;
+}
+
 window.addEventListener('DOMContentLoaded',()=>{
   const savedTheme=localStorage.getItem('mynotes_theme')||'facebook';
   applyTheme(savedTheme);
@@ -13000,19 +13408,23 @@ window.addEventListener('DOMContentLoaded',()=>{
   });
 
   // NOTE: initSticky() is intentionally NOT called here.
-  // It is called inside loadFromFirebase() AFTER real data is loaded from Firebase.
-  // Calling it here with empty DATA triggers saveToFirebase() which wipes everything.
   initJournalListeners();
   startClock();
   initNotesPasteHandler();
-
-  // Auto-refresh: not needed with Firestore (no SHA conflicts)
-
-  // Notification permission check
   checkNotifPermissionPrompt();
   cleanNotifiedIds();
-  // Badge updater — works without notification permission (favicon + PWA icon)
   startBadgeUpdater();
+
+  // Scroll progress bar wiring
+  const scrollArea = document.getElementById('page-scroll-area');
+  const progBar = document.getElementById('reading-progress-bar');
+  if(scrollArea && progBar){
+    scrollArea.addEventListener('scroll', ()=>{
+      const total = scrollArea.scrollHeight - scrollArea.clientHeight;
+      const pct = total > 0 ? Math.min(100,(scrollArea.scrollTop/total)*100) : 0;
+      progBar.style.width = pct + '%';
+    }, {passive:true});
+  }
 
   // Firebase auth state listener
   fbAuth.onAuthStateChanged(user=>{
@@ -13020,7 +13432,7 @@ window.addEventListener('DOMContentLoaded',()=>{
     if(user){
       closeSettings();
       loadFromFirebase();
-      _gcalAutoSyncOnLoad(); // ← auto-sync existing reminders after login
+      _gcalAutoSyncOnLoad();
     } else {
       dataLoaded=true;
       initSticky();
