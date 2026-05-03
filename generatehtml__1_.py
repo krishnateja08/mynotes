@@ -6060,7 +6060,7 @@ body.fontsize-compact .ncard-body{font-size:11px}
       <div class="tag-suggestions" id="tag-suggestions"></div>
     </div>
 
-    <!-- Category (shared for notes & reminders) -->
+    <!-- Category (shared for notes & reminders) — options populated dynamically by JS -->
     <div class="frow"><label>Category</label>
       <select id="f-category">
         <option value="personal">👤 Personal</option>
@@ -6884,7 +6884,15 @@ function openModal(type='note'){
   setTagChips([]);
   selectSwatchByValue('default');
   const catEl = document.getElementById('f-category');
-  if(catEl) catEl.value = 'personal';
+  if(catEl){
+    const allLists = getRemLists();
+    catEl.innerHTML = allLists.map(l=>
+      `<option value="${l.id}">${l.icon||'🔵'} ${esc(l.name)}</option>`
+    ).join('');
+    // Pre-select the currently active list (if any), else default to personal
+    catEl.value = _remListId || 'personal';
+    if(!catEl.value) catEl.value = 'personal';
+  }
   const pts = document.getElementById('preview-timestamps');
   if(pts) pts.innerHTML='';
   switchType(type);
@@ -7122,7 +7130,16 @@ function editItem(id){
   const prioRadio = document.querySelector(`input[name="f-priority"][value="${prio}"]`);
   if(prioRadio) prioRadio.checked = true;
   const catEl2 = document.getElementById('f-category');
-  if(catEl2) catEl2.value = item.category||'personal';
+  if(catEl2){
+    const allLists = getRemLists();
+    catEl2.innerHTML = allLists.map(l=>
+      `<option value="${l.id}">${l.icon||'🔵'} ${esc(l.name)}</option>`
+    ).join('');
+    const itemListId = item.list_id || item.category || 'personal';
+    catEl2.value = itemListId;
+    // If the saved value doesn't match any option (old data), fall back to personal
+    if(!catEl2.value || catEl2.value !== itemListId) catEl2.value = 'personal';
+  }
   switchType(item.type==='reminder'?'reminder':'note');
   document.getElementById('modal-overlay').classList.add('open');
   document.getElementById('autosave-lbl').classList.remove('show');
@@ -7149,7 +7166,8 @@ async function saveItem(){
     const dueStr=dueDate+' '+dueHour+':'+dueMin;
     const selPrio = document.querySelector('input[name="f-priority"]:checked');
     const priority = selPrio ? selPrio.value : 'medium';
-    const rem={id:id||uid(),type:'reminder',category:document.getElementById('f-category').value||'personal',title,body:document.getElementById('f-body').value.trim(),tags,due:dueStr,repeat:document.getElementById('f-repeat').value,priority,sent:ex?ex.sent||false:false,created:ex?ex.created:now,updated:now,attachments:ex?ex.attachments||[]:[]};
+    const selListId = document.getElementById('f-category').value||'personal';
+    const rem={id:id||uid(),type:'reminder',list_id:selListId,category:selListId,title,body:document.getElementById('f-body').value.trim(),tags,due:dueStr,repeat:document.getElementById('f-repeat').value,priority,sent:ex?ex.sent||false:false,created:ex?ex.created:now,updated:now,attachments:ex?ex.attachments||[]:[]};
     if(id)DATA.reminders=DATA.reminders.map(r=>r.id===id?rem:r);else DATA.reminders.push(rem);
     // ── Auto-sync to Google Calendar ──────────────────────────────────────
     if(dueStr){
