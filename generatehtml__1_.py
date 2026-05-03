@@ -235,8 +235,12 @@ function deleteTaskFromGoogleCalendar(taskId){
 }
 
 // AUTO-SYNC: Called after Firebase data loads — syncs any existing unsynced future reminders
+// Only runs if the user already has a valid Google token (i.e. they previously approved access).
+// This prevents the Google account-chooser popup appearing on every page load.
 function _gcalAutoSyncOnLoad(){
   if(!GOOGLE_CLIENT_ID) return;
+  // ── Guard: skip silently if no active token — user must trigger GCal manually ──
+  if(!_gcalToken || Date.now() >= _gcalTokenExpiry) return;
   // Wait for Firebase data to fully populate window.DATA
   setTimeout(()=>{
     const today = new Date().toISOString().slice(0,10);
