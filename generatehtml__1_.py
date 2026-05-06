@@ -11444,6 +11444,8 @@ function restoreEditorFontSize(){
   if(size){ applyEditorSize(size); const s=document.getElementById('editor-size-select'); if(s) s.value=size; }
 }
 document.addEventListener('DOMContentLoaded', restoreEditorFontSize);
+
+function mdInsert(text){
   const ta = document.getElementById('notes-editor-body');
   if(!ta) return;
   const s = ta.selectionStart;
