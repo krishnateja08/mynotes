@@ -1796,10 +1796,10 @@ body.theme-arctic .notes-folder-item.active .notes-folder-count{background:rgba(
 
 /* Column 2 — Notes list */
 .notes-list-panel{
-  width:200px;flex-shrink:0;
+  width:210px;flex-shrink:0;
   background:var(--sidebar);border-right:1px solid var(--border2);
   display:flex;flex-direction:column;
-  flex:0 0 200px;align-self:stretch;
+  flex:0 0 210px;align-self:stretch;
   min-height:0;overflow:hidden
 }
 .notes-list-hdr{
@@ -3770,7 +3770,7 @@ body.theme-ember .fin-vtbtn.active{color:#0f0d0b}
   .clock-time{font-size:13px}
   /* Notes: compact columns on tablet */
   .notes-folders-panel{width:160px}
-  .notes-list-panel{width:220px}
+  .notes-list-panel{width:231px}
   /* Reminders: compact tiles */
   .rem-summary-row{grid-template-columns:repeat(2,1fr);padding:10px 14px}
   .rem-lists-panel{width:160px}
@@ -3898,7 +3898,7 @@ body.theme-ember .fin-vtbtn.active{color:#0f0d0b}
 /* == RESPONSIVE: NEW PAGES == */
 @media(max-width:860px){
   .notes-folders-panel{width:160px}
-  .notes-list-panel{width:220px}
+  .notes-list-panel{width:231px}
   .rem-summary-row{grid-template-columns:repeat(2,1fr)}
   .rem-lists-panel{width:160px}
   .fin-list-thead,.fin-lrow{grid-template-columns:3px 28px 1fr 80px 80px 160px}
