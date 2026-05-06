@@ -1910,10 +1910,23 @@ body.theme-arctic .notes-list-item.active{background:rgba(56,72,112,.1)}
   font-family:'Inter',sans-serif;font-size:16px;
   color:var(--text2);line-height:1.8;width:100%;
   border:none;outline:none;background:transparent;
-  resize:none;padding:0;flex:1;min-height:300px;
-  caret-color:var(--accent)
+  padding:0;flex:1;min-height:300px;overflow-y:auto;
+  caret-color:var(--accent);word-break:break-word;
+  box-sizing:border-box;
 }
-.notes-editor-body-input::placeholder{color:var(--border2)}
+.notes-editor-body-input:empty:before{
+  content:attr(data-placeholder);color:var(--border2);pointer-events:none;
+}
+.notes-editor-body-input b,.notes-editor-body-input strong{font-weight:700;color:var(--text)}
+.notes-editor-body-input i,.notes-editor-body-input em{font-style:italic}
+.notes-editor-body-input h1{font-size:1.6em;font-weight:700;color:var(--text);margin:10px 0 4px;line-height:1.3}
+.notes-editor-body-input h2{font-size:1.3em;font-weight:700;color:var(--text);margin:8px 0 4px;line-height:1.3}
+.notes-editor-body-input h3{font-size:1.1em;font-weight:700;color:var(--text);margin:6px 0 4px;line-height:1.3}
+.notes-editor-body-input ul,.notes-editor-body-input ol{padding-left:20px;margin:4px 0}
+.notes-editor-body-input li{margin:2px 0}
+.notes-editor-body-input blockquote{border-left:3px solid var(--accent);padding-left:10px;color:var(--muted);margin:6px 0}
+.notes-editor-body-input code{background:var(--s2);border:1px solid var(--border);border-radius:4px;padding:1px 5px;font-family:'Courier New',monospace;font-size:0.9em}
+.notes-editor-body-input hr{border:none;border-top:1px solid var(--border);margin:10px 0}
 
 
 
@@ -1932,13 +1945,6 @@ body.theme-arctic .notes-list-item.active{background:rgba(56,72,112,.1)}
 .md-tb-sep{width:1px;height:16px;background:var(--border);margin:0 3px;flex-shrink:0}
 .md-tb-label{font-size:10px;color:var(--muted);text-transform:uppercase;
   letter-spacing:1px;font-weight:700;margin-left:4px}
-.md-tb-select{
-  background:var(--sidebar);border:1px solid var(--border);border-radius:5px;
-  padding:3px 6px;font-size:11px;font-weight:600;cursor:pointer;
-  color:var(--text2);font-family:'Inter',sans-serif;transition:all 0.15s;
-  line-height:1.6;outline:none;
-}
-.md-tb-select:hover{border-color:var(--accent);color:var(--accent)}
 
 /* == TEMPLATES PICKER == */
 .tmpl-btn{
@@ -5031,17 +5037,17 @@ body.fontsize-compact .ncard-body{font-size:11px}
               <!-- Markdown toolbar -->
               <div class="md-toolbar" id="md-toolbar">
                 <span class="md-tb-label">Format</span>
-                <button class="md-tb-btn" onclick="mdWrap('**','**')" title="Bold">B</button>
-                <button class="md-tb-btn" onclick="mdWrap('*','*')" title="Italic" style="font-style:italic">I</button>
+                <button class="md-tb-btn" onmousedown="event.preventDefault();mdBold()" title="Bold"><b>B</b></button>
+                <button class="md-tb-btn" onmousedown="event.preventDefault();mdItalic()" title="Italic" style="font-style:italic">I</button>
                 <div class="md-tb-sep"></div>
-                <button class="md-tb-btn" onclick="mdLinePrefix('# ')" title="Heading 1">H1</button>
-                <button class="md-tb-btn" onclick="mdLinePrefix('## ')" title="Heading 2">H2</button>
-                <button class="md-tb-btn" onclick="mdLinePrefix('### ')" title="Heading 3">H3</button>
+                <button class="md-tb-btn" onmousedown="event.preventDefault();mdHeading(1)" title="Heading 1">H1</button>
+                <button class="md-tb-btn" onmousedown="event.preventDefault();mdHeading(2)" title="Heading 2">H2</button>
+                <button class="md-tb-btn" onmousedown="event.preventDefault();mdHeading(3)" title="Heading 3">H3</button>
                 <div class="md-tb-sep"></div>
-                <button class="md-tb-btn" onclick="mdLinePrefix('- ')" title="Bullet list">• List</button>
-                <button class="md-tb-btn" onclick="mdLinePrefix('> ')" title="Quote">❝</button>
-                <button class="md-tb-btn" onclick="mdInsert('\n---\n')" title="Divider">—</button>
-                <button class="md-tb-btn" onclick="mdWrap('`','`')" title="Inline code">`code`</button>
+                <button class="md-tb-btn" onmousedown="event.preventDefault();mdList()" title="Bullet list">• List</button>
+                <button class="md-tb-btn" onmousedown="event.preventDefault();mdQuote()" title="Quote">❝</button>
+                <button class="md-tb-btn" onmousedown="event.preventDefault();mdDivider()" title="Divider">—</button>
+                <button class="md-tb-btn" onmousedown="event.preventDefault();mdCode()" title="Inline code">`code`</button>
                 <div class="md-tb-sep"></div>
                 <select class="md-tb-select" id="editor-font-select" onchange="applyEditorFont(this.value)" title="Font family">
                   <option value="'Inter',sans-serif">Inter</option>
@@ -5065,7 +5071,7 @@ body.fontsize-compact .ncard-body{font-size:11px}
                   <option value="24px">24</option>
                 </select>
               </div>
-              <textarea class="notes-editor-body-input" id="notes-editor-body" placeholder="Start writing… (supports Markdown: ## Heading, **bold**, - bullet, > quote, --- divider)" oninput="onNoteEditorInput()"></textarea>
+              <div class="notes-editor-body-input" id="notes-editor-body" contenteditable="true" data-placeholder="Start writing… (use toolbar for Bold, Italic, Headings, Lists…)" oninput="onNoteEditorInput()"></div>
               <div class="notes-md-preview" id="notes-md-preview"></div>
             </div>
           </div>
@@ -7636,14 +7642,16 @@ function showNoteEditor(id, focusBody=false){
   if(titleEl) titleEl.value = n.title||'';
   if(bodyEl){
     // Replace any saved data:image base64 URLs with compact in-memory tokens
-    // so the textarea stays clean and readable
+    // so the editor stays clean and readable
     let bodyText = n.body||'';
     bodyText = bodyText.replace(/!\[([^\]]*)\]\((data:image\/[^)]{20,})\)/g, (match, alt, dataUrl) => {
       const token = 'img_' + (++window._imgTokenCounter);
       window._imgDataStore[token] = dataUrl;
       return `![${alt||'pasted image'}](%%IMGDATA:${token}%%)`;
     });
-    bodyEl.value = bodyText;
+    // If content has HTML tags already, set directly; otherwise convert markdown to HTML
+    const isHtml = /<[a-z][\s\S]*>/i.test(bodyText);
+    bodyEl.innerHTML = isHtml ? bodyText : renderMarkdown(bodyText);
   }
   if(metaEl)  metaEl.textContent = n.updated||n.created||'';
   hideSavedIndicator();
@@ -7673,7 +7681,7 @@ async function saveCurrentNoteInline(){
   const titleEl = document.getElementById('notes-editor-title');
   const bodyEl  = document.getElementById('notes-editor-body');
   const title   = titleEl?.value.trim()||'';
-  const rawBody = bodyEl?.value||'';
+  const rawBody = bodyEl?.innerHTML||'';
   // Resolve any in-memory image tokens back to full data URLs before persisting
   const body = rawBody.replace(/%%IMGDATA:(img_\d+)%%/g, (match, token) => {
     return (window._imgDataStore && window._imgDataStore[token]) ? window._imgDataStore[token] : match;
@@ -11419,16 +11427,6 @@ function mdLinePrefix(prefix){
   }, 1200);
 }
 
-function mdInsert(text){
-  const ta = document.getElementById('notes-editor-body');
-  if(!ta) return;
-  const s = ta.selectionStart;
-  ta.value = ta.value.slice(0,s)+text+ta.value.slice(s);
-  ta.selectionStart = ta.selectionEnd = s+text.length;
-  ta.focus();
-  onNoteEditorInput();
-}
-
 function applyEditorFont(font){
   const ta = document.getElementById('notes-editor-body');
   if(ta) ta.style.fontFamily = font;
@@ -11442,18 +11440,43 @@ function applyEditorSize(size){
 function restoreEditorFontSize(){
   const font = localStorage.getItem('notes_editor_font');
   const size = localStorage.getItem('notes_editor_size');
-  if(font){
-    applyEditorFont(font);
-    const sel = document.getElementById('editor-font-select');
-    if(sel) sel.value = font;
-  }
-  if(size){
-    applyEditorSize(size);
-    const sel = document.getElementById('editor-size-select');
-    if(sel) sel.value = size;
-  }
+  if(font){ applyEditorFont(font); const s=document.getElementById('editor-font-select'); if(s) s.value=font; }
+  if(size){ applyEditorSize(size); const s=document.getElementById('editor-size-select'); if(s) s.value=size; }
 }
 document.addEventListener('DOMContentLoaded', restoreEditorFontSize);
+  const ta = document.getElementById('notes-editor-body');
+  if(!ta) return;
+  const s = ta.selectionStart;
+  ta.value = ta.value.slice(0,s)+text+ta.value.slice(s);
+  ta.selectionStart = ta.selectionEnd = s+text.length;
+  ta.focus();
+  onNoteEditorInput();
+}
+
+/* ── Rich-text toolbar actions ── */
+function _edFocus(){ const el=document.getElementById('notes-editor-body'); if(el) el.focus(); }
+function mdBold()  { _edFocus(); document.execCommand('bold');   onNoteEditorInput(); }
+function mdItalic(){ _edFocus(); document.execCommand('italic'); onNoteEditorInput(); }
+function mdHeading(n){ _edFocus(); document.execCommand('formatBlock',false,'h'+n); onNoteEditorInput(); }
+function mdList()  { _edFocus(); document.execCommand('insertUnorderedList'); onNoteEditorInput(); }
+function mdQuote() { _edFocus(); document.execCommand('formatBlock',false,'blockquote'); onNoteEditorInput(); }
+function mdDivider(){ _edFocus(); document.execCommand('insertHorizontalRule'); onNoteEditorInput(); }
+function mdCode(){
+  _edFocus();
+  const sel = window.getSelection();
+  if(!sel||!sel.rangeCount) return;
+  const range = sel.getRangeAt(0);
+  const selected = range.toString();
+  const code = document.createElement('code');
+  if(selected){
+    try{ range.surroundContents(code); }
+    catch(e){ document.execCommand('insertHTML',false,'<code>'+selected+'</code>'); }
+  } else {
+    code.textContent = 'code';
+    range.insertNode(code);
+  }
+  onNoteEditorInput();
+}
 
 /* ============================================================
    NOTE TEMPLATES
@@ -11530,7 +11553,7 @@ function applyTemplate(key){
   const bodyEl  = document.getElementById('notes-editor-body');
   if(titleEl && !titleEl.value) titleEl.value = t.title;
   if(bodyEl){
-    bodyEl.value = t.body;
+    bodyEl.innerHTML = renderMarkdown(t.body);
     onNoteEditorInput();
   }
   document.getElementById('tmpl-dropdown').classList.remove('open');
@@ -11683,7 +11706,7 @@ function setNoteViewMode(mode){
   const btnPrev  = document.getElementById('btn-preview-mode');
   if(!textarea||!preview) return;
   if(mode==='preview'){
-    preview.innerHTML = renderMarkdown(textarea.value);
+    preview.innerHTML = textarea.innerHTML;
     textarea.classList.add('hidden');
     preview.classList.add('active');
     btnEdit.classList.remove('active');
@@ -12260,18 +12283,12 @@ function initNotesPasteHandler(){
           }
           const reader = new FileReader();
           reader.onload = function(ev){
-            // Store base64 under a short token to keep the textarea readable
             const token = 'img_' + (++window._imgTokenCounter);
             window._imgDataStore[token] = ev.target.result;
-            const mdImg = `\n![pasted image](%%IMGDATA:${token}%%)\n`;
-            const start = ta.selectionStart;
-            const end   = ta.selectionEnd;
-            ta.value = ta.value.slice(0, start) + mdImg + ta.value.slice(end);
-            ta.selectionStart = ta.selectionEnd = start + mdImg.length;
+            const imgHtml = `<img src="${ev.target.result}" data-token="${token}" class="md-img" style="max-width:100%;border-radius:6px;margin:4px 0" onclick="mdImgZoom(this)"> `;
+            document.execCommand('insertHTML', false, imgHtml);
             ta.dispatchEvent(new Event('input'));
-            // Auto-switch to preview so the image is visible immediately
-            setNoteViewMode('preview');
-            toast(`Image pasted (${kb} KB) ✓ — showing preview`, 'success');
+            toast(`Image pasted (${kb} KB) ✓`, 'success');
           };
           reader.readAsDataURL(blob);
           return;
@@ -12322,17 +12339,26 @@ function initNotesPasteHandler(){
       mdLines.push(...mdRows.slice(1));
     }
 
+    // Insert HTML table at cursor position in contenteditable
+    const tmp2 = document.createElement('div');
+    tmp2.innerHTML = html;
+    const tbl2 = tmp2.querySelector('table');
+    if(tbl2){
+      tbl2.style.cssText='border-collapse:collapse;width:100%;font-size:13px;margin:8px 0';
+      tbl2.querySelectorAll('th,td').forEach(c=>{
+        c.style.cssText='border:1px solid var(--border);padding:5px 8px;text-align:left';
+      });
+      tbl2.querySelectorAll('th').forEach(c=>{ c.style.fontWeight='700'; });
+      document.execCommand('insertHTML',false,tbl2.outerHTML);
+      ta.dispatchEvent(new Event('input'));
+      toast('Table pasted ✓','success');
+      return;
+    }
+    // fallback: insert as markdown table text
     const mdTable = '\n' + mdLines.join('\n') + '\n';
-
-    // Insert at cursor position in textarea
-    const start = ta.selectionStart;
-    const end   = ta.selectionEnd;
-    const before = ta.value.slice(0, start);
-    const after  = ta.value.slice(end);
-    ta.value = before + mdTable + after;
-    ta.selectionStart = ta.selectionEnd = start + mdTable.length;
-    ta.dispatchEvent(new Event('input')); // trigger autosave
-    toast('Table pasted as Markdown ✓', 'success');
+    document.execCommand('insertText',false,mdTable);
+    ta.dispatchEvent(new Event('input'));
+    toast('Table pasted as text ✓', 'success');
   });
 }
 
@@ -13537,23 +13563,15 @@ function mdImgZoom(img){
 }
 function mdImgDelete(btn){
   const wrap = btn.closest('.md-img-wrap');
-  const token = wrap ? wrap.getAttribute('data-token') : null;
+  const img  = wrap ? wrap.querySelector('img') : btn.previousElementSibling;
+  const token = (wrap||btn).getAttribute('data-token') || (img && img.getAttribute('data-token'));
+  if(token && window._imgDataStore) delete window._imgDataStore[token];
+  // Remove the element from the contenteditable editor
+  const target = wrap || (img && img.closest('[data-token]')) || img;
+  if(target) target.remove();
+  else if(btn.parentNode) btn.parentNode.remove();
   const ta = document.getElementById('notes-editor-body');
-  if(ta){
-    if(token){
-      // Remove the token-based markdown line
-      ta.value = ta.value.replace(new RegExp('\\n?!\\[[^\\]]*\\]\\(%%IMGDATA:'+token+'%%\\)\\n?','g'), '\n').trim();
-      // Clean up memory store
-      if(window._imgDataStore) delete window._imgDataStore[token];
-    } else {
-      // Fallback: remove any data:image line matching this img src (external URLs etc.)
-      const src = wrap ? (wrap.querySelector('img')||{}).src : '';
-      if(src) ta.value = ta.value.replace(new RegExp('\\n?!\\[[^\\]]*\\]\\('+src.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+'\\)\\n?','g'),'\n').trim();
-    }
-    ta.dispatchEvent(new Event('input'));
-  }
-  // Remove from preview immediately
-  if(wrap) wrap.remove();
+  if(ta) ta.dispatchEvent(new Event('input'));
 }
 document.addEventListener('keydown',function(e){
   if(e.key==='Escape'){
