@@ -13402,7 +13402,8 @@ function updateOverdueBadge(){
   }
   document.addEventListener('keydown', function(e){
     const tag = document.activeElement?.tagName?.toLowerCase();
-    const editing = tag==='input'||tag==='textarea'||tag==='select';
+    const isContentEditable = document.activeElement?.contentEditable === 'true';
+    const editing = tag==='input'||tag==='textarea'||tag==='select'||isContentEditable;
     if(editing) return;
     if(e.metaKey || e.ctrlKey || e.altKey) return;
     switch(e.key){
