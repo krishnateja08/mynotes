@@ -1854,9 +1854,10 @@ body.theme-arctic .notes-list-item.active{background:rgba(56,72,112,.1)}
 .notes-list-item-pin{font-size:9px;color:var(--accent);font-weight:700;margin-bottom:2px}
 .notes-list-item-title{
   font-size:13px;font-weight:700;color:var(--text);
-  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.3
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.3;
+  flex:1;min-width:0
 }
-.notes-list-item-date{font-size:10px;color:var(--muted);font-weight:600;margin-top:2px}
+.notes-list-item-date{font-size:10px;color:var(--muted);font-weight:600;margin-top:0;flex-shrink:0}
 .notes-list-item-snippet{
   font-size:11px;color:var(--text2);margin-top:2px;
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.4
@@ -7531,8 +7532,10 @@ function renderNotesList(){
     const isActive = n.id===_selectedNoteId ? ' active' : '';
     return `<div class="notes-list-item${isActive}" onclick="selectNote('${n.id}')" id="nli-${n.id}">
       <div class="notes-list-item-accent${cl}"></div>
-      <div class="notes-list-item-title">${esc(n.title||'New Note')}</div>
-      <div class="notes-list-item-date">${dateStr}</div>
+      <div style="display:flex;align-items:baseline;justify-content:space-between;gap:6px;min-width:0">
+        <div class="notes-list-item-title">${esc(n.title||'New Note')}</div>
+        <div class="notes-list-item-date" style="margin-top:0;flex-shrink:0">${dateStr}</div>
+      </div>
       ${snippet?`<div class="notes-list-item-snippet">${esc(snippet)}</div>`:''}
     </div>`;
   }
