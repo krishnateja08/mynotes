@@ -1932,6 +1932,13 @@ body.theme-arctic .notes-list-item.active{background:rgba(56,72,112,.1)}
 .md-tb-sep{width:1px;height:16px;background:var(--border);margin:0 3px;flex-shrink:0}
 .md-tb-label{font-size:10px;color:var(--muted);text-transform:uppercase;
   letter-spacing:1px;font-weight:700;margin-left:4px}
+.md-tb-select{
+  background:var(--sidebar);border:1px solid var(--border);border-radius:5px;
+  padding:3px 6px;font-size:11px;font-weight:600;cursor:pointer;
+  color:var(--text2);font-family:'Inter',sans-serif;transition:all 0.15s;
+  line-height:1.6;outline:none;
+}
+.md-tb-select:hover{border-color:var(--accent);color:var(--accent)}
 
 /* == TEMPLATES PICKER == */
 .tmpl-btn{
@@ -5035,6 +5042,28 @@ body.fontsize-compact .ncard-body{font-size:11px}
                 <button class="md-tb-btn" onclick="mdLinePrefix('> ')" title="Quote">❝</button>
                 <button class="md-tb-btn" onclick="mdInsert('\n---\n')" title="Divider">—</button>
                 <button class="md-tb-btn" onclick="mdWrap('`','`')" title="Inline code">`code`</button>
+                <div class="md-tb-sep"></div>
+                <select class="md-tb-select" id="editor-font-select" onchange="applyEditorFont(this.value)" title="Font family">
+                  <option value="'Inter',sans-serif">Inter</option>
+                  <option value="'Georgia',serif">Georgia</option>
+                  <option value="'Times New Roman',serif">Times New Roman</option>
+                  <option value="'Courier New',monospace">Courier New</option>
+                  <option value="'Trebuchet MS',sans-serif">Trebuchet</option>
+                  <option value="'Arial',sans-serif">Arial</option>
+                  <option value="'Verdana',sans-serif">Verdana</option>
+                  <option value="'Segoe UI',sans-serif">Segoe UI</option>
+                </select>
+                <select class="md-tb-select" id="editor-size-select" onchange="applyEditorSize(this.value)" title="Font size">
+                  <option value="12px">12</option>
+                  <option value="13px">13</option>
+                  <option value="14px" selected>14</option>
+                  <option value="15px">15</option>
+                  <option value="16px">16</option>
+                  <option value="18px">18</option>
+                  <option value="20px">20</option>
+                  <option value="22px">22</option>
+                  <option value="24px">24</option>
+                </select>
               </div>
               <textarea class="notes-editor-body-input" id="notes-editor-body" placeholder="Start writing… (supports Markdown: ## Heading, **bold**, - bullet, > quote, --- divider)" oninput="onNoteEditorInput()"></textarea>
               <div class="notes-md-preview" id="notes-md-preview"></div>
@@ -11399,6 +11428,32 @@ function mdInsert(text){
   ta.focus();
   onNoteEditorInput();
 }
+
+function applyEditorFont(font){
+  const ta = document.getElementById('notes-editor-body');
+  if(ta) ta.style.fontFamily = font;
+  try{ localStorage.setItem('notes_editor_font', font); }catch(e){}
+}
+function applyEditorSize(size){
+  const ta = document.getElementById('notes-editor-body');
+  if(ta) ta.style.fontSize = size;
+  try{ localStorage.setItem('notes_editor_size', size); }catch(e){}
+}
+function restoreEditorFontSize(){
+  const font = localStorage.getItem('notes_editor_font');
+  const size = localStorage.getItem('notes_editor_size');
+  if(font){
+    applyEditorFont(font);
+    const sel = document.getElementById('editor-font-select');
+    if(sel) sel.value = font;
+  }
+  if(size){
+    applyEditorSize(size);
+    const sel = document.getElementById('editor-size-select');
+    if(sel) sel.value = size;
+  }
+}
+document.addEventListener('DOMContentLoaded', restoreEditorFontSize);
 
 /* ============================================================
    NOTE TEMPLATES
