@@ -446,6 +446,23 @@ body.theme-facebook {
   --over-bg:  rgba(0,0,0,.65);
 }
 
+body.theme-indigo {
+  --bg:       #1e2130;
+  --sidebar:  #161925;
+  --s2:       #252a3a;
+  --border:   rgba(255,255,255,.07);
+  --border2:  rgba(15,184,138,.3);
+  --text:     #ffffff;
+  --text2:    rgba(255,255,255,.65);
+  --muted:    rgba(255,255,255,.38);
+  --accent:   #0fb88a;
+  --accent2:  #0e9e77;
+  --green:    #0fb88a;
+  --red:      #f06060;
+  --blue:     #5b8df5;
+  --over-bg:  rgba(20,24,40,.7);
+}
+
 body{
   font-family:'Inter',sans-serif;
   background:var(--bg);color:var(--text);
@@ -589,6 +606,53 @@ body.theme-facebook .search-wrap input{background:#f0f2f5;border-color:#dadde1}
 body.theme-facebook .search-wrap input:focus{border-color:#1877f2;background:#fff}
 body.theme-facebook .btn-ghost{border-color:#dadde1;color:#65676b}
 body.theme-facebook .btn-ghost:hover{border-color:#1877f2;color:#1877f2}
+
+/* Indigo Teal overrides */
+body.theme-indigo aside{background:#161925;border-right:1px solid rgba(15,184,138,.08);backdrop-filter:blur(16px)}
+body.theme-indigo .topbar{background:rgba(22,25,37,.9);border-bottom:1px solid rgba(15,184,138,.07);box-shadow:0 1px 12px rgba(0,0,0,.25)}
+body.theme-indigo .nav-item.active{background:rgba(15,184,138,.13);color:var(--accent);border-left:2px solid var(--accent)}
+body.theme-indigo .nav-item:hover{background:rgba(255,255,255,.04)}
+body.theme-indigo .btn{color:#061a14;background:var(--accent)}
+body.theme-indigo .btn:hover{background:#0e9e77}
+body.theme-indigo .page-title{color:#ffffff}
+body.theme-indigo .clock-block{background:rgba(15,184,138,.07);border-color:rgba(15,184,138,.2)}
+body.theme-indigo .clock-block:hover{background:rgba(15,184,138,.12)}
+body.theme-indigo .clock-time{color:#0fb88a}
+body.theme-indigo .clock-zone{color:rgba(255,255,255,.45)}
+body.theme-indigo .topbar-sync{background:rgba(255,255,255,.04);border-color:rgba(255,255,255,.06)}
+body.theme-indigo .topbar-avatar{background:rgba(15,184,138,.12);border-color:rgba(15,184,138,.2);color:#0fb88a}
+body.theme-indigo .ctitle{color:#0fb88a}
+body.theme-indigo .stat-num{color:#0fb88a}
+body.theme-indigo .ncard,body.theme-indigo .fin-card,body.theme-indigo .tan-item,body.theme-indigo .fin-sum-card,body.theme-indigo .stat-card{background:#252a3a;border-color:rgba(255,255,255,.07)}
+body.theme-indigo .ncard:hover,body.theme-indigo .fin-card:hover,body.theme-indigo .tan-item:hover{border-color:rgba(15,184,138,.3)}
+body.theme-indigo .ncard.pinned-card{border-top:3px solid #0fb88a}
+body.theme-indigo .db-new-btn{background:#0fb88a}
+body.theme-indigo .db-new-btn:hover{background:#0e9e77}
+body.theme-indigo .db-filter-btn.active{background:rgba(15,184,138,.12);color:var(--accent)}
+body.theme-indigo .db-filter-btn.active .db-filter-count{background:rgba(15,184,138,.1);color:var(--accent)}
+body.theme-indigo .db-date-header{background:#1e2130;border-bottom-color:rgba(15,184,138,.08)}
+body.theme-indigo .dh-day{color:#0fb88a}
+body.theme-indigo .dh-mon{color:#0fb88a}
+body.theme-indigo .dh-ecount{background:rgba(15,184,138,.1);color:#0fb88a}
+body.theme-indigo .db-entry-time{color:#0fb88a}
+body.theme-indigo .db-entry:hover{background:rgba(15,184,138,.03)}
+body.theme-indigo .db-compose-dt{color:#0fb88a;background:rgba(15,184,138,.08)}
+body.theme-indigo .db-tag-trade{background:rgba(15,184,138,.12);color:#0fb88a}
+body.theme-indigo .db-tag-personal{background:rgba(91,141,245,.12);color:#5b8df5}
+body.theme-indigo .db-tag-idea{background:rgba(245,159,64,.12);color:#f59f40}
+body.theme-indigo .db-tag-health{background:rgba(240,96,96,.12);color:#f06060}
+body.theme-indigo .db-tag-work{background:rgba(91,141,245,.12);color:#5b8df5}
+body.theme-indigo .db-tag-family{background:rgba(200,140,200,.12);color:#c88cc8}
+body.theme-indigo .shop-folder.active{background:rgba(15,184,138,.1);color:var(--accent)}
+body.theme-indigo .nav-item.active .nav-count{background:rgba(15,184,138,.15);color:#0fb88a}
+body.theme-indigo .sidebar-logo{color:#0fb88a}
+body.theme-indigo .sync-pill{background:#252a3a;border:1px solid rgba(255,255,255,.07)}
+body.theme-indigo .search-wrap input{background:#252a3a;border-color:rgba(255,255,255,.08);color:#fff}
+body.theme-indigo .search-wrap input:focus{border-color:#0fb88a;background:#2d3347}
+body.theme-indigo .btn-ghost{border-color:rgba(255,255,255,.12);color:rgba(255,255,255,.65)}
+body.theme-indigo .btn-ghost:hover{border-color:#0fb88a;color:#0fb88a}
+body.theme-indigo .notes-list-item.active{background:rgba(15,184,138,.14);border-left:2px solid #0fb88a}
+body.theme-indigo .notes-list-item:hover{background:rgba(255,255,255,.03)}
 
 .sidebar-logo{
   padding:12px 14px 10px;
@@ -6345,6 +6409,19 @@ body.fontsize-compact .ncard-body{font-size:11px}
       <div class="theme-name" style="background:#161210;color:#d4724a">&#x1F525; Obsidian Ember</div>
     </div>
 
+    <!-- Indigo Teal -->
+    <div class="theme-card" id="theme-btn-indigo" onclick="applyTheme('indigo')">
+      <div class="theme-preview" style="background:#1e2130">
+        <div class="tp-side" style="background:#161925;border-right:1px solid rgba(15,184,138,.15)"></div>
+        <div class="tp-main" style="background:#1e2130">
+          <div class="tp-line" style="background:#0fb88a;width:60%"></div>
+          <div class="tp-line" style="background:#252a3a;width:90%"></div>
+          <div class="tp-line" style="background:#2d3347;width:70%"></div>
+        </div>
+      </div>
+      <div class="theme-name" style="background:#161925;color:#0fb88a">&#x1F30F; Indigo Teal</div>
+    </div>
+
   </div>
 
   <!-- FONT SIZE -->
@@ -6424,7 +6501,7 @@ let _realtimeListenerActive=false; // false on first snapshot, true thereafter
 let currentType='note';
 
 /* -- THEME --------------------------------------- */
-const THEMES=['facebook','rose','cream','beige','arctic','ocean','midnight','ember'];
+const THEMES=['facebook','rose','cream','beige','arctic','ocean','midnight','ember','indigo'];
 
 function applyTheme(t){
   document.body.className='theme-'+t;
