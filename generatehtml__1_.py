@@ -7559,6 +7559,7 @@ function renderNotesList(){
   }
 
   function noteItemHTML(n){
+    const isActive = n.id === _selectedNoteId ? ' active' : '';
     const cl  = n.color&&n.color!=='default' ? ' cl-'+n.color : '';
     const dateStr = (n.updated||n.created||'').slice(0,10);
     const snippet = (n.body||'')
