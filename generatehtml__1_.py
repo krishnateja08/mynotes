@@ -13643,6 +13643,26 @@ const IMP_CAT_LABEL = {
 
 function impGetData(){ return Array.isArray(DATA.important_dates) ? DATA.important_dates : []; }
 
+/* Annual roll-over: if a date has already passed this year, return the
+   same day+month for the next suitable year so every recurring event
+   (birthday, anniversary, etc.) always shows as an upcoming date.
+   The stored entry is NEVER modified — this is display-only projection. */
+function impEffectiveDate(dateStr){
+  if(!dateStr) return dateStr;
+  const todayStr = impTodayStr();
+  if(dateStr >= todayStr) return dateStr; // still in the future → no change
+
+  const parts = dateStr.split('-');
+  if(parts.length !== 3) return dateStr;
+  const mo = parts[1], dd = parts[2];
+  const curYr = new Date().getFullYear();
+
+  // Try same month-day in the current year first; if that's also past, use next year
+  let candidate = String(curYr) + '-' + mo + '-' + dd;
+  if(candidate < todayStr) candidate = String(curYr + 1) + '-' + mo + '-' + dd;
+  return candidate;
+}
+
 function impTodayStr(){
   const d=new Date();
   const y=d.getFullYear(), m=String(d.getMonth()+1).padStart(2,'0'), dd=String(d.getDate()).padStart(2,'0');
@@ -13852,14 +13872,24 @@ function impRenderPage(){
   const all=impGetData().slice();
   const todayStr=impTodayStr();
 
-  let filtered=all;
-  if(_impFilter==='upcoming')       filtered=all.filter(e=>e.date >  todayStr);
-  else if(_impFilter==='today')     filtered=all.filter(e=>e.date === todayStr);
-  else if(_impFilter==='past')      filtered=all.filter(e=>e.date <  todayStr);
-  else if(_impFilter==='birthdays') filtered=all.filter(e=>(e.title||'').toLowerCase().includes('birthday')||(e.title||'').toLowerCase().includes('bday'));
-  else if(_impFilter==='anniversaries') filtered=all.filter(e=>(e.title||'').toLowerCase().includes('anniversary')||(e.title||'').toLowerCase().includes('anniv'));
-  else if(_impFilter==='memories')  filtered=all.filter(e=>e.category==='personal'||(e.title||'').toLowerCase().includes('memory')||(e.title||'').toLowerCase().includes('memorial'));
-  // Year filter
+  /* Project past dates to their next annual occurrence so the list
+     always shows upcoming events. The 'past' filter is the only view
+     that intentionally shows the original historical dates. */
+  const workData = _impFilter==='past'
+    ? all
+    : all.map(e=>{
+        const eff=impEffectiveDate(e.date);
+        return (eff && eff!==e.date) ? {...e, date:eff} : e;
+      });
+
+  let filtered=workData;
+  if(_impFilter==='upcoming')           filtered=workData.filter(e=>e.date >  todayStr);
+  else if(_impFilter==='today')         filtered=workData.filter(e=>e.date === todayStr);
+  else if(_impFilter==='past')          filtered=all.filter(e=>e.date <  todayStr);
+  else if(_impFilter==='birthdays')     filtered=workData.filter(e=>(e.title||'').toLowerCase().includes('birthday')||(e.title||'').toLowerCase().includes('bday'));
+  else if(_impFilter==='anniversaries') filtered=workData.filter(e=>(e.title||'').toLowerCase().includes('anniversary')||(e.title||'').toLowerCase().includes('anniv'));
+  else if(_impFilter==='memories')      filtered=workData.filter(e=>e.category==='personal'||(e.title||'').toLowerCase().includes('memory')||(e.title||'').toLowerCase().includes('memorial'));
+  // Year filter (applied to projected dates)
   if(_impYearFilter) filtered=filtered.filter(e=>(e.date||'').startsWith(String(_impYearFilter)));
 
   // Sort month-wise: chronological (oldest to newest).
