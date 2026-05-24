@@ -1364,27 +1364,41 @@ body.theme-ember .imp-filter-btn.active{background:rgba(212,114,74,.12);color:va
 }
 .imp-grid{
   display:grid;
-  grid-template-columns:repeat(auto-fill,minmax(240px,1fr));
+  grid-template-columns:repeat(auto-fill,minmax(250px,1fr));
   gap:12px;
+  padding:14px 14px 14px;
 }
-.imp-month-section{margin-bottom:22px}
+.imp-month-section{
+  margin-bottom:20px;
+  background:var(--sidebar);
+  border:1px solid var(--border);
+  border-radius:14px;
+  overflow:hidden;
+  animation:imp-month-in .3s ease both;
+}
 .imp-month-section:last-child{margin-bottom:0}
+@keyframes imp-month-in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
 .imp-month-header{
   display:flex;align-items:center;justify-content:space-between;
-  padding:6px 4px 10px 4px;margin-bottom:4px;
+  padding:11px 16px;
+  background:linear-gradient(90deg,var(--s2) 0%,transparent 100%);
   border-bottom:1px solid var(--border);
 }
 .imp-month-label{
-  font-size:13px;font-weight:800;color:var(--text);
-  letter-spacing:0.8px;text-transform:uppercase;
+  font-size:12px;font-weight:800;color:var(--text2);
+  letter-spacing:1.2px;text-transform:uppercase;
+  display:flex;align-items:center;gap:8px;
 }
+.imp-month-tl-dot{width:10px;height:10px;border-radius:50%;background:var(--border2);flex-shrink:0}
 .imp-month-header.current .imp-month-label{color:var(--accent)}
+.imp-month-header.current .imp-month-tl-dot{background:var(--accent)}
 .imp-month-count{
-  font-size:11px;font-weight:600;color:var(--muted);
-  background:var(--s2);padding:3px 10px;border-radius:20px;
+  font-size:10px;font-weight:700;color:var(--muted);
+  background:var(--bg);padding:3px 10px;border-radius:20px;
+  border:1px solid var(--border);
 }
 .imp-month-header.current .imp-month-count{
-  background:rgba(37,99,235,.12);color:var(--accent);
+  background:rgba(37,99,235,.12);color:var(--accent);border-color:rgba(37,99,235,.2);
 }
 body.theme-rose .imp-month-header.current .imp-month-count{background:rgba(176,96,144,.14)}
 body.theme-ocean .imp-month-header.current .imp-month-count{background:rgba(0,210,180,.14)}
@@ -1392,12 +1406,19 @@ body.theme-midnight .imp-month-header.current .imp-month-count{background:rgba(2
 body.theme-ember .imp-month-header.current .imp-month-count{background:rgba(212,114,74,.14)}
 .imp-card{
   display:flex;align-items:stretch;gap:12px;
-  padding:12px 12px 12px 14px;
-  background:var(--sidebar);border:1px solid rgba(200,180,138,.15);
-  border-radius:12px;transition:all 0.15s;
+  padding:14px 14px 14px 16px;
+  background:var(--bg);border:1px solid var(--border);
+  border-radius:12px;transition:all 0.18s;
   border-left:5px solid #7c5cbf;
   min-width:0;
   position:relative;
+  animation:imp-card-in .25s ease both;
+}
+@keyframes imp-card-in{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+.imp-card-emoji{
+  position:absolute;top:10px;right:44px;
+  font-size:18px;line-height:1;opacity:.7;
+  pointer-events:none;
 }
 /* Category-colored left borders (#4) */
 .imp-card.cat-personal{border-left-color:#3b82f6}
@@ -1425,6 +1446,49 @@ body.theme-ember .imp-month-header.current .imp-month-count{background:rgba(212,
 }
 .imp-card-badge.overdue{
   background:rgba(220,38,38,.15);color:#dc2626;
+}
+
+/* ── YEAR NAVIGATION BAR ─────────────────────── */
+.imp-year-nav{
+  display:flex;align-items:center;gap:6px;
+  padding:10px 28px 0;overflow-x:auto;scrollbar-width:none;flex-shrink:0;
+}
+.imp-year-nav::-webkit-scrollbar{display:none}
+.imp-year-btn{
+  padding:5px 16px;border-radius:20px;font-size:12px;font-weight:700;
+  border:1px solid var(--border);background:var(--s2);color:var(--text2);
+  cursor:pointer;white-space:nowrap;transition:all .15s;font-family:'Inter',sans-serif;
+}
+.imp-year-btn:hover{border-color:var(--border2);color:var(--text)}
+.imp-year-btn.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+/* ── INSIGHTS ROW ─────────────────────────────── */
+.imp-insights-row{
+  display:flex;gap:8px;flex-wrap:wrap;
+  padding:10px 28px 2px;
+}
+.imp-insight-chip{
+  display:inline-flex;align-items:center;gap:5px;
+  font-size:11px;font-weight:700;padding:4px 12px;border-radius:20px;
+  background:var(--s2);color:var(--text2);border:1px solid var(--border);
+  white-space:nowrap;
+}
+.imp-insight-chip.birthday{background:rgba(236,72,153,.1);color:#db2777;border-color:rgba(236,72,153,.2)}
+.imp-insight-chip.anniv{background:rgba(124,92,191,.1);color:#7c5cbf;border-color:rgba(124,92,191,.2)}
+.imp-insight-chip.upcoming{background:rgba(5,150,105,.1);color:#059669;border-color:rgba(5,150,105,.2)}
+/* ── HERO PROGRESS BAR ─────────────────────────── */
+.imp-hero-prog-wrap{margin-top:8px;display:flex;align-items:center;gap:8px}
+.imp-hero-prog-track{flex:1;height:5px;background:var(--s2);border-radius:3px;overflow:hidden}
+.imp-hero-prog-fill{height:100%;border-radius:3px;background:var(--accent);transition:width .6s ease}
+.imp-hero-prog-label{font-size:10px;color:var(--muted);white-space:nowrap;font-weight:600}
+/* ── CATEGORY-COLOURED BADGE IN CARD ───────────── */
+.imp-card-badge.cat-personal{background:rgba(124,92,191,.12);color:#7c5cbf}
+.imp-card-badge.cat-official{background:rgba(14,159,159,.12);color:#0e7f7f}
+.imp-card-badge.cat-family{background:rgba(236,72,153,.12);color:#be185d}
+.imp-card-badge.cat-health{background:rgba(239,68,68,.12);color:#dc2626}
+.imp-card-badge.cat-finance{background:rgba(16,185,129,.12);color:#047857}
+.imp-card-badge.cat-other{background:rgba(167,139,250,.12);color:#6d28d9}
+@media(max-width:640px){
+  .imp-year-nav,.imp-insights-row{padding-left:14px;padding-right:14px}
 }
 
 /* Hero "Next Up" card (#3) */
@@ -1493,11 +1557,11 @@ body.theme-ember .imp-month-header.current .imp-month-count{background:rgba(212,
   padding:6px 4px;border-radius:8px;background:var(--s2);
   font-variant-numeric:tabular-nums;flex-shrink:0;
 }
-.imp-card-day{font-size:18px;font-weight:800;color:var(--text);line-height:1}
+.imp-card-day{font-size:26px;font-weight:800;color:var(--text);line-height:1}
 .imp-card-mon{font-size:9px;font-weight:700;letter-spacing:0.8px;text-transform:uppercase;color:var(--muted);margin-top:2px}
 .imp-card-yr{font-size:9px;color:var(--muted);margin-top:1px}
 .imp-card-body{flex:1;min-width:0;display:flex;flex-direction:column;justify-content:center;padding-right:40px}
-.imp-card-title{font-size:13px;font-weight:700;color:var(--text);margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.imp-card-title{font-size:13px;font-weight:700;color:var(--text);margin-bottom:3px;line-height:1.4;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .imp-card-note{font-size:11px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:4px}
 .imp-card-meta{display:flex;align-items:center;gap:5px;flex-wrap:wrap}
 .imp-card-badge{font-size:9px;font-weight:700;padding:2px 7px;border-radius:20px;background:rgba(37,99,235,.12);color:#2563eb;white-space:nowrap}
@@ -1549,8 +1613,8 @@ body.theme-ember .imp-month-header.current .imp-month-count{background:rgba(212,
   .imp-header{padding:14px 16px}
   .imp-filters{padding:12px 16px 0}
   .imp-list-wrap{padding:14px 16px 30px}
-  .imp-grid{grid-template-columns:1fr;gap:10px}
-  .imp-card{padding:10px 12px}
+  .imp-grid{grid-template-columns:1fr;gap:10px;padding:10px}
+  .imp-card{padding:12px 12px 12px 14px}
   .imp-card-date{min-width:46px;width:46px;padding:5px 3px}
   .imp-card-day{font-size:16px}
   .imp-card-actions{opacity:1}
@@ -5787,11 +5851,20 @@ body.fontsize-compact .ncard-body{font-size:11px}
   </div>
 
   <div class="imp-filters">
-    <button class="imp-filter-btn active" id="imp-f-all"      onclick="impSetFilter('all',this)">All</button>
-    <button class="imp-filter-btn"        id="imp-f-upcoming" onclick="impSetFilter('upcoming',this)">📅 Upcoming</button>
-    <button class="imp-filter-btn"        id="imp-f-today"    onclick="impSetFilter('today',this)">⭐ Today</button>
-    <button class="imp-filter-btn"        id="imp-f-past"     onclick="impSetFilter('past',this)">⏳ Past</button>
+    <button class="imp-filter-btn active" id="imp-f-all"         onclick="impSetFilter('all',this)">All</button>
+    <button class="imp-filter-btn"        id="imp-f-upcoming"    onclick="impSetFilter('upcoming',this)">📅 Upcoming</button>
+    <button class="imp-filter-btn"        id="imp-f-today"       onclick="impSetFilter('today',this)">⭐ Today</button>
+    <button class="imp-filter-btn"        id="imp-f-past"        onclick="impSetFilter('past',this)">⏳ Past</button>
+    <button class="imp-filter-btn"        id="imp-f-birthdays"   onclick="impSetFilter('birthdays',this)">🎂 Birthdays</button>
+    <button class="imp-filter-btn"        id="imp-f-anniversaries" onclick="impSetFilter('anniversaries',this)">💍 Anniversaries</button>
+    <button class="imp-filter-btn"        id="imp-f-memories"    onclick="impSetFilter('memories',this)">💜 Memories</button>
   </div>
+
+  <!-- Year selector -->
+  <div class="imp-year-nav" id="imp-year-nav"></div>
+
+  <!-- Insights row -->
+  <div class="imp-insights-row" id="imp-insights-row"></div>
 
   <div class="imp-list-wrap" id="imp-list-wrap">
     <div class="imp-empty">No important dates yet. Click "+ Add Date" to add your first one.</div>
@@ -6976,6 +7049,8 @@ async function loadFromFirebase(){
     invRender();
     impRenderDashboard();
     impRenderPage();
+    impRenderYearNav();
+    impRenderInsights();
     updateImpDatesCount();
 
     if(needsRepair && JSON.stringify(DATA) !== _beforeRepair){
@@ -13555,6 +13630,8 @@ async function invDelete(id){
 
 /* ==================== IMPORTANT DATES ==================== */
 let _impFilter = 'all';
+let _impYearFilter = null; // null = all years
+
 const IMP_CAT_LABEL = {
   personal:'👤 Personal',
   official:'💼 Official',
@@ -13709,6 +13786,64 @@ function impSetFilter(f, btn){
   impRenderPage();
 }
 
+function impSetYear(yr){
+  _impYearFilter = (_impYearFilter===yr) ? null : yr;
+  impRenderYearNav();
+  impRenderPage();
+}
+
+function impRenderYearNav(){
+  const el = document.getElementById('imp-year-nav');
+  if(!el) return;
+  const all = impGetData();
+  // Collect years from data + always include current year ±2
+  const curYr = new Date().getFullYear();
+  const dataYears = [...new Set(all.map(e=>(e.date||'').slice(0,4)).filter(Boolean).map(Number))];
+  const yrs = [...new Set([curYr-1, curYr, curYr+1, curYr+2, ...dataYears])].sort((a,b)=>a-b);
+  el.innerHTML = yrs.map(yr=>`<button class="imp-year-btn${_impYearFilter===yr?' active':''}" onclick="impSetYear(${yr})">${yr}</button>`).join('');
+}
+
+function impGetEmoji(title, category){
+  const t=(title||'').toLowerCase();
+  if(t.includes('birthday')||t.includes('b-day')||t.includes('bday')) return '🎂';
+  if(t.includes('anniversary')||t.includes('anniv')) return '💍';
+  if(t.includes('wedding')||t.includes('married')) return '💐';
+  if(t.includes('proposal')||t.includes('engaged')) return '💍';
+  if(t.includes('first met')||t.includes('first meet')||t.includes('first day')) return '❤️';
+  if(t.includes('graduation')||t.includes('convoc')) return '🎓';
+  if(t.includes('celebrat')||t.includes('party')) return '🎉';
+  if(t.includes('memorial')||t.includes('memory')) return '💜';
+  if(t.includes('exam')||t.includes('test')||t.includes('interview')) return '📝';
+  if(t.includes('travel')||t.includes('trip')||t.includes('flight')) return '✈️';
+  if(t.includes('doctor')||t.includes('hospital')||t.includes('appoint')) return '🏥';
+  if(category==='family') return '👨‍👩‍👧';
+  if(category==='health') return '💊';
+  if(category==='finance') return '💰';
+  if(category==='official') return '💼';
+  return '📌';
+}
+
+function impRenderInsights(){
+  const el = document.getElementById('imp-insights-row');
+  if(!el) return;
+  const all = impGetData();
+  const todayStr = impTodayStr();
+  const curYr = new Date().getFullYear();
+  const curMo = todayStr.slice(0,7);
+  const next30 = new Date(); next30.setDate(next30.getDate()+30);
+  const next30Str = next30.toISOString().slice(0,10);
+
+  const bdays = all.filter(e=>(e.title||'').toLowerCase().includes('birthday') && e.date>=todayStr && e.date<=next30Str).length;
+  const anniversaries = all.filter(e=>((e.title||'').toLowerCase().includes('anniversary')||(e.title||'').toLowerCase().includes('anniv')) && e.date.startsWith(String(curYr))).length;
+  const upcoming = all.filter(e=>e.date>=todayStr && e.date<=next30Str).length;
+
+  let html = '';
+  if(upcoming) html += `<span class="imp-insight-chip upcoming">🗓️ ${upcoming} coming up</span>`;
+  if(bdays)    html += `<span class="imp-insight-chip birthday">🎂 ${bdays} birthday${bdays>1?'s':''} soon</span>`;
+  if(anniversaries) html += `<span class="imp-insight-chip anniv">💍 ${anniversaries} anniversary${anniversaries>1?'s':''} this year</span>`;
+  el.innerHTML = html;
+}
+
 function impRenderPage(){
   const wrap=document.getElementById('imp-list-wrap');
   const hdrCount=document.getElementById('imp-hdr-count');
@@ -13718,15 +13853,22 @@ function impRenderPage(){
   const todayStr=impTodayStr();
 
   let filtered=all;
-  if(_impFilter==='upcoming')     filtered=all.filter(e=>e.date >  todayStr);
-  else if(_impFilter==='today')   filtered=all.filter(e=>e.date === todayStr);
-  else if(_impFilter==='past')    filtered=all.filter(e=>e.date <  todayStr);
+  if(_impFilter==='upcoming')       filtered=all.filter(e=>e.date >  todayStr);
+  else if(_impFilter==='today')     filtered=all.filter(e=>e.date === todayStr);
+  else if(_impFilter==='past')      filtered=all.filter(e=>e.date <  todayStr);
+  else if(_impFilter==='birthdays') filtered=all.filter(e=>(e.title||'').toLowerCase().includes('birthday')||(e.title||'').toLowerCase().includes('bday'));
+  else if(_impFilter==='anniversaries') filtered=all.filter(e=>(e.title||'').toLowerCase().includes('anniversary')||(e.title||'').toLowerCase().includes('anniv'));
+  else if(_impFilter==='memories')  filtered=all.filter(e=>e.category==='personal'||(e.title||'').toLowerCase().includes('memory')||(e.title||'').toLowerCase().includes('memorial'));
+  // Year filter
+  if(_impYearFilter) filtered=filtered.filter(e=>(e.date||'').startsWith(String(_impYearFilter)));
 
   // Sort month-wise: chronological (oldest to newest).
   // Entries with same date stay together; grouping happens after sort.
   filtered.sort((a,b)=>(a.date||'').localeCompare(b.date||''));
 
   if(hdrCount) hdrCount.textContent = all.length===1 ? '1 date' : all.length+' dates';
+  impRenderInsights();
+  impRenderYearNav();
 
   if(!filtered.length){
     const msg = _impFilter==='all'
@@ -13754,17 +13896,16 @@ function impRenderPage(){
   const renderCard = (e)=>{
     const days=impDaysUntil(e.date);
     const badge=impFormatBadge(e.date);
-    let cardCls='imp-card';
-    // Category-colored border (#4)
-    cardCls += ' cat-' + (e.category || 'other');
+    const emoji=impGetEmoji(e.title, e.category);
+    const cat = e.category || 'other';
+    let cardCls='imp-card cat-'+cat;
     if(days===0) cardCls+=' today';
     else if(days<0) cardCls+=' overdue';
-
-    // Urgent pulse badge for 1-3 days out (#2). Today/overdue already pulse via their own classes.
     let badgeCls = badge.cls;
     if(days>0 && days<=3) badgeCls += ' urgent';
 
-    return `<div class="${cardCls}">
+    return `<div class="${cardCls}" onclick="impOpenModal('${e.id}')" style="cursor:pointer">
+      <div class="imp-card-emoji">${emoji}</div>
       <div class="imp-card-date">
         <div class="imp-card-day">${impDayNum(e.date)}</div>
         <div class="imp-card-mon">${impMonthShort(e.date)}</div>
@@ -13775,12 +13916,12 @@ function impRenderPage(){
         ${e.note?`<div class="imp-card-note">${impEscape(e.note)}</div>`:''}
         <div class="imp-card-meta">
           <span class="imp-card-badge ${badgeCls}">${badge.text}</span>
-          <span class="imp-card-badge cat">${IMP_CAT_LABEL[e.category]||'📌 Other'}</span>
+          <span class="imp-card-badge cat cat-${cat}">${IMP_CAT_LABEL[cat]||'📌 Other'}</span>
         </div>
       </div>
       <div class="imp-card-actions">
-        <button class="imp-card-btn" onclick="impOpenModal('${e.id}')" title="Edit">✎</button>
-        <button class="imp-card-btn del" onclick="impDelete('${e.id}')" title="Delete">🗑</button>
+        <button class="imp-card-btn" onclick="event.stopPropagation();impOpenModal('${e.id}')" title="Edit">✎</button>
+        <button class="imp-card-btn del" onclick="event.stopPropagation();impDelete('${e.id}')" title="Delete">🗑</button>
       </div>
     </div>`;
   };
@@ -13813,7 +13954,17 @@ function impRenderPage(){
       cdBlocks = `<div class="imp-hero-cdblock"><div class="imp-hero-cdnum">🎉</div><div class="imp-hero-cdlbl">Today</div></div>`;
     }
 
-    heroHtml = `<div class="${heroCls}">
+    const heroEmoji = impGetEmoji(nextUp.title, nextUp.category);
+    // Progress bar: fraction of year elapsed toward event date (or days-based for nearby events)
+    let progPct = 0;
+    if(d>0){
+      const maxD = 365;
+      progPct = Math.round(Math.max(0, Math.min(100, (1 - d/maxD)*100)));
+    } else if(d===0){
+      progPct = 100;
+    }
+    heroHtml = `<div class="${heroCls}" style="cursor:pointer" onclick="impOpenModal('${nextUp.id}')">
+      <div style="font-size:36px;line-height:1;flex-shrink:0;align-self:center">${heroEmoji}</div>
       <div class="imp-hero-date">
         <div class="imp-hero-day">${impDayNum(nextUp.date)}</div>
         <div class="imp-hero-mon">${impMonthShort(nextUp.date)}</div>
@@ -13824,6 +13975,10 @@ function impRenderPage(){
         <div class="imp-hero-title">${impEscape(nextUp.title)}</div>
         ${nextUp.note?`<div class="imp-hero-note">${impEscape(nextUp.note)}</div>`:''}
         <span class="imp-hero-cat">${IMP_CAT_LABEL[nextUp.category]||'📌 Other'}</span>
+        <div class="imp-hero-prog-wrap">
+          <div class="imp-hero-prog-track"><div class="imp-hero-prog-fill" style="width:${progPct}%"></div></div>
+          <div class="imp-hero-prog-label">${d===0?'Today!':(d===1?'Tomorrow':d+' days away')}</div>
+        </div>
       </div>
       ${cdBlocks?`<div class="imp-hero-countdown">${cdBlocks}</div>`:''}
     </div>`;
@@ -13838,7 +13993,7 @@ function impRenderPage(){
     const cntText = g.items.length===1 ? '1 date' : g.items.length+' dates';
     return `<div class="imp-month-section">
       <div class="imp-month-header${isCurrent?' current':''}">
-        <span class="imp-month-label">📅 ${g.label}</span>
+        <span class="imp-month-label"><span class="imp-month-tl-dot"></span>${g.label}</span>
         <span class="imp-month-count">${cntText}</span>
       </div>
       <div class="imp-grid">${g.items.map(renderCard).join('')}</div>
