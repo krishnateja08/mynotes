@@ -2248,6 +2248,7 @@ body.theme-arctic .notes-list-item.active{background:rgba(56,72,112,.1)}
   width:20px;height:20px;display:flex;align-items:center;justify-content:center;
 }
 .cal-year-mini-cell.has-ev{background:rgba(var(--accent-rgb,99,102,241),.18);font-weight:700}
+.cal-year-mini-cell.has-imp{background:rgba(202,138,4,.22);color:var(--accent2);font-weight:700}
 .cal-year-mini-cell.is-today{background:var(--accent);color:#fff;font-weight:700}
 .cal-year-mini-cell.other-m{opacity:.25}
 /* Today view */
@@ -2262,6 +2263,17 @@ body.theme-arctic .notes-list-item.active{background:rgba(56,72,112,.1)}
 .cal-today-time{font-size:12px;font-weight:700;color:var(--accent);min-width:48px}
 .cal-today-title{font-size:13px;font-weight:600;color:var(--text)}
 .cal-today-empty{text-align:center;padding:40px;color:var(--muted);font-size:14px}
+/* Important date legend chip in calendar */
+.cal-imp-legend{
+  display:flex;align-items:center;gap:4px;font-size:11px;color:var(--accent2);
+  padding:2px 8px;background:rgba(202,138,4,.12);border:1px solid rgba(202,138,4,.25);
+  border-radius:12px;white-space:nowrap;
+}
+.cal-rem-legend{
+  display:flex;align-items:center;gap:4px;font-size:11px;color:var(--accent);
+  padding:2px 8px;background:rgba(99,102,241,.1);border:1px solid rgba(99,102,241,.2);
+  border-radius:12px;white-space:nowrap;
+}
 .full-cal-dow-row{
   display:grid;grid-template-columns:repeat(7,1fr);
   border-bottom:1px solid var(--border);flex-shrink:0;
@@ -5516,6 +5528,10 @@ body.fontsize-compact .ncard-body{font-size:11px}
         <div class="full-cal-header">
           <button class="full-cal-nav" id="cal-nav-prev" onclick="calNav(-1)">&#x2039; Prev</button>
           <div class="full-cal-title" id="full-cal-title">March 2026</div>
+          <div style="display:flex;gap:6px;align-items:center;flex-shrink:0">
+            <span class="cal-rem-legend">🔔 Reminders</span>
+            <span class="cal-imp-legend">🗓️ Important Dates</span>
+          </div>
           <button class="full-cal-nav" id="cal-nav-next" onclick="calNav(1)">Next &#x203A;</button>
         </div>
         <div class="full-cal-dow-row" id="full-cal-dow-row">
@@ -12370,6 +12386,35 @@ function renderFullCal(){
     remMap[ds].push(r);
   });
 
+  // Build important dates map: accounts for yearly recurrence across visible years
+  // We populate keys for current year ±1 so all views are covered
+  const impMap = {};
+  const _cy = _calYear || new Date().getFullYear();
+  (DATA.important_dates||[]).forEach(e=>{
+    if(!e.date) return;
+    const parts = e.date.split('-');
+    if(parts.length < 3) return;
+    const mo = parts[1], dd = parts[2];
+    // Add entry for _cy-1, _cy, _cy+1 so week/month edges are covered
+    [-1,0,1].forEach(offset=>{
+      const yr = _cy + offset;
+      const ds = yr+'-'+mo+'-'+dd;
+      if(!impMap[ds]) impMap[ds]=[];
+      impMap[ds].push(e);
+    });
+  });
+
+  // Emoji helper for important dates
+  const impEmoji = e => {
+    const t=(e.title||'').toLowerCase();
+    if(t.includes('birthday')||t.includes('bday')) return '🎂';
+    if(t.includes('anniversary')||t.includes('anniv')) return '💍';
+    if(t.includes('holiday')||t.includes('vacation')) return '🏖️';
+    if(t.includes('wedding')) return '💒';
+    if(t.includes('graduation')) return '🎓';
+    return '🗓️';
+  };
+
   const prioClass = p => p==='high'?'prio-high':p==='low'?'prio-low':'prio-medium';
 
   // Sync nav button visibility (Today view hides prev/next)
@@ -12385,10 +12430,18 @@ function renderFullCal(){
     const dayLabel = now.toLocaleDateString(undefined,{weekday:'long',month:'long',day:'numeric',year:'numeric'});
     titleEl.textContent = 'Today';
     const rems = (remMap[ds]||[]).sort((a,b)=>(a.due||'').localeCompare(b.due||''));
+    const imps = impMap[ds]||[];
     let html = `<div class="cal-today-view"><div class="cal-today-date">${dayLabel}</div>`;
-    if(!rems.length){
-      html += `<div class="cal-today-empty">🎉 No reminders for today!</div>`;
+    if(!rems.length && !imps.length){
+      html += `<div class="cal-today-empty">🎉 No reminders or important dates for today!</div>`;
     } else {
+      imps.forEach(e=>{
+        const emoji = impEmoji(e);
+        html += `<div class="cal-today-event-card cal-imp-card" style="border-left:3px solid var(--accent2)">
+          <div class="cal-today-time" style="color:var(--accent2)">${emoji}</div>
+          <div><div class="cal-today-title">${e.title||'Untitled'}</div>${e.note?`<div style="font-size:11px;color:var(--muted);margin-top:2px">${e.note}</div>`:''}</div>
+        </div>`;
+      });
       rems.forEach(r=>{
         const timeStr = r.due && r.due.length>10 ? r.due.slice(11,16) : '—';
         const doneStyle = r.sent ? 'opacity:.5;text-decoration:line-through' : '';
@@ -12411,6 +12464,7 @@ function renderFullCal(){
     const d = new Date(_calYear, _calMonth, _calDay);
     titleEl.textContent = d.toLocaleDateString(undefined,{weekday:'long',month:'long',day:'numeric',year:'numeric'});
     const rems = remMap[ds]||[];
+    const dayImps = impMap[ds]||[];
     // Build a map hour -> reminders
     const hourMap = {};
     rems.forEach(r=>{
@@ -12419,10 +12473,13 @@ function renderFullCal(){
       hourMap[h].push(r);
     });
     let html = '<div class="cal-day-view">';
-    // All-day section
+    // Important dates + all-day section at top
     const allDay = hourMap[-1]||[];
-    if(allDay.length){
+    if(dayImps.length || allDay.length){
       html += `<div class="cal-day-hour-row"><div class="cal-day-hour-label" style="font-size:9px;padding-top:6px">All day</div><div class="cal-day-hour-events">`;
+      dayImps.forEach(e=>{
+        html += `<div class="full-cal-event" style="background:rgba(var(--accent2-rgb,202,138,4),.15);color:var(--accent2);border-left:3px solid var(--accent2)">${impEmoji(e)} ${e.title||'Untitled'}</div>`;
+      });
       allDay.forEach(r=>{
         html += `<div class="full-cal-event ${prioClass(r.priority||'medium')}" onclick="editItem('${r.id}')">${r.title||'Untitled'}</div>`;
       });
@@ -12480,6 +12537,12 @@ function renderFullCal(){
         const hrs = (remMap[ddStr]||[]).filter(r=> r.due && r.due.length>10 && parseInt(r.due.slice(11,13))===h);
         const isT = ddStr===today;
         let evHtml = hrs.map(r=>`<div class="full-cal-event ${prioClass(r.priority||'medium')}" style="font-size:10px" onclick="editItem('${r.id}')">${r.due.slice(11,16)} ${r.title||'Untitled'}</div>`).join('');
+        // Add imp date chips at hour 0
+        if(h===0){
+          (impMap[ddStr]||[]).forEach(e=>{
+            evHtml = `<div class="full-cal-event" style="background:rgba(202,138,4,.15);color:var(--accent2);border-left:2px solid var(--accent2);font-size:10px;margin-bottom:1px">${impEmoji(e)} ${e.title||'Untitled'}</div>` + evHtml;
+          });
+        }
         html += `<div class="cal-week-hour-cell${isT?' today':''}" onclick="calDayClick('${ddStr}')">${evHtml}</div>`;
       }
     }
@@ -12510,10 +12573,16 @@ function renderFullCal(){
       const isToday   = ds===today;
       const isWeekend = [0,6].includes(new Date(_calYear,_calMonth,d).getDay());
       const rems      = remMap[ds]||[];
+      const dayImpList = impMap[ds]||[];
       const MAX_SHOW  = 3;
-      const visible   = rems.slice(0, MAX_SHOW);
-      const overflow  = rems.length - MAX_SHOW;
-      const evHtml = visible.map(r=>{
+      // Imp dates count against the MAX_SHOW budget
+      const impVisible = dayImpList.slice(0, MAX_SHOW);
+      const remVisible = rems.slice(0, Math.max(0, MAX_SHOW - impVisible.length));
+      const overflow   = (dayImpList.length + rems.length) - (impVisible.length + remVisible.length);
+      const impHtml = impVisible.map(e=>{
+        return `<div class="full-cal-event" style="background:rgba(202,138,4,.15);color:var(--accent2);border-left:2px solid var(--accent2)" title="${e.title}">${impEmoji(e)} ${e.title}</div>`;
+      }).join('');
+      const evHtml = remVisible.map(r=>{
         const pc = prioClass(r.priority||'medium');
         const doneClass = r.sent ? ' ev-done' : '';
         const timeStr = r.due.length>10 ? r.due.slice(11,16)+' ' : '';
@@ -12521,7 +12590,7 @@ function renderFullCal(){
       }).join('');
       const moreHtml = overflow>0 ? `<div class="full-cal-more" onclick="event.stopPropagation();calDayClick('${ds}')">+${overflow} more</div>` : '';
       html += `<div class="full-cal-cell${isToday?' today':''}${isWeekend?' weekend':''}" onclick="calDayClick('${ds}')">
-        <div class="full-cal-day-num">${d}</div>${evHtml}${moreHtml}</div>`;
+        <div class="full-cal-day-num">${d}</div>${impHtml}${evHtml}${moreHtml}</div>`;
     }
     const totalCells = firstDay + daysInMonth;
     const trailing   = totalCells % 7 === 0 ? 0 : 7 - (totalCells % 7);
@@ -12553,8 +12622,11 @@ function renderFullCal(){
       for(let d=1;d<=daysInM;d++){
         const ds = _calYear+'-'+String(m+1).padStart(2,'0')+'-'+String(d).padStart(2,'0');
         const hasEv = (remMap[ds]||[]).length>0;
+        const hasImp = (impMap[ds]||[]).length>0;
         const isT   = ds===nowStr;
-        html += `<div class="cal-year-mini-cell${isT?' is-today':hasEv?' has-ev':''}">${d}</div>`;
+        const cellClass = isT?' is-today':(hasImp?' has-imp':(hasEv?' has-ev':''));
+        const cellTitle = hasImp ? (impMap[ds].map(e=>impEmoji(e)+' '+e.title).join(', ')) : '';
+        html += `<div class="cal-year-mini-cell${cellClass}" title="${cellTitle}">${d}</div>`;
       }
       html += '</div></div>';
     }
