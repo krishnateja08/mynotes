@@ -6753,18 +6753,18 @@ body.fontsize-compact .ncard-body{font-size:11px}
     </div>
     <div id="row-repeat" class="frow" style="display:none">
       <label>🔁 Repeat</label>
-      <div style="display:flex;gap:8px;align-items:center;width:100%">
-        <select id="f-repeat-toggle" onchange="toggleRepeatCustom()" style="padding:9px 8px;background:var(--bg);border:1px solid var(--border2);border-radius:8px;color:var(--text);font-family:'Inter',sans-serif;font-size:13px;outline:none;cursor:pointer;flex:0 0 auto">
+      <div style="display:flex;flex-direction:column;gap:8px;width:100%;box-sizing:border-box">
+        <select id="f-repeat-toggle" onchange="toggleRepeatCustom()" style="width:100%;padding:9px 8px;background:var(--bg);border:1px solid var(--border2);border-radius:8px;color:var(--text);font-family:'Inter',sans-serif;font-size:13px;outline:none;cursor:pointer;box-sizing:border-box">
           <option value="none">No repeat</option>
           <option value="daily">Daily</option>
           <option value="weekly">Weekly</option>
           <option value="monthly">Monthly</option>
           <option value="custom">⚙️ Custom</option>
         </select>
-        <div id="repeat-custom-fields" style="display:none;flex:1;display:none;gap:8px;align-items:center">
-          <span style="font-size:13px;color:var(--text2);white-space:nowrap">Every</span>
-          <input id="f-repeat-num" type="number" min="1" max="999" value="1" style="width:64px;padding:8px 6px;background:var(--bg);border:1px solid var(--border2);border-radius:8px;color:var(--text);font-family:'Inter',sans-serif;font-size:13px;outline:none;text-align:center">
-          <select id="f-repeat-unit" style="padding:9px 8px;background:var(--bg);border:1px solid var(--border2);border-radius:8px;color:var(--text);font-family:'Inter',sans-serif;font-size:13px;outline:none;cursor:pointer;flex:1">
+        <div id="repeat-custom-fields" style="display:none;gap:8px;align-items:center;width:100%;box-sizing:border-box;background:var(--s2);border:1px solid var(--border2);border-radius:8px;padding:10px 12px">
+          <span style="font-size:13px;color:var(--text2);white-space:nowrap;flex-shrink:0">Every</span>
+          <input id="f-repeat-num" type="number" min="1" max="999" value="1" style="width:60px;min-width:0;padding:8px 6px;background:var(--bg);border:1px solid var(--border2);border-radius:8px;color:var(--text);font-family:'Inter',sans-serif;font-size:13px;outline:none;text-align:center;flex-shrink:0">
+          <select id="f-repeat-unit" style="flex:1;min-width:0;padding:9px 8px;background:var(--bg);border:1px solid var(--border2);border-radius:8px;color:var(--text);font-family:'Inter',sans-serif;font-size:13px;outline:none;cursor:pointer;width:100%;box-sizing:border-box">
             <option value="hours">Hours</option>
             <option value="days" selected>Days</option>
             <option value="weeks">Weeks</option>
