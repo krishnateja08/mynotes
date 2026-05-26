@@ -6667,7 +6667,10 @@ body.fontsize-compact .ncard-body{font-size:11px}
       <div style="display:flex;gap:8px;align-items:center;width:100%">
         <select id="f-repeat-toggle" onchange="toggleRepeatCustom()" style="padding:9px 8px;background:var(--bg);border:1px solid var(--border2);border-radius:8px;color:var(--text);font-family:'Inter',sans-serif;font-size:13px;outline:none;cursor:pointer;flex:0 0 auto">
           <option value="none">No repeat</option>
-          <option value="custom">Custom</option>
+          <option value="daily">Daily</option>
+          <option value="weekly">Weekly</option>
+          <option value="monthly">Monthly</option>
+          <option value="custom">⚙️ Custom</option>
         </select>
         <div id="repeat-custom-fields" style="display:none;flex:1;display:none;gap:8px;align-items:center">
           <span style="font-size:13px;color:var(--text2);white-space:nowrap">Every</span>
@@ -7674,13 +7677,11 @@ document.addEventListener('click', e=>{
 function toggleRepeatCustom(){
   const tog=document.getElementById('f-repeat-toggle').value;
   const cf=document.getElementById('repeat-custom-fields');
-  if(tog==='none'){
-    cf.style.display='none';
-    document.getElementById('f-repeat').value='none';
-  } else {
+  if(tog==='custom'){
     cf.style.display='flex';
-    // Set default if empty
     if(!document.getElementById('f-repeat-num').value) document.getElementById('f-repeat-num').value='1';
+  } else {
+    cf.style.display='none';
   }
 }
 function switchType(t){
@@ -7742,23 +7743,17 @@ function editItem(id){
     if(rv==='none'){
       document.getElementById('f-repeat-toggle').value='none';
       document.getElementById('repeat-custom-fields').style.display='none';
+    } else if(rv==='daily'||rv==='weekly'||rv==='monthly'){
+      document.getElementById('f-repeat-toggle').value=rv;
+      document.getElementById('repeat-custom-fields').style.display='none';
     } else {
+      // Custom "N-unit" format
       document.getElementById('f-repeat-toggle').value='custom';
       document.getElementById('repeat-custom-fields').style.display='flex';
-      // Parse stored value like "2-days" or legacy "daily"/"weekly"/"monthly"
       const m = rv.match(/^(\d+)-(\w+)$/);
       if(m){
         document.getElementById('f-repeat-num').value=m[1];
         document.getElementById('f-repeat-unit').value=m[2];
-      } else if(rv==='daily'){
-        document.getElementById('f-repeat-num').value='1';
-        document.getElementById('f-repeat-unit').value='days';
-      } else if(rv==='weekly'){
-        document.getElementById('f-repeat-num').value='1';
-        document.getElementById('f-repeat-unit').value='weeks';
-      } else if(rv==='monthly'){
-        document.getElementById('f-repeat-num').value='1';
-        document.getElementById('f-repeat-unit').value='months';
       }
     }
   })();
@@ -7807,6 +7802,7 @@ async function saveItem(){
     const rem={id:id||uid(),type:'reminder',list_id:selListId,category:selListId,title,body:document.getElementById('f-body').value.trim(),tags,due:dueStr,repeat:(function(){
       const tog=document.getElementById('f-repeat-toggle').value;
       if(tog==='none') return 'none';
+      if(tog==='daily'||tog==='weekly'||tog==='monthly') return tog;
       const num=parseInt(document.getElementById('f-repeat-num').value)||1;
       const unit=document.getElementById('f-repeat-unit').value||'days';
       return num+'-'+unit;
