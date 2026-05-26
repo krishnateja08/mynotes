@@ -6664,12 +6664,24 @@ body.fontsize-compact .ncard-body{font-size:11px}
     </div>
     <div id="row-repeat" class="frow" style="display:none">
       <label>🔁 Repeat</label>
-      <select id="f-repeat">
-        <option value="none">No repeat</option>
-        <option value="daily">Daily</option>
-        <option value="weekly">Weekly</option>
-        <option value="monthly">Monthly</option>
-      </select>
+      <div style="display:flex;gap:8px;align-items:center;width:100%">
+        <select id="f-repeat-toggle" onchange="toggleRepeatCustom()" style="padding:9px 8px;background:var(--bg);border:1px solid var(--border2);border-radius:8px;color:var(--text);font-family:'Inter',sans-serif;font-size:13px;outline:none;cursor:pointer;flex:0 0 auto">
+          <option value="none">No repeat</option>
+          <option value="custom">Custom</option>
+        </select>
+        <div id="repeat-custom-fields" style="display:none;flex:1;display:none;gap:8px;align-items:center">
+          <span style="font-size:13px;color:var(--text2);white-space:nowrap">Every</span>
+          <input id="f-repeat-num" type="number" min="1" max="999" value="1" style="width:64px;padding:8px 6px;background:var(--bg);border:1px solid var(--border2);border-radius:8px;color:var(--text);font-family:'Inter',sans-serif;font-size:13px;outline:none;text-align:center">
+          <select id="f-repeat-unit" style="padding:9px 8px;background:var(--bg);border:1px solid var(--border2);border-radius:8px;color:var(--text);font-family:'Inter',sans-serif;font-size:13px;outline:none;cursor:pointer;flex:1">
+            <option value="hours">Hours</option>
+            <option value="days" selected>Days</option>
+            <option value="weeks">Weeks</option>
+            <option value="months">Months</option>
+          </select>
+        </div>
+      </div>
+      <!-- Hidden field that stores the final repeat value used by save logic -->
+      <input type="hidden" id="f-repeat" value="none">
     </div>
     <div id="row-remind-before" class="frow" style="display:none">
       <label>🔔 Remind me before</label>
@@ -7348,7 +7360,16 @@ function renderReminderCard(r){
   let sc='pending',sl='🔔 Pending';
   try{if(r.sent){sc='sent';sl='✅ Done';}else if(isOverdue(r)){sc='overdue';sl='🔴 Overdue';}}catch{}
   const tags=(r.tags||[]).map(t=>`<span class="ctag">#${esc(t)}</span>`).join('');
-  const rep=r.repeat&&r.repeat!=='none'?`<span class="ctag">🔁 ${r.repeat}</span>`:'';
+  const rep=(function(){
+    const rv=r.repeat;
+    if(!rv||rv==='none') return '';
+    const m=rv.match(/^(\d+)-(\w+)$/);
+    if(m){
+      const n=m[1], u=m[2].charAt(0).toUpperCase()+m[2].slice(1);
+      return `<span class="ctag">🔁 Every ${n} ${u}</span>`;
+    }
+    return `<span class="ctag">🔁 ${rv}</span>`;
+  })();
   const prio=r.priority||'medium';
   const prioMap={high:'High',medium:'Med',low:'Low'};
   const prioBadge=`<span class="prio-badge prio-${prio}">${prioMap[prio]||''}</span>`;
@@ -7399,7 +7420,7 @@ function renderReminderRow(r){
   let sc='pending';
   try{if(r.sent){sc='sent';}else if(isOverdue(r)){sc='overdue';}}catch{}
   const tags=(r.tags||[]).slice(0,2).map(t=>`<span class="ctag">#${esc(t)}</span>`).join('');
-  const rep=r.repeat&&r.repeat!=='none'?`<span class="ctag">🔁 ${r.repeat}</span>`:'';
+  const rep=(function(){const rv=r.repeat;if(!rv||rv==='none')return '';const m=rv.match(/^(\d+)-(\w+)$/);if(m){const n=m[1],u=m[2].charAt(0).toUpperCase()+m[2].slice(1);return `<span class="ctag">🔁 Every ${n} ${u}</span>`;}return `<span class="ctag">🔁 ${rv}</span>`;})()
   const doneBtn = !r.sent
     ? `<button class="cbtn done-btn" onclick="event.stopPropagation();markReminderDone('${r.id}')">✅ Done</button>`
     : `<button class="cbtn" onclick="event.stopPropagation();markReminderDone('${r.id}')">↩ Reopen</button>`;
@@ -7451,6 +7472,10 @@ function openModal(type='note'){
   document.getElementById('f-due-hour').value='09';
   document.getElementById('f-due-min').value='00';
   document.getElementById('f-repeat').value='none';
+  document.getElementById('f-repeat-toggle').value='none';
+  document.getElementById('f-repeat-num').value='1';
+  document.getElementById('f-repeat-unit').value='days';
+  document.getElementById('repeat-custom-fields').style.display='none';
   const rbEl = document.getElementById('f-remind-before'); if(rbEl) rbEl.value='30';
   document.getElementById('f-pinned').value='false';
   document.getElementById('pin-btn').className='pin-btn';
@@ -7646,6 +7671,18 @@ document.addEventListener('click', e=>{
   if(!e.target.closest('#tag-chip-wrap')&&!e.target.closest('#tag-suggestions')) hideTagSuggestions();
 });
 
+function toggleRepeatCustom(){
+  const tog=document.getElementById('f-repeat-toggle').value;
+  const cf=document.getElementById('repeat-custom-fields');
+  if(tog==='none'){
+    cf.style.display='none';
+    document.getElementById('f-repeat').value='none';
+  } else {
+    cf.style.display='flex';
+    // Set default if empty
+    if(!document.getElementById('f-repeat-num').value) document.getElementById('f-repeat-num').value='1';
+  }
+}
 function switchType(t){
   currentType=t;
   document.getElementById('tt-note').classList.toggle('active',t==='note');
@@ -7699,6 +7736,32 @@ function editItem(id){
     }
   }
   document.getElementById('f-repeat').value=item.repeat||'none';
+  // Populate the custom repeat UI
+  (function(){
+    const rv = item.repeat||'none';
+    if(rv==='none'){
+      document.getElementById('f-repeat-toggle').value='none';
+      document.getElementById('repeat-custom-fields').style.display='none';
+    } else {
+      document.getElementById('f-repeat-toggle').value='custom';
+      document.getElementById('repeat-custom-fields').style.display='flex';
+      // Parse stored value like "2-days" or legacy "daily"/"weekly"/"monthly"
+      const m = rv.match(/^(\d+)-(\w+)$/);
+      if(m){
+        document.getElementById('f-repeat-num').value=m[1];
+        document.getElementById('f-repeat-unit').value=m[2];
+      } else if(rv==='daily'){
+        document.getElementById('f-repeat-num').value='1';
+        document.getElementById('f-repeat-unit').value='days';
+      } else if(rv==='weekly'){
+        document.getElementById('f-repeat-num').value='1';
+        document.getElementById('f-repeat-unit').value='weeks';
+      } else if(rv==='monthly'){
+        document.getElementById('f-repeat-num').value='1';
+        document.getElementById('f-repeat-unit').value='months';
+      }
+    }
+  })();
   // restore priority radio
   const prio = item.priority||'medium';
   const prioRadio = document.querySelector(`input[name="f-priority"][value="${prio}"]`);
@@ -7741,7 +7804,13 @@ async function saveItem(){
     const selPrio = document.querySelector('input[name="f-priority"]:checked');
     const priority = selPrio ? selPrio.value : 'medium';
     const selListId = document.getElementById('f-category').value||'personal';
-    const rem={id:id||uid(),type:'reminder',list_id:selListId,category:selListId,title,body:document.getElementById('f-body').value.trim(),tags,due:dueStr,repeat:document.getElementById('f-repeat').value,priority,sent:ex?ex.sent||false:false,created:ex?ex.created:now,updated:now,attachments:ex?ex.attachments||[]:[]};
+    const rem={id:id||uid(),type:'reminder',list_id:selListId,category:selListId,title,body:document.getElementById('f-body').value.trim(),tags,due:dueStr,repeat:(function(){
+      const tog=document.getElementById('f-repeat-toggle').value;
+      if(tog==='none') return 'none';
+      const num=parseInt(document.getElementById('f-repeat-num').value)||1;
+      const unit=document.getElementById('f-repeat-unit').value||'days';
+      return num+'-'+unit;
+    })(),priority,sent:ex?ex.sent||false:false,created:ex?ex.created:now,updated:now,attachments:ex?ex.attachments||[]:[]};
     if(id)DATA.reminders=DATA.reminders.map(r=>r.id===id?rem:r);else DATA.reminders.push(rem);
     // ── Auto-sync to Google Calendar ──────────────────────────────────────
     if(dueStr){
@@ -8834,7 +8903,23 @@ async function toggleRemDone(id){
   if(!rem.sent && rem.repeat && rem.repeat !== 'none' && rem.due){
     const base = new Date(rem.due.slice(0,10) + 'T00:00:00');
     let next = new Date(base);
-    if(rem.repeat === 'daily'){
+    // Parse format: "N-unit" (e.g. "2-days", "3-weeks") or legacy "daily"/"weekly"/"monthly"
+    const m = rem.repeat.match(/^(\d+)-(\w+)$/);
+    if(m){
+      const n = parseInt(m[1])||1;
+      const unit = m[2];
+      if(unit==='hours'){
+        // For hours-based repeat, advance from due datetime
+        const baseTime = new Date(rem.due.replace(' ','T'));
+        baseTime.setHours(baseTime.getHours() + n);
+        const pd2 = v=>String(v).padStart(2,'0');
+        rem.due = baseTime.getFullYear()+'-'+pd2(baseTime.getMonth()+1)+'-'+pd2(baseTime.getDate())+' '+pd2(baseTime.getHours())+':'+pd2(baseTime.getMinutes());
+        rem.sent = false;
+        renderAll(); renderRemindersPage(); await saveToFirebase(); return;
+      } else if(unit==='days')  { next.setDate(next.getDate() + n); }
+      else if(unit==='weeks') { next.setDate(next.getDate() + n*7); }
+      else if(unit==='months'){ next.setMonth(next.getMonth() + n); }
+    } else if(rem.repeat === 'daily'){
       next.setDate(next.getDate() + 1);
     } else if(rem.repeat === 'weekly'){
       next.setDate(next.getDate() + 7);
