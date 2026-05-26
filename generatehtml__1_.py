@@ -2180,6 +2180,88 @@ body.theme-arctic .notes-list-item.active{background:rgba(56,72,112,.1)}
   padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer;
   font-family:'Inter',sans-serif;
 }
+/* Calendar sub-view tabs (Today/Day/Week/Month/Year) */
+.cal-subview-tabs{
+  display:flex;align-items:center;gap:4px;padding:10px 16px 6px;
+  background:var(--sidebar);border-bottom:1px solid var(--border);flex-shrink:0;flex-wrap:wrap;
+}
+.cal-subview-btn{
+  background:var(--s2);border:1px solid var(--border2);border-radius:20px;
+  padding:5px 16px;font-size:12px;font-weight:600;cursor:pointer;
+  color:var(--text2);font-family:'Inter',sans-serif;transition:all 0.15s;
+}
+.cal-subview-btn:hover{border-color:var(--accent);color:var(--accent)}
+.cal-subview-btn.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+/* Day view: time slots */
+.cal-day-view{display:flex;flex-direction:column;flex:1;overflow-y:auto;}
+.cal-day-hour-row{
+  display:flex;align-items:stretch;border-bottom:1px solid var(--border);min-height:52px;
+}
+.cal-day-hour-label{
+  width:52px;font-size:11px;color:var(--muted);padding:4px 6px 0;text-align:right;flex-shrink:0;
+}
+.cal-day-hour-events{
+  flex:1;padding:3px 6px;display:flex;flex-direction:column;gap:2px;border-left:1px solid var(--border);
+}
+/* Week view: days as columns */
+.cal-week-grid{display:grid;grid-template-columns:52px repeat(7,1fr);flex:1;overflow:hidden;}
+.cal-week-header-cell{
+  text-align:center;padding:6px 2px;font-size:11px;font-weight:700;color:var(--muted);
+  border-right:1px solid var(--border);border-bottom:1px solid var(--border);
+  text-transform:uppercase;letter-spacing:.5px;background:var(--sidebar);
+}
+.cal-week-header-cell.today-col{color:var(--accent)}
+.cal-week-col{
+  border-right:1px solid var(--border);display:flex;flex-direction:column;
+  overflow-y:auto;
+}
+.cal-week-col:last-child{border-right:none}
+.cal-week-hour-cell{
+  min-height:44px;border-bottom:1px solid var(--border);padding:2px 4px;
+  display:flex;flex-direction:column;gap:1px;position:relative;
+}
+.cal-week-time-col{border-right:1px solid var(--border);}
+.cal-week-time-cell{
+  min-height:44px;border-bottom:1px solid var(--border);
+  font-size:10px;color:var(--muted);padding:3px 4px 0;text-align:right;
+}
+/* Year view */
+.cal-year-grid{
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));
+  gap:16px;padding:16px;overflow-y:auto;flex:1;
+}
+.cal-year-month{
+  border:1px solid var(--border);border-radius:10px;overflow:hidden;
+  background:var(--card);cursor:pointer;transition:box-shadow 0.15s;
+}
+.cal-year-month:hover{box-shadow:0 2px 12px rgba(0,0,0,.12)}
+.cal-year-month-title{
+  text-align:center;font-size:12px;font-weight:700;padding:6px;
+  background:var(--sidebar);color:var(--text);border-bottom:1px solid var(--border);
+}
+.cal-year-mini-grid{
+  display:grid;grid-template-columns:repeat(7,1fr);padding:4px;gap:1px;
+}
+.cal-year-mini-dow{font-size:9px;text-align:center;color:var(--muted);font-weight:700;padding:2px 0}
+.cal-year-mini-cell{
+  font-size:10px;text-align:center;padding:2px;border-radius:50%;cursor:default;
+  width:20px;height:20px;display:flex;align-items:center;justify-content:center;
+}
+.cal-year-mini-cell.has-ev{background:rgba(var(--accent-rgb,99,102,241),.18);font-weight:700}
+.cal-year-mini-cell.is-today{background:var(--accent);color:#fff;font-weight:700}
+.cal-year-mini-cell.other-m{opacity:.25}
+/* Today view */
+.cal-today-view{display:flex;flex-direction:column;flex:1;overflow-y:auto;padding:16px;gap:12px;}
+.cal-today-header{font-size:18px;font-weight:800;color:var(--text);}
+.cal-today-date{font-size:13px;color:var(--muted);margin-bottom:4px;}
+.cal-today-event-card{
+  background:var(--card);border:1px solid var(--border);border-radius:10px;
+  padding:12px 14px;display:flex;gap:10px;align-items:flex-start;cursor:pointer;
+}
+.cal-today-event-card:hover{background:var(--s2)}
+.cal-today-time{font-size:12px;font-weight:700;color:var(--accent);min-width:48px}
+.cal-today-title{font-size:13px;font-weight:600;color:var(--text)}
+.cal-today-empty{text-align:center;padding:40px;color:var(--muted);font-size:14px}
 .full-cal-dow-row{
   display:grid;grid-template-columns:repeat(7,1fr);
   border-bottom:1px solid var(--border);flex-shrink:0;
@@ -5421,15 +5503,22 @@ body.fontsize-compact .ncard-body{font-size:11px}
         </button>
       </div>
 
-      <!-- Full Monthly Calendar -->
+      <!-- Full Calendar (Today/Day/Week/Month/Year views) -->
       <div class="full-cal-wrap" id="full-cal-wrap">
-        <div class="full-cal-header">
-          <button class="full-cal-nav" onclick="calNav(-1)">‹ Prev</button>
-          <div class="full-cal-title" id="full-cal-title">March 2026</div>
-          <button class="full-cal-today-btn" onclick="calGoToday()">Today</button>
-          <button class="full-cal-nav" onclick="calNav(1)">Next ›</button>
+        <!-- Sub-view tabs -->
+        <div class="cal-subview-tabs" id="cal-subview-tabs">
+          <button class="cal-subview-btn" id="cal-sv-today" onclick="setCalView('today',this)">Today</button>
+          <button class="cal-subview-btn" id="cal-sv-day"   onclick="setCalView('day',this)">Day</button>
+          <button class="cal-subview-btn" id="cal-sv-week"  onclick="setCalView('week',this)">Week</button>
+          <button class="cal-subview-btn active" id="cal-sv-month" onclick="setCalView('month',this)">Month</button>
+          <button class="cal-subview-btn" id="cal-sv-year"  onclick="setCalView('year',this)">Year</button>
         </div>
-        <div class="full-cal-dow-row">
+        <div class="full-cal-header">
+          <button class="full-cal-nav" id="cal-nav-prev" onclick="calNav(-1)">&#x2039; Prev</button>
+          <div class="full-cal-title" id="full-cal-title">March 2026</div>
+          <button class="full-cal-nav" id="cal-nav-next" onclick="calNav(1)">Next &#x203A;</button>
+        </div>
+        <div class="full-cal-dow-row" id="full-cal-dow-row">
           <div class="full-cal-dow">Sun</div>
           <div class="full-cal-dow">Mon</div>
           <div class="full-cal-dow">Tue</div>
@@ -12117,6 +12206,8 @@ function startBadgeUpdater(){
    ============================================================ */
 let _calYear  = new Date().getFullYear();
 let _calMonth = new Date().getMonth();
+let _calDay   = new Date().getDate();
+let _calViewMode = 'month'; // 'today' | 'day' | 'week' | 'month' | 'year'
 let _calSelDate = null;
 let _rrpSelDate = null; // selected date in the right-panel mini-cal for filtering
 let _remViewMode = 'list';
@@ -12140,10 +12231,34 @@ function setRemView(mode, btn){
   }
 }
 
+function setCalView(mode, btn){
+  _calViewMode = mode;
+  document.querySelectorAll('.cal-subview-btn').forEach(b=>b.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+  // For 'today': jump to today's date, then render as day view
+  if(mode==='today'){
+    const now = new Date();
+    _calYear  = now.getFullYear();
+    _calMonth = now.getMonth();
+    _calDay   = now.getDate();
+  }
+  renderFullCal();
+}
+
 function calNav(dir){
-  _calMonth += dir;
-  if(_calMonth > 11){ _calMonth=0; _calYear++; }
-  if(_calMonth < 0 ){ _calMonth=11; _calYear--; }
+  if(_calViewMode==='today' || _calViewMode==='day'){
+    const d = new Date(_calYear, _calMonth, _calDay + dir);
+    _calYear = d.getFullYear(); _calMonth = d.getMonth(); _calDay = d.getDate();
+  } else if(_calViewMode==='week'){
+    const d = new Date(_calYear, _calMonth, _calDay + dir*7);
+    _calYear = d.getFullYear(); _calMonth = d.getMonth(); _calDay = d.getDate();
+  } else if(_calViewMode==='month'){
+    _calMonth += dir;
+    if(_calMonth > 11){ _calMonth=0; _calYear++; }
+    if(_calMonth < 0 ){ _calMonth=11; _calYear--; }
+  } else if(_calViewMode==='year'){
+    _calYear += dir;
+  }
   renderFullCal();
 }
 
@@ -12151,17 +12266,22 @@ function calGoToday(){
   const now = new Date();
   _calYear  = now.getFullYear();
   _calMonth = now.getMonth();
+  _calDay   = now.getDate();
   renderFullCal();
 }
 
 function renderFullCal(){
-  const titleEl = document.getElementById('full-cal-title');
-  const grid    = document.getElementById('full-cal-grid');
+  const titleEl  = document.getElementById('full-cal-title');
+  const grid     = document.getElementById('full-cal-grid');
+  const dowRow   = document.getElementById('full-cal-dow-row');
+  const navPrev  = document.getElementById('cal-nav-prev');
+  const navNext  = document.getElementById('cal-nav-next');
   if(!titleEl||!grid) return;
 
   const monthNames=['January','February','March','April','May','June',
     'July','August','September','October','November','December'];
-  titleEl.textContent = monthNames[_calMonth]+' '+_calYear;
+  const dayNames=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  const today = localToday();
 
   // Build reminder map: date string -> array of reminders
   const remMap = {};
@@ -12172,76 +12292,205 @@ function renderFullCal(){
     remMap[ds].push(r);
   });
 
-  const today       = localToday();
-  const firstDay    = new Date(_calYear, _calMonth, 1).getDay(); // 0=Sun
-  const daysInMonth = new Date(_calYear, _calMonth+1, 0).getDate();
-  // prev month fill
-  const prevDays    = new Date(_calYear, _calMonth, 0).getDate();
-
-  // Colour palette for categories
-  const catColor = {
-    personal: 'prio-medium',
-    official: 'prio-high'
-  };
   const prioClass = p => p==='high'?'prio-high':p==='low'?'prio-low':'prio-medium';
 
-  let html = '';
+  // Sync nav button visibility (Today view hides prev/next)
+  if(navPrev) navPrev.style.display = _calViewMode==='today' ? 'none' : '';
+  if(navNext) navNext.style.display = _calViewMode==='today' ? 'none' : '';
 
-  // Leading days from prev month
-  for(let i=firstDay-1; i>=0; i--){
-    const d = prevDays - i;
-    html += `<div class="full-cal-cell other-month">
-      <div class="full-cal-day-num">${d}</div>
-    </div>`;
+  // ── TODAY view ────────────────────────────────────────────────
+  if(_calViewMode==='today'){
+    if(dowRow) dowRow.style.display='none';
+    grid.style.display='block';
+    const ds = today;
+    const now = new Date();
+    const dayLabel = now.toLocaleDateString(undefined,{weekday:'long',month:'long',day:'numeric',year:'numeric'});
+    titleEl.textContent = 'Today';
+    const rems = (remMap[ds]||[]).sort((a,b)=>(a.due||'').localeCompare(b.due||''));
+    let html = `<div class="cal-today-view"><div class="cal-today-date">${dayLabel}</div>`;
+    if(!rems.length){
+      html += `<div class="cal-today-empty">🎉 No reminders for today!</div>`;
+    } else {
+      rems.forEach(r=>{
+        const timeStr = r.due && r.due.length>10 ? r.due.slice(11,16) : '—';
+        const doneStyle = r.sent ? 'opacity:.5;text-decoration:line-through' : '';
+        html += `<div class="cal-today-event-card" onclick="editItem('${r.id}')" style="${doneStyle}">
+          <div class="cal-today-time">${timeStr}</div>
+          <div><div class="cal-today-title">${r.title||'Untitled'}</div></div>
+        </div>`;
+      });
+    }
+    html += '</div>';
+    grid.innerHTML = html;
+    return;
   }
 
-  // Days in current month
-  for(let d=1; d<=daysInMonth; d++){
-    const ds = _calYear+'-'+String(_calMonth+1).padStart(2,'0')+'-'+String(d).padStart(2,'0');
-    const isToday   = ds===today;
-    const isWeekend = [0,6].includes(new Date(_calYear,_calMonth,d).getDay());
-    const rems      = remMap[ds]||[];
-
-    const MAX_SHOW = 3;
-    const visible  = rems.slice(0, MAX_SHOW);
-    const overflow = rems.length - MAX_SHOW;
-
-    const eventsHtml = visible.map(r=>{
-      const pc = prioClass(r.priority||'medium');
-      const doneClass = r.sent ? ' ev-done' : '';
-      const timeStr = r.due.length>10 ? r.due.slice(11,16)+' ' : '';
-      return `<div class="full-cal-event ${pc}${doneClass}" onclick="event.stopPropagation();editItem('${r.id}')" title="${r.title}">${timeStr}${r.title}</div>`;
-    }).join('');
-
-    const moreHtml = overflow>0
-      ? `<div class="full-cal-more" onclick="event.stopPropagation();calDayClick('${ds}')">+${overflow} more</div>`
-      : '';
-
-    html += `<div class="full-cal-cell${isToday?' today':''}${isWeekend?' weekend':''}" onclick="calDayClick('${ds}')">
-      <div class="full-cal-day-num">${d}</div>
-      ${eventsHtml}${moreHtml}
-    </div>`;
+  // ── DAY view ──────────────────────────────────────────────────
+  if(_calViewMode==='day'){
+    if(dowRow) dowRow.style.display='none';
+    grid.style.display='block';
+    const ds = _calYear+'-'+String(_calMonth+1).padStart(2,'0')+'-'+String(_calDay).padStart(2,'0');
+    const d = new Date(_calYear, _calMonth, _calDay);
+    titleEl.textContent = d.toLocaleDateString(undefined,{weekday:'long',month:'long',day:'numeric',year:'numeric'});
+    const rems = remMap[ds]||[];
+    // Build a map hour -> reminders
+    const hourMap = {};
+    rems.forEach(r=>{
+      const h = r.due && r.due.length>10 ? parseInt(r.due.slice(11,13)) : -1;
+      if(!hourMap[h]) hourMap[h]=[];
+      hourMap[h].push(r);
+    });
+    let html = '<div class="cal-day-view">';
+    // All-day section
+    const allDay = hourMap[-1]||[];
+    if(allDay.length){
+      html += `<div class="cal-day-hour-row"><div class="cal-day-hour-label" style="font-size:9px;padding-top:6px">All day</div><div class="cal-day-hour-events">`;
+      allDay.forEach(r=>{
+        html += `<div class="full-cal-event ${prioClass(r.priority||'medium')}" onclick="editItem('${r.id}')">${r.title||'Untitled'}</div>`;
+      });
+      html += '</div></div>';
+    }
+    for(let h=0;h<24;h++){
+      const label = h===0?'12 AM':h<12?h+' AM':h===12?'12 PM':(h-12)+' PM';
+      const hrs = hourMap[h]||[];
+      let evHtml = hrs.map(r=>`<div class="full-cal-event ${prioClass(r.priority||'medium')}" onclick="editItem('${r.id}')">${r.due.slice(11,16)} ${r.title||'Untitled'}</div>`).join('');
+      html += `<div class="cal-day-hour-row"><div class="cal-day-hour-label">${label}</div><div class="cal-day-hour-events">${evHtml}</div></div>`;
+    }
+    html += '</div>';
+    grid.innerHTML = html;
+    return;
   }
 
-  // Trailing days from next month
-  const totalCells = firstDay + daysInMonth;
-  const trailing   = totalCells % 7 === 0 ? 0 : 7 - (totalCells % 7);
-  for(let d=1; d<=trailing; d++){
-    html += `<div class="full-cal-cell other-month">
-      <div class="full-cal-day-num">${d}</div>
-    </div>`;
+  // ── WEEK view ─────────────────────────────────────────────────
+  if(_calViewMode==='week'){
+    // Find Sunday of the week containing _calDay
+    const anchor = new Date(_calYear, _calMonth, _calDay);
+    const sunOffset = anchor.getDay(); // 0=Sun
+    const weekStart = new Date(anchor); weekStart.setDate(anchor.getDate() - sunOffset);
+
+    // Title
+    const we = new Date(weekStart); we.setDate(we.getDate()+6);
+    const fmt = d=>d.toLocaleDateString(undefined,{month:'short',day:'numeric'});
+    titleEl.textContent = fmt(weekStart)+' – '+fmt(we)+', '+we.getFullYear();
+
+    // DOW row  shows dates
+    if(dowRow){
+      dowRow.style.display='';
+      dowRow.style.gridTemplateColumns='52px repeat(7,1fr)';
+      let dowHtml = '<div class="full-cal-dow" style="border-right:1px solid var(--border)"></div>';
+      for(let i=0;i<7;i++){
+        const dd = new Date(weekStart); dd.setDate(weekStart.getDate()+i);
+        const ddStr = dd.getFullYear()+'-'+String(dd.getMonth()+1).padStart(2,'0')+'-'+String(dd.getDate()).padStart(2,'0');
+        const isTod = ddStr===today;
+        dowHtml += `<div class="full-cal-dow${isTod?' today-col':''}" style="${isTod?'color:var(--accent)':''}">${dayNames[i]}<br><span style="font-size:14px;font-weight:800">${dd.getDate()}</span></div>`;
+      }
+      dowRow.innerHTML = dowHtml;
+    }
+
+    grid.style.display='grid';
+    grid.style.gridTemplateColumns='52px repeat(7,1fr)';
+    grid.style.gridAutoRows='';
+
+    let html = '';
+    // Time label + day columns
+    for(let h=0;h<24;h++){
+      const label = h===0?'12 AM':h<12?h+' AM':h===12?'12 PM':(h-12)+' PM';
+      html += `<div class="cal-week-time-cell">${label}</div>`;
+      for(let i=0;i<7;i++){
+        const dd = new Date(weekStart); dd.setDate(weekStart.getDate()+i);
+        const ddStr = dd.getFullYear()+'-'+String(dd.getMonth()+1).padStart(2,'0')+'-'+String(dd.getDate()).padStart(2,'0');
+        const hrs = (remMap[ddStr]||[]).filter(r=> r.due && r.due.length>10 && parseInt(r.due.slice(11,13))===h);
+        const isT = ddStr===today;
+        let evHtml = hrs.map(r=>`<div class="full-cal-event ${prioClass(r.priority||'medium')}" style="font-size:10px" onclick="editItem('${r.id}')">${r.due.slice(11,16)} ${r.title||'Untitled'}</div>`).join('');
+        html += `<div class="cal-week-hour-cell${isT?' today':''}" onclick="calDayClick('${ddStr}')">${evHtml}</div>`;
+      }
+    }
+    grid.innerHTML = html;
+    return;
   }
 
-  grid.innerHTML = html;
+  // ── MONTH view ────────────────────────────────────────────────
+  if(_calViewMode==='month'){
+    if(dowRow){
+      dowRow.style.display='';
+      dowRow.style.gridTemplateColumns='';
+      dowRow.innerHTML = dayNames.map(n=>`<div class="full-cal-dow">${n}</div>`).join('');
+    }
+    grid.style.display='grid';
+    grid.style.gridTemplateColumns='repeat(7,1fr)';
+    titleEl.textContent = monthNames[_calMonth]+' '+_calYear;
+    const firstDay    = new Date(_calYear, _calMonth, 1).getDay();
+    const daysInMonth = new Date(_calYear, _calMonth+1, 0).getDate();
+    const prevDays    = new Date(_calYear, _calMonth, 0).getDate();
+
+    let html = '';
+    for(let i=firstDay-1; i>=0; i--){
+      html += `<div class="full-cal-cell other-month"><div class="full-cal-day-num">${prevDays-i}</div></div>`;
+    }
+    for(let d=1; d<=daysInMonth; d++){
+      const ds = _calYear+'-'+String(_calMonth+1).padStart(2,'0')+'-'+String(d).padStart(2,'0');
+      const isToday   = ds===today;
+      const isWeekend = [0,6].includes(new Date(_calYear,_calMonth,d).getDay());
+      const rems      = remMap[ds]||[];
+      const MAX_SHOW  = 3;
+      const visible   = rems.slice(0, MAX_SHOW);
+      const overflow  = rems.length - MAX_SHOW;
+      const evHtml = visible.map(r=>{
+        const pc = prioClass(r.priority||'medium');
+        const doneClass = r.sent ? ' ev-done' : '';
+        const timeStr = r.due.length>10 ? r.due.slice(11,16)+' ' : '';
+        return `<div class="full-cal-event ${pc}${doneClass}" onclick="event.stopPropagation();editItem('${r.id}')" title="${r.title}">${timeStr}${r.title}</div>`;
+      }).join('');
+      const moreHtml = overflow>0 ? `<div class="full-cal-more" onclick="event.stopPropagation();calDayClick('${ds}')">+${overflow} more</div>` : '';
+      html += `<div class="full-cal-cell${isToday?' today':''}${isWeekend?' weekend':''}" onclick="calDayClick('${ds}')">
+        <div class="full-cal-day-num">${d}</div>${evHtml}${moreHtml}</div>`;
+    }
+    const totalCells = firstDay + daysInMonth;
+    const trailing   = totalCells % 7 === 0 ? 0 : 7 - (totalCells % 7);
+    for(let d=1; d<=trailing; d++){
+      html += `<div class="full-cal-cell other-month"><div class="full-cal-day-num">${d}</div></div>`;
+    }
+    grid.innerHTML = html;
+    return;
+  }
+
+  // ── YEAR view ─────────────────────────────────────────────────
+  if(_calViewMode==='year'){
+    if(dowRow) dowRow.style.display='none';
+    grid.style.display='block';
+    titleEl.textContent = String(_calYear);
+    const nowStr = today;
+
+    let html = '<div class="cal-year-grid">';
+    for(let m=0;m<12;m++){
+      const daysInM = new Date(_calYear, m+1, 0).getDate();
+      const firstD  = new Date(_calYear, m, 1).getDay();
+      html += `<div class="cal-year-month" onclick="setCalView('month',document.getElementById('cal-sv-month'));_calMonth=${m};_calYear=${_calYear};renderFullCal()">`;
+      html += `<div class="cal-year-month-title">${monthNames[m]}</div>`;
+      html += `<div class="cal-year-mini-grid">`;
+      // DOW headers
+      ['S','M','T','W','T','F','S'].forEach(d=>{ html+=`<div class="cal-year-mini-dow">${d}</div>`; });
+      // Leading blanks
+      for(let i=0;i<firstD;i++) html+=`<div class="cal-year-mini-cell other-m"></div>`;
+      for(let d=1;d<=daysInM;d++){
+        const ds = _calYear+'-'+String(m+1).padStart(2,'0')+'-'+String(d).padStart(2,'0');
+        const hasEv = (remMap[ds]||[]).length>0;
+        const isT   = ds===nowStr;
+        html += `<div class="cal-year-mini-cell${isT?' is-today':hasEv?' has-ev':''}">${d}</div>`;
+      }
+      html += '</div></div>';
+    }
+    html += '</div>';
+    grid.innerHTML = html;
+    return;
+  }
 }
 
 function calDayClick(ds){
-  // Open add reminder modal pre-filled with that date
-  openModal('reminder');
-  setTimeout(()=>{
-    const dateEl = document.getElementById('f-due-date');
-    if(dateEl) dateEl.value = ds;
-  }, 50);
+  // Switch to day view for that date
+  const [y,m,d] = ds.split('-').map(Number);
+  _calYear=y; _calMonth=m-1; _calDay=d;
+  setCalView('day', document.getElementById('cal-sv-day'));
 }
 
 /* ============================================================
