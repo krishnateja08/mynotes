@@ -3570,33 +3570,40 @@ body.theme-beige .nav-item.active{color:#7c5cbf}
 .tan-section-chevron.collapsed{transform:rotate(-90deg)}
 .tan-section-body{transition:opacity 0.2s}
 .tan-section-body.collapsed{display:none}
-/* 4. Card — left priority strip + shadow */
+/* 4. Card — premium redesign with quick-actions */
 @keyframes tan-fadein{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
 @keyframes tan-fadeout{from{opacity:1;max-height:120px;margin-bottom:10px}to{opacity:0;max-height:0;margin-bottom:0;padding:0}}
 .tan-item{
   background:var(--sidebar);border:1px solid var(--border);
-  border-radius:8px;margin-bottom:4px;
+  border-radius:12px;margin-bottom:8px;
   display:flex;flex-direction:column;gap:0;
-  transition:border-color 0.15s;
-  overflow:hidden;
-  animation:tan-fadein 0.2s ease
+  transition:border-color 0.18s,box-shadow 0.18s;
+  overflow:hidden;position:relative;
+  animation:tan-fadein 0.2s ease;
+  box-shadow:0 1px 4px rgba(0,0,0,.04)
 }
-/* Priority row tints for instant visual scanning */
-.tan-item.is-high{background:rgba(220,38,38,.045);border-color:rgba(220,38,38,.18)}
-.tan-item.is-medium{background:rgba(217,119,6,.035);border-color:rgba(217,119,6,.15)}
+.tan-item:hover{
+  border-color:var(--accent);
+  box-shadow:0 4px 16px rgba(0,0,0,.08)
+}
+/* Priority row tints */
+.tan-item.is-high{background:rgba(220,38,38,.04);border-color:rgba(220,38,38,.18)}
+.tan-item.is-medium{background:rgba(217,119,6,.03);border-color:rgba(217,119,6,.14)}
 .tan-item.is-low{background:rgba(5,150,105,.03);border-color:rgba(5,150,105,.13)}
+.tan-item.is-high:hover{border-color:rgba(220,38,38,.45)}
+.tan-item.is-medium:hover{border-color:rgba(217,119,6,.45)}
+.tan-item.is-low:hover{border-color:rgba(5,150,105,.45)}
 body.theme-midnight .tan-item.is-high{background:rgba(220,38,38,.07);border-color:rgba(220,38,38,.22)}
 body.theme-midnight .tan-item.is-medium{background:rgba(217,119,6,.06);border-color:rgba(217,119,6,.2)}
 body.theme-midnight .tan-item.is-low{background:rgba(5,150,105,.05);border-color:rgba(5,150,105,.18)}
 body.theme-ember .tan-item.is-high{background:rgba(220,38,38,.08);border-color:rgba(220,38,38,.25)}
 body.theme-ember .tan-item.is-medium{background:rgba(217,119,6,.07);border-color:rgba(217,119,6,.22)}
 body.theme-ember .tan-item.is-low{background:rgba(5,150,105,.06);border-color:rgba(5,150,105,.2)}
-.tan-item:hover{border-color:var(--border2)}
 .tan-item.editing{border-color:var(--accent);box-shadow:0 0 0 2px rgba(139,94,42,.12)}
 .tan-item.fading-out{animation:tan-fadeout 0.25s ease forwards}
-.tan-item.is-done{opacity:.65}
-.tan-item.is-done .tan-item-inner{padding:4px 10px;gap:2px}
-.tan-item.is-done .tan-item-text{font-size:11px;line-height:1.3}
+.tan-item.is-done{opacity:.6}
+.tan-item.is-done .tan-item-inner{padding:6px 12px;gap:2px}
+.tan-item.is-done .tan-item-text{font-size:12px;line-height:1.3}
 .tan-item.is-done .tan-item-priority{font-size:9px;padding:0px 5px}
 .tan-item.is-done .tan-item-strip{width:3px}
 .tan-item.is-done .tan-cat-badge{font-size:9px;padding:1px 6px}
@@ -3605,8 +3612,8 @@ body.theme-ember .tan-item.is-low{background:rgba(5,150,105,.06);border-color:rg
 .tan-item.is-done input[type=checkbox]{width:12px;height:12px}
 .del-act{color:#c04040!important;border-color:rgba(192,64,64,.3)!important}
 .del-act:hover{background:#f8eeec!important;border-color:#c04040!important}
-/* 1. Left priority strip */
-.tan-item-strip{width:4px;flex-shrink:0;border-radius:0;align-self:stretch;min-height:100%}
+/* 1. Left priority strip — thicker, full height */
+.tan-item-strip{width:5px;flex-shrink:0;border-radius:0;align-self:stretch;min-height:100%}
 .tan-item-strip.high{background:#dc2626}
 .tan-item-strip.medium{background:#d97706}
 .tan-item-strip.low{background:#059669}
@@ -3618,27 +3625,87 @@ body.theme-ember .tan-item.is-low{background:rgba(5,150,105,.06);border-color:rg
 .tan-item-strip.cat-visit{background:#ea580c}
 .tan-item-strip.cat-events{background:#0891b2}
 .tan-item-strip.cat-recurring{background:#6366f1}
-.tan-item-inner{padding:7px 12px;display:flex;flex-direction:column;gap:4px;flex:1;min-width:0}
+.tan-item-inner{padding:10px 14px;display:flex;flex-direction:column;gap:6px;flex:1;min-width:0}
 .tan-item-top{display:flex;align-items:center;gap:8px}
+/* Checkbox styled as circle */
+.tan-done-cb{
+  appearance:none;-webkit-appearance:none;
+  width:18px;height:18px;border-radius:50%;border:1.5px solid var(--border2);
+  background:transparent;cursor:pointer;flex-shrink:0;position:relative;
+  transition:all 0.15s
+}
+.tan-done-cb:hover{border-color:var(--accent)}
+.tan-done-cb:checked{background:var(--accent);border-color:var(--accent)}
+.tan-done-cb:checked::after{
+  content:'✓';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+  font-size:10px;font-weight:700;color:#fff;line-height:1
+}
 .tan-item-priority{
   display:inline-flex;align-items:center;gap:3px;
-  font-size:11px;font-weight:700;border-radius:4px;padding:1px 6px;
+  font-size:10px;font-weight:700;border-radius:20px;padding:2px 8px;
   flex-shrink:0;white-space:nowrap
 }
 .tan-item-priority.high{background:#fee2e2;color:#991b1b}
 .tan-item-priority.medium{background:#fef3c7;color:#92400e}
 .tan-item-priority.low{background:#d1fae5;color:#065f46}
+body.theme-midnight .tan-item-priority.high{background:rgba(220,38,38,.18);color:#fca5a5}
+body.theme-midnight .tan-item-priority.medium{background:rgba(217,119,6,.18);color:#fcd34d}
+body.theme-midnight .tan-item-priority.low{background:rgba(5,150,105,.18);color:#6ee7b7}
 .tan-item-text{
   font-family:'Inter',sans-serif;font-size:14px;
   color:var(--text);line-height:1.4;word-break:break-word;
   flex:1;min-width:0;font-weight:600
 }
 .tan-item-text.done{text-decoration:line-through;color:var(--muted)}
-.tan-item-meta{display:flex;align-items:center;gap:5px;flex-wrap:wrap}
+.tan-item-meta{display:flex;align-items:center;gap:5px;flex-wrap:wrap;margin-top:1px}
 .tan-date-badge{
-  font-size:12px;font-weight:600;color:var(--muted);
-  background:var(--s2);border-radius:5px;padding:2px 8px;white-space:nowrap
+  display:inline-flex;align-items:center;gap:3px;
+  font-size:11px;font-weight:500;color:var(--muted);
+  background:var(--s2);border-radius:20px;padding:2px 9px;white-space:nowrap;
+  border:1px solid var(--border)
 }
+/* ── QUICK ACTION BUTTONS (hover reveal) ── */
+.tan-quick-actions{
+  display:flex;align-items:center;gap:4px;
+  opacity:0;transform:translateX(6px);
+  transition:opacity 0.18s,transform 0.18s;
+  flex-shrink:0;margin-left:auto
+}
+.tan-item:hover .tan-quick-actions{opacity:1;transform:translateX(0)}
+.tan-qa-btn{
+  width:28px;height:28px;border-radius:8px;
+  border:1px solid var(--border);background:var(--bg);
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;color:var(--muted);font-size:13px;line-height:1;
+  transition:all 0.12s;flex-shrink:0
+}
+.tan-qa-btn:hover{background:var(--s2);border-color:var(--border2)}
+.tan-qa-done:hover{color:#059669;border-color:rgba(5,150,105,.4);background:rgba(5,150,105,.08)}
+.tan-qa-edit:hover{color:var(--accent);border-color:var(--accent);background:rgba(139,94,42,.07)}
+.tan-qa-dup:hover{color:#2563eb;border-color:rgba(37,99,235,.4);background:rgba(37,99,235,.07)}
+.tan-qa-del:hover{color:#dc2626;border-color:rgba(220,38,38,.4);background:rgba(220,38,38,.07)}
+/* ── SECTION HEADER upgrades ── */
+.tan-section-hdr{
+  display:flex;align-items:center;gap:8px;
+  padding:10px 4px;cursor:pointer;user-select:none;margin-bottom:8px;margin-top:6px
+}
+.tan-section-hdr:hover .tan-section-title{color:var(--accent)}
+.tan-section-title{font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:0.9px;color:var(--text2);transition:color 0.15s}
+.tan-section-count{
+  font-size:11px;background:var(--s2);color:var(--muted);
+  border-radius:20px;padding:2px 10px;font-weight:600;
+  border:1px solid var(--border)
+}
+/* ── EMPTY STATE (all caught up) ── */
+.tan-empty-premium{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:48px 20px;gap:10px;text-align:center;
+  background:var(--sidebar);border:1px dashed var(--border);border-radius:16px;
+  margin-bottom:12px
+}
+.tan-empty-premium-icon{font-size:44px;opacity:.35;line-height:1}
+.tan-empty-premium-title{font-size:15px;font-weight:700;color:var(--text)}
+.tan-empty-premium-sub{font-size:12px;color:var(--muted);line-height:1.5}
 /* 5. Tag chips */
 .tan-tag-chip{
   display:inline-flex;align-items:center;gap:3px;
@@ -10345,18 +10412,19 @@ function renderTaskNotes(){
 
   if(!items.length){
     const isFiltered = _tanFilter!=='all' || _tanCatFilter!=='all' || (document.getElementById('tan-search')?.value||'').trim();
-    list.innerHTML = `<div class="tan-empty">
-      <div class="tan-empty-icon">${isFiltered?'🔍':'🎉'}</div>
-      <div style="font-size:15px;font-weight:700;color:var(--text)">${isFiltered?'No matching notes':'All caught up!'}</div>
-      <div style="font-size:13px">${isFiltered?'Try a different filter or search term.':'Nothing pending — take a break or plan ahead! ☕'}</div>
+    list.innerHTML = `<div class="tan-empty-premium">
+      <div class="tan-empty-premium-icon">${isFiltered?'🔍':'🎉'}</div>
+      <div class="tan-empty-premium-title">${isFiltered?'No matching tasks':'You\'re all caught up!'}</div>
+      <div class="tan-empty-premium-sub">${isFiltered?'Try a different filter or search term.':'Nothing pending — take a break or plan ahead! ☕'}</div>
     </div>`;
     return;
   }
 
   // also show nice empty state when open section is empty
-  const _openEmptyHtml = `<div class="tan-empty" style="padding:30px 20px">
-    <div class="tan-empty-icon" style="font-size:28px">✅</div>
-    <div style="font-size:13px;font-weight:600;color:var(--text2)">All tasks done — well done!</div>
+  const _openEmptyHtml = `<div class="tan-empty-premium" style="padding:28px 20px;margin-bottom:8px">
+    <div class="tan-empty-premium-icon" style="font-size:30px">✅</div>
+    <div class="tan-empty-premium-title" style="font-size:13px">All tasks done — well done!</div>
+    <div class="tan-empty-premium-sub">You've cleared everything. Add a new task above.</div>
   </div>`;
 
   // 3. split into open and done sections
@@ -10372,36 +10440,75 @@ function renderTaskNotes(){
   function renderItem(n){
     const cat      = n.category || 'personal';
     const CAT_META = {
-      personal: {label:'🏠 Personal', color:'#7f6fd4'},
-      official: {label:'💼 Official', color:'#3b82f6'},
-      kids:     {label:'🧒 Kids',     color:'#16a34a'},
-      visit:    {label:'📅 Visit',    color:'#ea580c'},
-      events:   {label:'🎉 Events',   color:'#0891b2'},
-      recurring:{label:'🔁 Recurring',color:'#6366f1'}
+      personal: {label:'Personal',  icon:'🏠', color:'#7f6fd4'},
+      official: {label:'Official',  icon:'💼', color:'#3b82f6'},
+      kids:     {label:'Kids',      icon:'🧒', color:'#16a34a'},
+      visit:    {label:'Visit',     icon:'📅', color:'#ea580c'},
+      events:   {label:'Events',    icon:'🎉', color:'#0891b2'},
+      recurring:{label:'Recurring', icon:'🔁', color:'#6366f1'}
     };
     const catMeta  = CAT_META[cat] || CAT_META.personal;
-    const catLabel = catMeta.label;
     const catColor = catMeta.color;
-    const isRecurring = cat==='recurring' || (n.recurrence && n.recurrence!=='');
-    const recurBadge  = isRecurring ? `<span class="tan-recur-badge">🔁 ${n.recurrence||'recurring'}</span>` : '';
-    const prio     = n.priority || 'medium';
-    const prioLabels = {high:'🔴 High', medium:'🟡 Med', low:'🟢 Low'};
-    const doneCls  = n.done ? ' done' : '';
-    // 5. tags as chips
-    const tagArr   = Array.isArray(n.tags) ? n.tags : (n.tags ? [n.tags] : []);
-    const tagHtml  = tagArr.map(t=>`<span class="tan-tag-chip">#${esc(t)}</span>`).join('');
 
-    return `<div class="tan-item${n.done?' is-done':''} is-${prio}" id="tan-item-${n.id}" style="display:flex;flex-direction:row;margin-bottom:10px">
+    const isRecurring = cat==='recurring' || (n.recurrence && n.recurrence!=='');
+    const recurBadge  = isRecurring
+      ? `<span class="tan-recur-badge" style="display:inline-flex;align-items:center;gap:3px;font-size:10px;font-weight:600;background:rgba(99,102,241,.1);color:#4f46e5;border-radius:20px;padding:2px 8px;border:1px solid rgba(99,102,241,.2)">🔁 ${n.recurrence||'recurring'}</span>`
+      : '';
+
+    const prio = n.priority || 'medium';
+    const PRIO_META = {
+      high:   {label:'High',   icon:'●', bg:'#fee2e2', color:'#991b1b'},
+      medium: {label:'Medium', icon:'●', bg:'#fef3c7', color:'#92400e'},
+      low:    {label:'Low',    icon:'●', bg:'#d1fae5', color:'#065f46'}
+    };
+    const pm = PRIO_META[prio] || PRIO_META.medium;
+
+    const doneCls = n.done ? ' done' : '';
+
+    // Tags as pill chips
+    const tagArr  = Array.isArray(n.tags) ? n.tags : (n.tags ? [n.tags] : []);
+    const tagHtml = tagArr.map(t=>`<span class="tan-tag-chip">#${esc(t)}</span>`).join('');
+
+    // Due date label with overdue highlight
+    const todayStr = localToday();
+    let dateBadge = '';
+    if(n.date){
+      const isOverdueDate = !n.done && n.date < todayStr;
+      const isToday = n.date === todayStr;
+      const dateLabel = isToday ? 'Today' : fmtDate(n.date);
+      const dateBg = isOverdueDate
+        ? 'background:rgba(220,38,38,.1);color:#dc2626;border-color:rgba(220,38,38,.25)'
+        : isToday
+          ? 'background:rgba(5,150,105,.1);color:#059669;border-color:rgba(5,150,105,.25)'
+          : '';
+      const dateIcon = isOverdueDate ? '⚠️' : '📅';
+      dateBadge = `<span class="tan-date-badge" style="${dateBg}">${dateIcon} ${dateLabel}</span>`;
+    }
+
+    // Cat badge styled inline (pill shape, category colour)
+    const catBadge = `<span style="display:inline-flex;align-items:center;gap:3px;font-size:10px;font-weight:600;border-radius:20px;padding:2px 9px;background:${catColor}18;color:${catColor};border:1px solid ${catColor}30">${catMeta.icon} ${catMeta.label}</span>`;
+
+    // Status badge
+    const statusBadge = n.done
+      ? `<span style="font-size:10px;font-weight:600;background:rgba(5,150,105,.1);color:#059669;border-radius:20px;padding:2px 8px;border:1px solid rgba(5,150,105,.2)">✅ Done</span>`
+      : '';
+
+    return `<div class="tan-item${n.done?' is-done':''} is-${prio}" id="tan-item-${n.id}" style="display:flex;flex-direction:row">
       <div class="tan-item-strip" style="background:${catColor}"></div>
-      <div class="tan-item-inner" style="padding:10px 14px;gap:6px">
+      <div class="tan-item-inner">
         <div class="tan-item-top">
           <input type="checkbox" class="tan-done-cb" ${n.done?'checked':''} onchange="toggleTanDone('${n.id}')">
-          <span class="tan-item-priority ${prio}">${prioLabels[prio]}</span>
+          <span class="tan-item-priority ${prio}" style="background:${pm.bg};color:${pm.color}">${pm.icon} ${pm.label}</span>
           <div class="tan-item-text${doneCls}" style="cursor:pointer" onclick="event.stopPropagation();tanViewDetail('${n.id}')">${esc(n.text)}</div>
-          <div class="tan-item-actions">
-            <button class="tan-act" onclick="tanViewDetail('${n.id}')">Detail</button>
-            <button class="tan-act" onclick="tanToggleEdit('${n.id}')">Edit</button>
-            ${n.done?`<button class="tan-act del-act" onclick="deleteTanNote('${n.id}')">Delete</button>`:''}
+          <!-- Quick action buttons (reveal on hover) -->
+          <div class="tan-quick-actions">
+            <button class="tan-qa-btn tan-qa-done" title="${n.done?'Reopen':'Mark done'}" onclick="event.stopPropagation();toggleTanDone('${n.id}')">${n.done?'↩':'✓'}</button>
+            <button class="tan-qa-btn tan-qa-edit" title="Edit" onclick="event.stopPropagation();tanToggleEdit('${n.id}')">✏</button>
+            <button class="tan-qa-btn tan-qa-dup"  title="Duplicate" onclick="event.stopPropagation();tanDuplicate('${n.id}')">⧉</button>
+            <button class="tan-qa-btn tan-qa-del"  title="Delete" onclick="event.stopPropagation();deleteTanNote('${n.id}')">🗑</button>
+          </div>
+          <!-- 3-dot overflow menu (always visible fallback) -->
+          <div class="tan-item-actions" style="flex-shrink:0;position:relative">
             <button class="tan-dot-btn" onclick="toggleTanDropdown('${n.id}',event)" title="More">⋯</button>
             <div class="tan-dropdown" id="tan-dd-${n.id}">
               <div class="tan-dd-item" onclick="tanViewDetail('${n.id}')">🔍 Detail</div>
@@ -10411,12 +10518,12 @@ function renderTaskNotes(){
             </div>
           </div>
         </div>
-        <div class="tan-item-meta" style="margin-top:2px">
-          <span class="tan-cat-badge ${cat}">${catLabel}</span>
+        <div class="tan-item-meta">
+          ${catBadge}
+          ${dateBadge}
           ${recurBadge}
-          <span class="tan-date-badge">📅 ${fmtDate(n.date)}</span>
           ${tagHtml}
-          <span style="font-size:11px;color:var(--muted)">${n.done?'✅ Done':'⏳ Open'}</span>
+          ${statusBadge}
         </div>
         <div class="tan-edit-area" id="tan-edit-${n.id}">
           <textarea class="tan-edit-textarea" id="tan-edit-text-${n.id}" rows="3">${esc(n.text)}</textarea>
@@ -10449,11 +10556,14 @@ function renderTaskNotes(){
 
   function sectionHtml(title, arr, key){
     if(!arr.length) return '';
+    const countColor = key==='open'
+      ? 'background:rgba(124,92,191,.12);color:var(--accent);border-color:rgba(124,92,191,.25)'
+      : 'background:rgba(5,150,105,.1);color:#059669;border-color:rgba(5,150,105,.2)';
     return `<div>
       <div class="tan-section-hdr" onclick="tanToggleSection('${key}')">
         <span class="tan-section-chevron" id="tan-chev-${key}">▼</span>
         <span class="tan-section-title">${title}</span>
-        <span class="tan-section-count">${arr.length}</span>
+        <span class="tan-section-count" style="${countColor}">${arr.length}</span>
       </div>
       <div class="tan-section-body" id="tan-sec-${key}">
         ${arr.map(renderItem).join('')}
