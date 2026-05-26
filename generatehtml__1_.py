@@ -2158,6 +2158,7 @@ body.theme-arctic .notes-list-item.active{background:rgba(56,72,112,.1)}
 .full-cal-wrap{
   display:none;flex-direction:column;
   height:calc(100vh - 58px);background:var(--bg);overflow:hidden;
+  min-height:0;
 }
 .full-cal-wrap.active{display:flex}
 .full-cal-header{
@@ -2193,7 +2194,7 @@ body.theme-arctic .notes-list-item.active{background:rgba(56,72,112,.1)}
 .cal-subview-btn:hover{border-color:var(--accent);color:var(--accent)}
 .cal-subview-btn.active{background:var(--accent);color:#fff;border-color:var(--accent)}
 /* Day view: time slots */
-.cal-day-view{display:flex;flex-direction:column;flex:1;overflow-y:auto;}
+.cal-day-view{display:flex;flex-direction:column;width:100%;overflow-y:visible;}
 .cal-day-hour-row{
   display:flex;align-items:stretch;border-bottom:1px solid var(--border);min-height:52px;
 }
@@ -2285,6 +2286,11 @@ body.theme-arctic .notes-list-item.active{background:rgba(56,72,112,.1)}
 .full-cal-grid{
   display:grid;grid-template-columns:repeat(7,1fr);
   grid-auto-rows:1fr;flex:1;overflow:hidden;
+  min-height:0;
+}
+/* Day / Today / Year views set grid to block+scroll */
+.full-cal-grid.cal-scroll-view{
+  display:block !important;overflow-y:auto !important;overflow-x:hidden;
 }
 .full-cal-cell{
   border-right:1px solid var(--border);border-bottom:1px solid var(--border);
@@ -12310,18 +12316,23 @@ function setRemView(mode, btn){
   _remViewMode = mode;
   document.querySelectorAll('.rem-view-toggle .tan-filter-btn').forEach(b=>b.classList.remove('active'));
   if(btn) btn.classList.add('active');
-  const calWrap  = document.getElementById('full-cal-wrap');
-  const remTiles = document.querySelector('#page-reminders .rem-summary-row');
-  const remCols  = document.querySelector('#page-reminders .rem-columns');
+  const calWrap    = document.getElementById('full-cal-wrap');
+  const remTiles   = document.querySelector('#page-reminders .rem-summary-row');
+  const remCols    = document.querySelector('#page-reminders .rem-columns');
+  const scrollArea = document.getElementById('page-scroll-area');
   if(mode==='cal'){
-    if(calWrap)  calWrap.classList.add('active');
-    if(remTiles) remTiles.style.display='none';
-    if(remCols)  remCols.style.display='none';
+    if(calWrap)    calWrap.classList.add('active');
+    if(remTiles)   remTiles.style.display='none';
+    if(remCols)    remCols.style.display='none';
+    // Disable outer scroll area so only the calendar grid scrolls
+    if(scrollArea) scrollArea.style.overflow='hidden';
     renderFullCal();
   } else {
-    if(calWrap)  calWrap.classList.remove('active');
-    if(remTiles) remTiles.style.display='';
-    if(remCols)  remCols.style.display='';
+    if(calWrap)    calWrap.classList.remove('active');
+    if(remTiles)   remTiles.style.display='';
+    if(remCols)    remCols.style.display='';
+    // Restore outer scroll
+    if(scrollArea) scrollArea.style.overflow='';
   }
 }
 
@@ -12420,6 +12431,18 @@ function renderFullCal(){
   // Sync nav button visibility (Today view hides prev/next)
   if(navPrev) navPrev.style.display = _calViewMode==='today' ? 'none' : '';
   if(navNext) navNext.style.display = _calViewMode==='today' ? 'none' : '';
+
+  // Scroll mode: Today/Day/Year need overflow-y:auto on the grid
+  const _scrollViews = ['today','day','year'];
+  if(_scrollViews.includes(_calViewMode)){
+    grid.classList.add('cal-scroll-view');
+    grid.style.overflowY = 'auto';
+    grid.style.overflowX = 'hidden';
+  } else {
+    grid.classList.remove('cal-scroll-view');
+    grid.style.overflowY = 'hidden';
+    grid.style.overflowX = '';
+  }
 
   // ── TODAY view ────────────────────────────────────────────────
   if(_calViewMode==='today'){
@@ -12522,6 +12545,9 @@ function renderFullCal(){
       dowRow.innerHTML = dowHtml;
     }
 
+    grid.classList.remove('cal-scroll-view');
+    grid.style.overflowY='auto';
+    grid.style.overflowX='hidden';
     grid.style.display='grid';
     grid.style.gridTemplateColumns='52px repeat(7,1fr)';
     grid.style.gridAutoRows='';
