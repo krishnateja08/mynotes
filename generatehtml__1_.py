@@ -12107,7 +12107,7 @@ function renderDashUpcomingList(remDates, todayStr, reminders){
         const oc = item.type==="task"
           ? "showPage('tasknotes',document.getElementById('nav-tasknotes-btn'))"
           : "editItem('"+item.id+"')";
-        return '<div class="upc-item" style="cursor:pointer;background:rgba(220,38,38,.07);border:1px solid rgba(220,38,38,.15)" onclick='"+oc+'">'
+        return '<div class="upc-item" style="cursor:pointer;background:rgba(220,38,38,.07);border:1px solid rgba(220,38,38,.15)" onclick="'+oc+'">'
           +'<div class="upc-dot upc-dot-today"></div>'
           +'<div class="upc-title">'+typeIcon+" "+item.title+'</div>'
           +'<div class="upc-due" style="color:#dc2626;background:rgba(220,38,38,.1);padding:2px 7px;border-radius:5px">'+ageLabel+'</div>'
