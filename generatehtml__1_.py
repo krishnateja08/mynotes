@@ -8176,7 +8176,7 @@ function quickCapture(){
     DATA.notes.push({id:'n_'+Date.now(),title:text,body:'',folder:'personal',created:now.toISOString()});
   } else if(type==='reminder'){
     if(!DATA.reminders) DATA.reminders=[];
-    DATA.reminders.push({id:'r_'+Date.now(),text:text,due:dateStr+' 23:59',done:false,created:now.toISOString()});
+    DATA.reminders.push({id:'r_'+Date.now(),title:text,body:'',due:dateStr+' 23:59',done:false,category:'personal',priority:'medium',created:now.toISOString()});
   } else if(type==='task'){
     if(!DATA.tasknotes) DATA.tasknotes=[];
     DATA.tasknotes.push({id:'tn_'+Date.now(),text:text,done:false,category:'personal',date:dateStr,created:now.toISOString()});
