@@ -5379,7 +5379,7 @@ body.fontsize-compact .ncard-body{font-size:11px}
         <select id="qc-type" class="qc-type">
           <option value="note">Note</option>
           <option value="reminder">Reminder</option>
-          <option value="task">Task</option>
+          <option value="task" selected>Task</option>
           <option value="sticky">Sticky</option>
           <option value="daybook">Daybook</option>
         </select>
