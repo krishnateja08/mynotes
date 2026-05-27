@@ -2220,8 +2220,8 @@ body.theme-arctic .notes-list-item.active{background:rgba(56,72,112,.1)}
 .cal-week-hour-cell{
   min-height:44px;border-bottom:1px solid var(--border);border-right:1px solid var(--border);padding:2px 4px;
   display:flex;flex-direction:column;gap:1px;position:relative;
-.cal-week-hour-cell:nth-child(8n){border-right:none}
 }
+.cal-week-hour-cell:nth-child(8n){border-right:none}
 .cal-week-time-col{border-right:1px solid var(--border);}
 .cal-week-time-cell{
   min-height:44px;border-bottom:1px solid var(--border);
@@ -2281,12 +2281,11 @@ body.theme-arctic .notes-list-item.active{background:rgba(56,72,112,.1)}
   border-bottom:1px solid var(--border);flex-shrink:0;
 }
 .full-cal-dow{
+  text-align:center;padding:8px 4px;font-size:10px;font-weight:700;
   text-transform:uppercase;letter-spacing:1px;color:var(--muted);
   border-right:1px solid var(--border);
 }
 .full-cal-dow:last-child{border-right:none}
-  text-transform:uppercase;letter-spacing:1px;color:var(--muted);
-}
 .full-cal-grid{
   display:grid;grid-template-columns:repeat(7,1fr);
   grid-auto-rows:1fr;flex:1;overflow:hidden;
@@ -5456,8 +5455,6 @@ body.fontsize-compact .ncard-body{font-size:11px}
         <div class="dash-cal-right">
           <div class="dash-upcoming-title">📅 Upcoming Reminders</div>
           <div class="dash-upcoming-items" id="dash-upcoming-list"><div class="dash-empty">No upcoming reminders.</div></div>
-          <div class="dash-upcoming-title" id="dash-missed-inline-title" style="margin-top:16px;color:#dc2626;display:none">&#128308; Missed &amp; Overdue</div>
-          <div class="dash-upcoming-items" id="dash-missed-inline-list" style="display:none"></div>
         </div>
       </div>
       <!-- Bottom three widgets -->
@@ -8188,8 +8185,10 @@ function quickCapture(){
     DATA.tasknotes.push({id:'tn_'+Date.now(),text:text,done:false,category:'personal',date:dateStr,created:now.toISOString()});
     if(typeof TASKNOTES!=='undefined') TASKNOTES=DATA.tasknotes;
   } else if(type==='sticky'){
-    if(!Array.isArray(STICKIES)||!STICKIES.length) STICKIES=DATA.stickies||[];
-    const s={id:'s_'+Date.now(),text:text,bg:'#fde68a',colorId:'yellow',pinned:false,tags:[],created:now.toISOString(),updated:now.toISOString()};STICKIES.unshift(s);DATA.stickies=STICKIES;
+    if(!Array.isArray(STICKIES) || !STICKIES.length) STICKIES = DATA.stickies || [];
+    const s={id:'s_'+Date.now(),text:text,bg:'#fde68a',colorId:'yellow',pinned:false,tags:[],created:now.toISOString(),updated:now.toISOString()};
+    STICKIES.unshift(s);
+    DATA.stickies = STICKIES;
   } else if(type==='daybook'){
     if(!DATA.daybook) DATA.daybook=[];
     DATA.daybook.push({id:'db_'+Date.now(),date:dateStr,time:timeStr,text:text,tags:[],created:now.toISOString()});
@@ -10567,7 +10566,7 @@ function renderTaskNotes(){
       ? 'background:rgba(124,92,191,.12);color:var(--accent);border-color:rgba(124,92,191,.25)'
       : 'background:rgba(5,150,105,.1);color:#059669;border-color:rgba(5,150,105,.2)';
     const clearAllBtn = key==='done'
-      ? `<button onclick="event.stopPropagation();clearAllDoneTasks()" style="margin-left:auto;font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;border:1px solid rgba(220,38,38,.3);background:rgba(220,38,38,.08);color:#dc2626;cursor:pointer;font-family:Inter,sans-serif">&#128465; Clear All</button>`
+      ? `<button onclick="event.stopPropagation();clearAllDoneTasks()" style="margin-left:auto;font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;border:1px solid rgba(220,38,38,.3);background:rgba(220,38,38,.08);color:#dc2626;cursor:pointer;font-family:'Inter',sans-serif" title="Delete all completed tasks">🗑 Clear All</button>`
       : '';
     return `<div>
       <div class="tan-section-hdr" onclick="tanToggleSection('${key}')">
@@ -10593,18 +10592,18 @@ function tanToggleSection(key){
   if(chev) chev.classList.toggle('collapsed');
 }
 
+
 function clearAllDoneTasks(){
-  const count = TASKNOTES.filter(function(n){return n.done;}).length;
-  if(!count){ toast("No completed tasks to clear","error"); return; }
-  if(!confirm("Delete all "+count+" completed task"+(count>1?"s":"")+"? This cannot be undone.")) return;
-  TASKNOTES = TASKNOTES.filter(function(n){return !n.done;});
+  const count = TASKNOTES.filter(n=>n.done).length;
+  if(!count){ toast('No completed tasks to clear','error'); return; }
+  if(!confirm('Delete all ' + count + ' completed task' + (count>1?'s':'') + '? This cannot be undone.')) return;
+  TASKNOTES = TASKNOTES.filter(n=>!n.done);
   DATA.tasknotes = TASKNOTES;
   saveTaskNotes();
   renderTaskNotes();
   updateBadge();
-  toast(count+" completed task"+(count>1?"s":"")+" cleared","success");
+  toast(count + ' completed task' + (count>1?'s':'')+' cleared ✓','success');
 }
-
 function tanToggleEdit(id){
   const el   = document.getElementById('tan-edit-'+id);
   const item = document.getElementById('tan-item-'+id);
@@ -12076,45 +12075,6 @@ function renderDashUpcomingList(remDates, todayStr, reminders){
       <div class="${dueCls}">${dueLabel}</div>
     </div>`;
   }).join('');
-
-  // -- MISSED & OVERDUE inline (below upcoming) --
-  const inlineMissedEl    = document.getElementById("dash-missed-inline-list");
-  const inlineMissedTitle = document.getElementById("dash-missed-inline-title");
-  if(inlineMissedEl){
-    const overdueRems2 = (DATA.reminders||[]).filter(r=>isOverdue(r))
-      .sort((a,b)=>(b.due||"").localeCompare(a.due||"")).slice(0,4);
-    const overdueTask2 = (TASKNOTES||[])
-      .filter(t=>!t.done && t.date && t.date.slice(0,10) < todayStr)
-      .sort((a,b)=>(a.date||"").localeCompare(b.date||"")).slice(0,4);
-    const allMissed2 = [
-      ...overdueRems2.map(r=>({type:"rem",  id:r.id, title:r.title||"Untitled", due:r.due.slice(0,10)})),
-      ...overdueTask2.map(t=>({type:"task", id:t.id, title:t.text||"Untitled",  due:t.date||""}))
-    ];
-    if(!allMissed2.length){
-      inlineMissedEl.style.display="none";
-      if(inlineMissedTitle) inlineMissedTitle.style.display="none";
-    } else {
-      inlineMissedEl.style.display="flex";
-      inlineMissedEl.style.flexDirection="column";
-      inlineMissedEl.style.gap="7px";
-      if(inlineMissedTitle) inlineMissedTitle.style.display="";
-      const now3=new Date();
-      inlineMissedEl.innerHTML = allMissed2.map(function(item){
-        const dueD  = new Date(item.due+"T00:00:00");
-        const diffD = Math.round((now3-dueD)/864e5);
-        const ageLabel = diffD<=0?"Today":diffD===1?"1d ago":diffD+"d ago";
-        const typeIcon = item.type==="task" ? "&#9997;" : "&#128276;";
-        const oc = item.type==="task"
-          ? "showPage('tasknotes',document.getElementById('nav-tasknotes-btn'))"
-          : "editItem('"+item.id+"')";
-        return '<div class="upc-item" style="cursor:pointer;background:rgba(220,38,38,.07);border:1px solid rgba(220,38,38,.15)" onclick="'+oc+'">'
-          +'<div class="upc-dot upc-dot-today"></div>'
-          +'<div class="upc-title">'+typeIcon+" "+item.title+'</div>'
-          +'<div class="upc-due" style="color:#dc2626;background:rgba(220,38,38,.1);padding:2px 7px;border-radius:5px">'+ageLabel+'</div>'
-          +'</div>';
-      }).join("");
-    }
-  }
 }
 
 async function dashCloseReminder(id){
