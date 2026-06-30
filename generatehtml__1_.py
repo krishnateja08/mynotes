@@ -7172,7 +7172,26 @@ body.fontsize-compact .ncard-body{font-size:11px}
     <button class="btn-ghost" onclick="closeSettings()">Close</button>
   </div>
 
+  <!-- BACKUP & RESTORE -->
+  <div class="settings-section-title" style="margin-top:24px">💾 Backup &amp; Restore</div>
+  <p style="font-size:12px;color:var(--muted);margin-bottom:14px;line-height:1.6">
+    Download a full copy of your data as a JSON file. Keep it somewhere safe (e.g. upload it to a private GitHub repo)
+    so you can restore from it if anything ever goes wrong with the cloud sync.
+    A backup is also downloaded automatically once per day when the app loads, as long as you have real data loaded.
+  </p>
+  <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+    <button class="btn" onclick="downloadDataBackup()" style="display:flex;align-items:center;gap:8px">
+      <span style="font-size:15px">📥</span> Download Backup (JSON)
+    </button>
+    <button class="btn-ghost" onclick="document.getElementById('restore-file-input').click()" style="display:flex;align-items:center;gap:8px">
+      <span style="font-size:15px">📤</span> Restore from Backup
+    </button>
+    <input type="file" id="restore-file-input" accept="application/json,.json" style="display:none" onchange="restoreFromBackupFile(this.files[0])">
+  </div>
+  <div style="font-size:11px;color:var(--muted);margin-top:8px" id="last-backup-label"></div>
+
   <!-- DAYBOOK PIN -->
+
   <div class="settings-section-title" style="margin-top:24px">🔐 Daybook, Investments & Important Dates PIN Lock</div>
   <p style="font-size:12px;color:var(--muted);margin-bottom:14px;line-height:1.6">
     Set a 4-digit PIN to lock your Daybook, Investments, and Important Dates. Leave blank to disable the lock. PIN is stored only in your browser.
@@ -7285,6 +7304,7 @@ function openSettings(){
   updateAuthUI(fbAuth.currentUser);
   document.getElementById('settings-panel').classList.add('open');
   if(typeof dbRefreshPinSettingsUI === 'function') dbRefreshPinSettingsUI();
+  updateLastBackupLabel();
   // Sync font size slider
   const fs = localStorage.getItem('mynotes_fontsize')||'normal';
   const fsSlider = document.getElementById('font-size-slider');
@@ -7315,10 +7335,27 @@ async function loadFromFirebase(){
     // Skip the echo of our own saves to prevent an infinite loop.
     if(_isSavingToFirestore){ return; }
 
+    // ── SAFETY FIX (data-loss bug) ──────────────────────────────────────────
+    // On first load, a snapshot can fire from LOCAL CACHE before the server
+    // has actually been reached (e.g. waking from sleep, switching wifi,
+    // a brief connectivity hiccup right as the tab loads). If that cache-only
+    // snapshot reports doc.exists === false, the app would previously think
+    // "this is a brand new user with no data" and could go on to auto-save
+    // an empty DATA object over the real cloud document. To prevent that,
+    // we ignore cache-only snapshots on first load and wait for a
+    // server-confirmed one before treating the data as authoritative.
+    if(doc.metadata && doc.metadata.fromCache && !_realtimeListenerActive){
+      console.warn('Ignoring cache-only Firestore snapshot on first load (waiting for server confirmation) to avoid mistaking a connectivity blip for "no data".');
+      return;
+    }
+    // ─────────────────────────────────────────────────────────────────────
+
     setSyncing(true, _realtimeListenerActive ? 'Updating...' : 'Loading...');
 
     try{
+    let _docExistedOnServer = false;
     if(doc.exists){
+      _docExistedOnServer = true;
       const remote=doc.data();
       // Restore DATA from Firestore (each key is stored as a JSON string to avoid Firestore nested-object limits)
       try{ DATA=JSON.parse(remote.payload||'{}'); }catch(e){ DATA=remote; }
@@ -7400,9 +7437,21 @@ async function loadFromFirebase(){
     updateImpDatesCount();
 
     if(needsRepair && JSON.stringify(DATA) !== _beforeRepair){
-      await saveToFirebase();
-      // saveToFirebase sets _isSavingToFirestore so its echo is skipped
-      if(!_realtimeListenerActive) toast('Data repaired & synced ✓','success');
+      // ── SAFETY FIX (data-loss bug) ──────────────────────────────────────
+      // Only auto-save the "repair" if the document already existed on the
+      // server (i.e. we're patching a few missing fields on a REAL doc).
+      // If the doc didn't exist on the server at all, never auto-save here —
+      // that could be a transient state, and auto-saving would create/
+      // overwrite the user's real data with an empty skeleton. In that case
+      // we just keep the repaired structure in memory; it will be saved
+      // naturally the next time the user actually makes a change.
+      if(_docExistedOnServer){
+        await saveToFirebase();
+        // saveToFirebase sets _isSavingToFirestore so its echo is skipped
+        if(!_realtimeListenerActive) toast('Data repaired & synced ✓','success');
+      } else {
+        console.warn('Skipped auto-repair save: document does not exist on the server. Will only save once you make a change, to avoid risking data loss.');
+      }
     } else {
       if(!_realtimeListenerActive){
         toast('Loaded ✓','success');
@@ -7411,6 +7460,7 @@ async function loadFromFirebase(){
         toast('🔄 Synced from another device','success');
       }
     }
+    maybeAutoBackup();
     _realtimeListenerActive=true;
 
     }catch(e){
@@ -7430,10 +7480,124 @@ async function loadFromFirebase(){
   }); // end onSnapshot
 }
 
+/* -- BACKUP & RESTORE ---------------------------- */
+// Manual + automatic JSON export of all your data, so you always have a copy
+// outside of Firestore. Keep these files somewhere safe (e.g. a private
+// GitHub repo) so you can restore from one if the cloud data is ever lost.
+
+function downloadDataBackup(silent){
+  try{
+    const payload = JSON.stringify(DATA, null, 2);
+    const blob = new Blob([payload], {type:'application/json'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    const ts = new Date();
+    const pad = n => String(n).padStart(2,'0');
+    const stamp = `${ts.getFullYear()}-${pad(ts.getMonth()+1)}-${pad(ts.getDate())}_${pad(ts.getHours())}-${pad(ts.getMinutes())}`;
+    a.href = url;
+    a.download = `mynotes-backup-${stamp}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(()=>URL.revokeObjectURL(url), 2000);
+    localStorage.setItem('last_backup_date', new Date().toISOString().slice(0,10));
+    updateLastBackupLabel();
+    if(!silent) toast('📥 Backup downloaded','success');
+  }catch(e){
+    console.warn('Backup download failed:', e);
+    if(!silent) toast('Backup failed: '+e.message,'error');
+  }
+}
+
+function updateLastBackupLabel(){
+  const el = document.getElementById('last-backup-label');
+  if(!el) return;
+  const last = localStorage.getItem('last_backup_date');
+  el.textContent = last ? `Last backup downloaded: ${last}` : 'No backup downloaded yet.';
+}
+
+// Auto-download a backup once per calendar day, but only once we have
+// confirmed, genuinely-loaded data (never backs up an empty/placeholder state).
+function maybeAutoBackup(){
+  try{
+    const _contentKeys = ['notes','reminders','stickies','archived','trades','routines',
+      'routine_logs','tasknotes','finance','daybook','shopping','investments','important_dates'];
+    const hasRealData = _contentKeys.some(k => Array.isArray(DATA[k]) && DATA[k].length>0);
+    if(!hasRealData) return; // don't back up an empty state
+    const today = new Date().toISOString().slice(0,10);
+    const last = localStorage.getItem('last_backup_date');
+    if(last !== today){
+      downloadDataBackup(true); // silent — no toast spam on every load
+    }
+  }catch(e){ console.warn('Auto-backup check failed:', e); }
+}
+
+// Restore: lets you load a previously-downloaded backup JSON back into the
+// app and push it to Firestore. Asks for confirmation since this overwrites
+// whatever is currently in the cloud.
+function restoreFromBackupFile(file){
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = async (e)=>{
+    let parsed;
+    try{
+      parsed = JSON.parse(e.target.result);
+    }catch(err){
+      toast('That file is not valid JSON','error');
+      return;
+    }
+    const _contentKeys = ['notes','reminders','stickies','archived','trades','routines',
+      'routine_logs','tasknotes','finance','daybook','shopping','investments','important_dates'];
+    const itemCount = _contentKeys.reduce((sum,k)=> sum + (Array.isArray(parsed[k]) ? parsed[k].length : 0), 0);
+    if(!confirm(`This backup contains ${itemCount} total items across all sections.\n\nRestoring will REPLACE everything currently in your account (locally and in the cloud). This cannot be undone.\n\nContinue?`)) return;
+    DATA = parsed;
+    TRADES        = DATA.trades        || [];
+    ROUTINES      = DATA.routines      || [];
+    ROUTINE_LOGS  = DATA.routine_logs  || [];
+    TASKNOTES     = DATA.tasknotes     || [];
+    FINANCE       = DATA.finance       || [];
+    dataLoaded = true;
+    renderAll();
+    const ok = await saveToFirebase();
+    if(ok){ toast('✅ Data restored from backup','success'); document.getElementById('restore-file-input').value=''; }
+  };
+  reader.readAsText(file);
+}
+
 async function saveToFirebase(){
   if(!dataLoaded){ console.warn('saveToFirebase blocked: data not loaded yet'); return false; }
   const user=fbAuth.currentUser;
   if(!user){toast('Sign in first','error');openSettings();return false;}
+
+  // ── SAFETY GUARD (data-loss bug fix) ──────────────────────────────────────
+  // Never silently overwrite a non-empty cloud document with empty local data.
+  // This is a hard backstop: no matter WHY DATA ended up empty (a load bug,
+  // a connectivity glitch, a future code change), this check stops the save
+  // before it can wipe real data, by re-checking what's actually on the
+  // server right now.
+  const _contentKeys = ['notes','reminders','stickies','archived','trades','routines',
+    'routine_logs','tasknotes','finance','daybook','shopping','investments','important_dates'];
+  const _localIsEmpty = _contentKeys.every(k => !Array.isArray(DATA[k]) || DATA[k].length===0);
+  if(_localIsEmpty){
+    try{
+      const freshDoc = await fbDb.collection('users').doc(user.uid).get({source:'server'});
+      if(freshDoc.exists){
+        let remotePayload = {};
+        try{ remotePayload = JSON.parse(freshDoc.data().payload||'{}'); }catch(e){}
+        const _remoteHasData = _contentKeys.some(k => Array.isArray(remotePayload[k]) && remotePayload[k].length>0);
+        if(_remoteHasData){
+          console.error('SAFETY GUARD: blocked save — local data is empty but the cloud document has real data. Aborting to prevent data loss.');
+          toast('⚠️ Save blocked — would have overwritten your saved data with empty data. Refresh and try again.','error');
+          setSyncing(false,'Error');
+          return false;
+        }
+      }
+    }catch(e){
+      console.warn('Safety check could not verify server state, proceeding with caution:', e);
+    }
+  }
+  // ───────────────────────────────────────────────────────────────────────
+
   setSyncing(true,'Saving...');
   try{
     if(typeof FINANCE !== 'undefined' && FINANCE.length > 0)       DATA.finance      = [...FINANCE];
