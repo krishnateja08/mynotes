@@ -4094,6 +4094,44 @@ body.theme-midnight .tan-item-priority.low{background:rgba(5,150,105,.18);color:
 .fin-card-date{font-size:10px;color:var(--muted);font-weight:500}
 .fin-card-btns{display:flex;gap:5px;flex-wrap:wrap}
 /* Finance list-row */
+/* Excel-style compact spreadsheet view */
+.fin-view-card .fin-excelbox{display:none}
+.fin-view-list .fin-excelbox{display:none}
+.fin-view-excel .fin-grid{display:none}
+.fin-view-excel .fin-listbox{display:none}
+.fin-view-excel .fin-excelbox{display:block}
+.fin-excelbox{border-radius:10px;overflow:auto;border:1px solid var(--border)}
+.fin-excel-table{width:100%;border-collapse:collapse;font-size:12px;white-space:nowrap}
+.fin-excel-table thead th{
+  text-align:left;padding:6px 10px;font-size:10px;font-weight:800;
+  text-transform:uppercase;letter-spacing:0.6px;color:var(--muted);
+  background:var(--s2);border-bottom:2px solid var(--border2);position:sticky;top:0
+}
+.fin-excel-table thead th.r{text-align:right}
+.fin-excel-table tbody td{padding:4px 10px;border-bottom:1px solid var(--border);vertical-align:middle;color:var(--text)}
+.fin-excel-table tbody td.r{text-align:right}
+.fin-excel-table tbody tr{cursor:pointer;transition:background .1s}
+.fin-excel-table tbody tr:nth-child(even){background:rgba(0,0,0,.015)}
+.fin-excel-table tbody tr:hover{background:rgba(0,0,0,.04)}
+body.theme-midnight .fin-excel-table tbody tr:hover,body.theme-ember .fin-excel-table tbody tr:hover{background:rgba(255,255,255,.05)}
+.fin-excel-table tbody tr:last-child td{border-bottom:none}
+.fin-xname{font-weight:700}
+.fin-xnote{color:var(--muted);max-width:180px;overflow:hidden;text-overflow:ellipsis;display:inline-block;vertical-align:middle}
+.fin-xamt{font-family:'Courier New',monospace;font-weight:700}
+.fin-xamt.gave{color:#059669}
+.fin-xamt.borrowed{color:#dc2626}
+.fin-xamt.settled{color:var(--muted)}
+.fin-xbadge{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.3px;border-radius:4px;padding:1px 6px}
+.fin-xbadge.pending{background:#fef3c7;color:#92400e}
+.fin-xbadge.partial{background:#dbeafe;color:#1e40af}
+.fin-xbadge.settled{background:#d1fae5;color:#065f46}
+.fin-xbadge.overdue{background:#fee2e2;color:#991b1b}
+.fin-xacts{display:flex;gap:2px;justify-content:flex-end;opacity:.6;transition:opacity .15s}
+.fin-excel-table tbody tr:hover .fin-xacts{opacity:1}
+.fin-xact-btn{background:none;border:none;cursor:pointer;font-size:12px;padding:3px 6px;border-radius:5px;color:var(--muted)}
+.fin-xact-btn:hover{color:var(--text);background:var(--s2)}
+.fin-xact-btn.del:hover{color:#dc2626;background:rgba(220,38,38,.1)}
+
 .fin-view-toggle{
   display:flex;background:var(--s2);border:1.5px solid var(--border);
   border-radius:8px;padding:3px;gap:2px
@@ -6201,6 +6239,7 @@ body.fontsize-compact .ncard-body{font-size:11px}
       <div class="fin-view-toggle">
         <button class="fin-vtbtn active" id="fin-vcard" onclick="finSetView('card')" title="Card view">⊞ Cards</button>
         <button class="fin-vtbtn" id="fin-vlist" onclick="finSetView('list')" title="List view">☰ List</button>
+        <button class="fin-vtbtn" id="fin-vexcel" onclick="finSetView('excel')" title="Compact spreadsheet view">📊 Excel</button>
       </div>
       <button class="btn" onclick="openFinModal()">+ New Entry</button>
     </div>
@@ -6287,6 +6326,7 @@ body.fontsize-compact .ncard-body{font-size:11px}
   <div class="fin-list fin-view-card" id="fin-list">
     <div class="fin-grid" id="fin-card-grid"></div>
     <div class="fin-listbox" id="fin-listbox"></div>
+    <div class="fin-excelbox" id="fin-excelbox"></div>
   </div>
 
 </div>
@@ -11121,6 +11161,7 @@ function finSetView(v){
   if(list){ list.className = 'fin-list fin-view-'+v; }
   document.getElementById('fin-vcard').classList.toggle('active', v==='card');
   document.getElementById('fin-vlist').classList.toggle('active', v==='list');
+  document.getElementById('fin-vexcel').classList.toggle('active', v==='excel');
   renderFinance();
 }
 
@@ -11489,6 +11530,7 @@ function renderFinance(){
   if(!items.length){
     const grid=document.getElementById('fin-card-grid');
     const lbox=document.getElementById('fin-listbox');
+    const xbox=document.getElementById('fin-excelbox');
     const empty=`<div class="fin-empty">
       <div style="font-size:40px;opacity:.4">💰</div>
       <div style="font-size:14px;font-weight:600;color:var(--text2)">No entries found</div>
@@ -11496,6 +11538,7 @@ function renderFinance(){
     </div>`;
     if(grid) grid.innerHTML=empty;
     if(lbox) lbox.innerHTML='';
+    if(xbox) xbox.innerHTML='';
     return;
   }
 
@@ -11506,6 +11549,7 @@ function renderFinance(){
 
   const cardGrid = document.getElementById('fin-card-grid');
   const listBox  = document.getElementById('fin-listbox');
+  const excelBox = document.getElementById('fin-excelbox');
 
   const rendered = items.map(e=>{
     const st=finStatus(e);
@@ -11646,7 +11690,25 @@ function renderFinance(){
     </div>
     <div id="fin-item-${e.id}" class="fin-item-expand" style="padding:10px 14px;background:var(--bg);border-bottom:1px solid var(--border)">${expandBody}</div>`;
 
-    return {cardHtml, rowHtml};
+    // ── EXCEL row (single-line, compact spreadsheet style) ──
+    const stShort = st==='settled'?'Settled':st==='partial'?'Partial':st==='overdue'?'Overdue':'Pending';
+    const excelRowHtml=`<tr onclick="openFinModal('${e.id}')">
+      <td class="fin-xname">${esc(e.person)}</td>
+      <td><span class="fin-xnote" title="${esc(e.notes||'')}">${esc(e.notes||'—')}</span></td>
+      <td class="r fin-xamt ${amtCls}">${finRupee(e.amount)}${rem<e.amount&&st!=='settled'?` <span style="font-size:9px;color:var(--muted);font-weight:600">(Rem ${finRupee(rem)})</span>`:''}</td>
+      <td><span class="fin-xbadge ${st}">${stShort}</span></td>
+      <td>${payLabel[e.paymethod||'cash']}</td>
+      <td>${fmtD(e.date)}</td>
+      <td class="r">
+        <div class="fin-xacts">
+          <button class="fin-xact-btn" onclick="event.stopPropagation();openFinModal('${e.id}')" title="Edit">✎</button>
+          ${st!=='settled'?`<button class="fin-xact-btn" onclick="event.stopPropagation();toggleFinRepay('${e.id}')" title="Add payment">💵</button>`:''}
+          <button class="fin-xact-btn del" onclick="event.stopPropagation();deleteFinEntry('${e.id}')" title="Delete">✕</button>
+        </div>
+      </td>
+    </tr>`;
+
+    return {cardHtml, rowHtml, excelRowHtml};
   });
 
   if(cardGrid){
@@ -11732,6 +11794,11 @@ function renderFinance(){
       <div class="fin-list-th">Actions</div>
     </div>`;
     listBox.innerHTML = thead + rendered.map(r=>r.rowHtml).join('');
+  }
+  if(excelBox){
+    excelBox.innerHTML = `<table class="fin-excel-table"><thead><tr>
+      <th>Person</th><th>Note</th><th class="r">Amount</th><th>Status</th><th>Method</th><th>Date</th><th class="r">Actions</th>
+    </tr></thead><tbody>${rendered.map(r=>r.excelRowHtml).join('')}</tbody></table>`;
   }
 }
 let ROUTINE_LOGS = [];
