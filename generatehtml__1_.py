@@ -4826,7 +4826,7 @@ body.theme-midnight .inv-status.under,body.theme-ember .inv-status.under{color:#
 body.theme-midnight .inv-gap.pos,body.theme-ember .inv-gap.pos{color:#fbbf24}
 body.theme-midnight .inv-gap.neg,body.theme-ember .inv-gap.neg{color:#f87171}
 body.theme-midnight .inv-gap.zero,body.theme-ember .inv-gap.zero{color:#5adb8a}
-.inv-actions{display:flex;gap:4px;justify-content:flex-end;opacity:0;transition:opacity .15s}
+.inv-actions{display:flex;gap:4px;justify-content:flex-end;opacity:.55;transition:opacity .15s}
 .inv-table tbody tr:hover .inv-actions{opacity:1}
 .inv-abtn{background:none;border:none;cursor:pointer;font-size:14px;padding:5px 7px;border-radius:7px;color:var(--muted);transition:all .12s;line-height:1}
 .inv-abtn:hover{color:var(--text);background:var(--s2)}
@@ -6485,7 +6485,7 @@ body.fontsize-compact .ncard-body{font-size:11px}
   <div class="inv-wrap">
     <div class="inv-header">
       <span class="inv-title">📊 Investment Portfolio</span>
-      <button class="btn" onclick="invOpenAddRow()">+ Add Asset</button>
+      <div id="inv-header-actions" style="display:flex;gap:8px"></div>
     </div>
     <div class="inv-summary">
       <div class="inv-sum-card">
@@ -14462,6 +14462,7 @@ async function shopDelItem(shopId,itemId){
 let INVESTMENTS = [];
 let _invEditId = null;
 let _invAdding = false;
+let _invBulkEdit = false; // true = every row is editable at once, saved together
 
 // Vibrant unique colors for each asset's allocation bar (matching Excel style)
 const INV_BAR_COLORS = [
@@ -14522,6 +14523,7 @@ function invRender(){
   }
 
   updateInvestmentsCount();
+  invRenderHeaderActions();
 
   if(!assets.length && !_invAdding){
     container.innerHTML=`<div class="inv-empty"><div class="inv-empty-icon">📊</div><div class="inv-empty-text">No investment assets yet — click <b>+ Add Asset</b> to begin tracking</div></div>`;
@@ -14537,35 +14539,38 @@ function invRender(){
     const gapNum = parseFloat(gap);
     const gapCls = gapNum>0?'pos':gapNum<0?'neg':'zero';
     const barColor = INV_BAR_COLORS[i % INV_BAR_COLORS.length];
-    const isEditing = _invEditId===a.id;
+    const isEditing = _invBulkEdit || _invEditId===a.id;
 
     if(isEditing){
-      rows += `<tr>
-        <td><input class="inv-edit-input" id="inv-e-name" value="${esc(a.name)}" placeholder="Asset name"></td>
-        <td class="r"><input class="inv-edit-input num" id="inv-e-value" type="number" value="${a.value}" placeholder="0"></td>
+      rows += `<tr${_invBulkEdit?' class="inv-bulk-row"':''}>
+        <td><input class="inv-edit-input" id="inv-e-name-${a.id}" value="${esc(a.name)}" placeholder="Asset name"></td>
+        <td class="r"><input class="inv-edit-input num" id="inv-e-value-${a.id}" type="number" value="${a.value}" placeholder="0"></td>
         <td class="r"><span class="inv-pct">${pct}%</span></td>
-        <td class="r"><input class="inv-edit-input num" id="inv-e-target" type="number" value="${a.target}" step="0.5" placeholder="0"></td>
+        <td class="r"><input class="inv-edit-input num" id="inv-e-target-${a.id}" type="number" value="${a.target}" step="0.5" placeholder="0"></td>
         <td class="inv-col-alloc"><div class="inv-bar-wrap"><div class="inv-bar-fill" style="width:${Math.min(pct,100)}%;background:${barColor}"></div></div></td>
         <td class="inv-col-status"><span class="inv-status ${status.cls}">${status.icon} ${status.text}</span></td>
         <td class="r"><span class="inv-gap ${gapCls}">${gapNum>0?'+':''}${gap}%</span></td>
         <td class="r">
           <div style="display:flex;gap:4px;justify-content:flex-end">
-            <button class="inv-abtn" onclick="invSaveEdit()" title="Save" style="color:#1a8a5a;font-size:16px">✓</button>
-            <button class="inv-abtn" onclick="invCancelEdit()" title="Cancel" style="font-size:16px">✕</button>
+            ${_invBulkEdit
+              ? `<button class="inv-abtn del" onclick="invDelete('${a.id}')" title="Delete">✕</button>`
+              : `<button class="inv-abtn" onclick="invSaveEdit()" title="Save" style="color:#1a8a5a;font-size:16px">✓</button>
+                 <button class="inv-abtn" onclick="invCancelEdit()" title="Cancel" style="font-size:16px">✕</button>`
+            }
           </div>
         </td>
       </tr>`;
       // Mobile edit card
       cards += `<div class="inv-medit">
         <div class="inv-medit-fields">
-          <div><label>Asset Name</label><input class="inv-edit-input" id="inv-me-name" value="${esc(a.name)}" placeholder="Asset name"></div>
-          <div><label>Value (INR)</label><input class="inv-edit-input" id="inv-me-value" type="number" value="${a.value}" placeholder="0"></div>
-          <div><label>Target %</label><input class="inv-edit-input" id="inv-me-target" type="number" value="${a.target}" step="0.5" placeholder="0"></div>
+          <div><label>Asset Name</label><input class="inv-edit-input" id="inv-me-name-${a.id}" value="${esc(a.name)}" placeholder="Asset name"></div>
+          <div><label>Value (INR)</label><input class="inv-edit-input" id="inv-me-value-${a.id}" type="number" value="${a.value}" placeholder="0"></div>
+          <div><label>Target %</label><input class="inv-edit-input" id="inv-me-target-${a.id}" type="number" value="${a.target}" step="0.5" placeholder="0"></div>
         </div>
-        <div class="inv-medit-btns">
+        ${_invBulkEdit ? '' : `<div class="inv-medit-btns">
           <button class="inv-medit-cancel" onclick="invCancelEdit()">Cancel</button>
           <button class="inv-medit-save" onclick="invSaveEdit(true)">Save</button>
-        </div>
+        </div>`}
       </div>`;
     } else {
       rows += `<tr>
@@ -14788,6 +14793,7 @@ function invRenderChart(assets, total){
 }
 
 function invOpenAddRow(){
+  if(_invBulkEdit) return; // add row not available mid bulk-edit
   _invAdding = true;
   _invEditId = null;
   invRender();
@@ -14813,6 +14819,7 @@ async function invSaveNew(fromMobile){
 }
 
 function invStartEdit(id){
+  if(_invBulkEdit) return; // already editable in bulk mode
   _invEditId = id;
   _invAdding = false;
   invRender();
@@ -14822,11 +14829,60 @@ function invCancelEdit(){
   invRender();
 }
 
+function invRenderHeaderActions(){
+  const el = document.getElementById('inv-header-actions');
+  if(!el) return;
+  if(_invBulkEdit){
+    el.innerHTML = `
+      <button class="btn-ghost" onclick="invCancelBulkEdit()">✕ Cancel</button>
+      <button class="btn" onclick="invSaveAllBulk()">✓ Save All</button>`;
+  } else {
+    el.innerHTML = `
+      <button class="btn-ghost" onclick="invToggleBulkEdit()">✎ Edit All</button>
+      <button class="btn" onclick="invOpenAddRow()">+ Add Asset</button>`;
+  }
+}
+
+function invToggleBulkEdit(){
+  _invAdding = false;
+  _invEditId = null;
+  _invBulkEdit = true;
+  invRender();
+}
+
+function invCancelBulkEdit(){
+  _invBulkEdit = false;
+  invRender(); // discards any unsaved in-progress edits, restores last saved values
+}
+
+// Reads every row's inputs (desktop or mobile, whichever is present) and
+// commits them all together in one save — used by the "Edit All" flow.
+async function invSaveAllBulk(){
+  const assets = invGetData();
+  let anyEmpty = false;
+  assets.forEach(a=>{
+    const nameEl  = document.getElementById('inv-e-name-'+a.id)  || document.getElementById('inv-me-name-'+a.id);
+    const valEl   = document.getElementById('inv-e-value-'+a.id) || document.getElementById('inv-me-value-'+a.id);
+    const tgtEl   = document.getElementById('inv-e-target-'+a.id)|| document.getElementById('inv-me-target-'+a.id);
+    const name = (nameEl?.value||'').trim();
+    if(!name){ anyEmpty = true; return; }
+    a.name   = name;
+    a.value  = parseFloat(valEl?.value)||0;
+    a.target = parseFloat(tgtEl?.value)||0;
+  });
+  if(anyEmpty){ toast('Every asset needs a name — fix the highlighted row(s)','error'); return; }
+  _invBulkEdit = false;
+  invRender();
+  const ok = await saveToFirebase();
+  if(ok) toast('All changes saved ✓','success');
+  else toast('⚠️ Saved locally but cloud save failed — check your connection and try again','error');
+}
+
 async function invSaveEdit(fromMobile){
   const pfx = fromMobile ? 'inv-me-' : 'inv-e-';
-  const name = (document.getElementById(pfx+'name')?.value||'').trim();
-  const value = parseFloat(document.getElementById(pfx+'value')?.value)||0;
-  const target = parseFloat(document.getElementById(pfx+'target')?.value)||0;
+  const name = (document.getElementById(pfx+'name-'+_invEditId)?.value||'').trim();
+  const value = parseFloat(document.getElementById(pfx+'value-'+_invEditId)?.value)||0;
+  const target = parseFloat(document.getElementById(pfx+'target-'+_invEditId)?.value)||0;
   if(!name){toast('Enter an asset name','error');return;}
   const assets = invGetData();
   const a = assets.find(x=>x.id===_invEditId);
