@@ -5096,40 +5096,6 @@ body.sidebar-collapsed .nav-item:hover::after{opacity:1}
   50%{opacity:.6;transform:scale(1.3)}
 }
 
-/* -- FLOATING ACTION BUTTON --------------------- */
-#fab-container{
-  position:fixed;bottom:28px;right:28px;z-index:500;
-  display:flex;flex-direction:column;align-items:flex-end;gap:10px;
-}
-.fab-btn{
-  width:56px;height:56px;border-radius:50%;
-  background:var(--accent);color:#fff;border:none;
-  font-size:24px;cursor:pointer;
-  box-shadow:0 4px 20px rgba(0,0,0,.25);
-  transition:all .25s cubic-bezier(.34,1.56,.64,1);
-  display:flex;align-items:center;justify-content:center;
-  font-weight:300;line-height:1;
-}
-.fab-btn:hover{background:var(--accent2);transform:scale(1.08)}
-.fab-btn.open{transform:rotate(45deg) scale(1.05);background:var(--red)}
-.fab-menu{
-  display:flex;flex-direction:column;align-items:flex-end;gap:8px;
-  pointer-events:none;opacity:0;transform:translateY(10px);
-  transition:all .22s cubic-bezier(.4,0,.2,1);
-}
-.fab-menu.open{opacity:1;transform:translateY(0);pointer-events:all}
-.fab-option{
-  display:flex;align-items:center;gap:9px;
-  background:var(--sidebar);color:var(--text);
-  border:1px solid var(--border);border-radius:28px;
-  padding:9px 16px 9px 12px;font-size:13px;font-weight:600;
-  cursor:pointer;font-family:'Inter',sans-serif;
-  box-shadow:0 2px 12px rgba(0,0,0,.14);
-  transition:all .18s;white-space:nowrap;
-}
-.fab-option:hover{background:var(--accent);color:#fff;border-color:var(--accent);transform:translateX(-4px)}
-.fab-label{font-size:12px}
-
 /* -- CARD ENTRANCE ANIMATIONS ------------------- */
 @keyframes card-in{
   from{opacity:0;transform:translateY(14px) scale(.98)}
@@ -6808,19 +6774,6 @@ body.fontsize-compact .ncard-body{font-size:11px}
     <button class="btn" onclick="saveTrade()">💾 Save Trade</button>
   </div>
 </div>
-</div>
-
-<!-- -- FLOATING ACTION BUTTON -------------------- -->
-<div id="fab-container">
-  <div id="fab-menu" class="fab-menu">
-    <button class="fab-option" onclick="openModal();closeFab()" title="Add Note or Reminder"><span>📝</span><span class="fab-label">Note / Reminder</span></button>
-    <button class="fab-option" onclick="addSticky();closeFab()" title="New Sticky"><span>📌</span><span class="fab-label">Sticky Note</span></button>
-    <button class="fab-option" onclick="showPage('tasknotes',document.getElementById('nav-tasknotes-btn'));document.getElementById('tan-quick-input').focus();closeFab()" title="Quick Task"><span>✍️</span><span class="fab-label">Task Note</span></button>
-    <button class="fab-option" onclick="impOpenModal();closeFab()" title="Important Date"><span>🗓️</span><span class="fab-label">Important Date</span></button>
-  </div>
-  <button id="fab-btn" class="fab-btn" onclick="toggleFab()" title="Quick Add">
-    <span id="fab-icon">＋</span>
-  </button>
 </div>
 
 <!-- -- ADD/EDIT MODAL ---------------------------- -->
@@ -15465,28 +15418,6 @@ function toggleSidebar(){
 (function initSidebarCollapse(){
   if(_sidebarCollapsed) document.body.classList.add('sidebar-collapsed');
 })();
-
-// -- FLOATING ACTION BUTTON -----------------------
-let _fabOpen = false;
-function toggleFab(){
-  _fabOpen = !_fabOpen;
-  document.getElementById('fab-menu').classList.toggle('open', _fabOpen);
-  document.getElementById('fab-btn').classList.toggle('open', _fabOpen);
-  document.getElementById('fab-icon').textContent = _fabOpen ? '✕' : '＋';
-}
-function closeFab(){
-  _fabOpen = false;
-  const m = document.getElementById('fab-menu');
-  const b = document.getElementById('fab-btn');
-  if(m) m.classList.remove('open');
-  if(b) b.classList.remove('open');
-  const ic = document.getElementById('fab-icon');
-  if(ic) ic.textContent = '＋';
-}
-// Close FAB when clicking outside
-document.addEventListener('click', function(e){
-  if(_fabOpen && !e.target.closest('#fab-container')) closeFab();
-});
 
 // -- READING / SCROLL PROGRESS BAR ----------------
 (function initScrollProgress(){
