@@ -14608,7 +14608,7 @@ function invRender(){
   let addCard = '';
   if(_invAdding){
     addRow = `<tr style="background:rgba(42,122,64,.06)">
-      <td><input class="inv-edit-input" id="inv-a-name" placeholder="e.g. Fixed Deposit" autofocus></td>
+      <td><input class="inv-edit-input" id="inv-a-name" placeholder="e.g. Fixed Deposit"></td>
       <td class="r"><input class="inv-edit-input num" id="inv-a-value" type="number" placeholder="0"></td>
       <td class="r"><span class="inv-pct">—</span></td>
       <td class="r"><input class="inv-edit-input num" id="inv-a-target" type="number" placeholder="0" step="0.5"></td>
@@ -14807,8 +14807,9 @@ async function invSaveNew(fromMobile){
   assets.push({id:'inv_'+Date.now(), name, value, target});
   _invAdding = false;
   invRender();
-  toast('Asset added ✓','success');
-  await saveToFirebase();
+  const ok = await saveToFirebase();
+  if(ok) toast('Asset added ✓','success');
+  else toast('⚠️ Asset added locally but cloud save failed — check your connection and try again','error');
 }
 
 function invStartEdit(id){
@@ -14832,8 +14833,9 @@ async function invSaveEdit(fromMobile){
   if(a){a.name=name;a.value=value;a.target=target;}
   _invEditId = null;
   invRender();
-  toast('Asset updated ✓','success');
-  await saveToFirebase();
+  const ok = await saveToFirebase();
+  if(ok) toast('Asset updated ✓','success');
+  else toast('⚠️ Update saved locally but cloud save failed — check your connection and try again','error');
 }
 
 async function invDelete(id){
