@@ -11198,9 +11198,17 @@ function openFinModal(id){
   document.getElementById('fin-date').value       =ex?.date      ||localToday();
   document.getElementById('fin-duedate').value    =ex?.duedate   ||'';
   document.getElementById('fin-notes').value      =ex?.notes     ||'';
+  // Reset Save button in case a previous save left it disabled/labeled "Saving…"
+  const saveBtn = document.querySelector('#fin-modal-overlay .mfoot .btn');
+  if(saveBtn){ saveBtn.disabled=false; saveBtn.textContent='💾 Save Entry'; }
   document.getElementById('fin-modal-overlay').classList.add('open');
 }
-function closeFinModal(){document.getElementById('fin-modal-overlay').classList.remove('open');}
+function closeFinModal(){
+  document.getElementById('fin-modal-overlay').classList.remove('open');
+  // Safety net: always leave the button re-enabled for next time
+  const saveBtn = document.querySelector('#fin-modal-overlay .mfoot .btn');
+  if(saveBtn){ saveBtn.disabled=false; saveBtn.textContent='💾 Save Entry'; }
+}
 
 async function saveFinEntry(){
   const person=document.getElementById('fin-person').value.trim();
@@ -11228,26 +11236,31 @@ async function saveFinEntry(){
   try{ localStorage.setItem('fin_backup', JSON.stringify(FINANCE)); }catch(e){}
 
   // Disable Save button immediately to prevent double-tap on mobile
-  const saveBtn = document.querySelector('#fin-modal-overlay .btn');
+  const saveBtn = document.querySelector('#fin-modal-overlay .mfoot .btn');
   if(saveBtn){ saveBtn.disabled=true; saveBtn.textContent='⏳ Saving…'; }
 
-  // On slow mobile networks, Firebase data may not be loaded yet — wait up to 8s
-  if(!dataLoaded){
-    toast('Saving\u2026 please wait','success');
-    let waited=0;
-    await new Promise(resolve=>{
-      const check=setInterval(()=>{
-        waited+=250;
-        if(dataLoaded||waited>=8000){clearInterval(check);resolve();}
-      },250);
-    });
-  }
+  try{
+    // On slow mobile networks, Firebase data may not be loaded yet — wait up to 8s
+    if(!dataLoaded){
+      toast('Saving\u2026 please wait','success');
+      let waited=0;
+      await new Promise(resolve=>{
+        const check=setInterval(()=>{
+          waited+=250;
+          if(dataLoaded||waited>=8000){clearInterval(check);resolve();}
+        },250);
+      });
+    }
 
-  const ok = await saveFinance();
-  // Close modal AFTER save completes (prevents iOS Safari losing async context)
-  closeFinModal();
-  renderFinance();
-  toast(ok!==false?'Entry saved \u2713':'Entry saved locally (sync pending)','success');
+    const ok = await saveFinance();
+    // Close modal AFTER save completes (prevents iOS Safari losing async context)
+    closeFinModal();
+    renderFinance();
+    toast(ok!==false?'Entry saved \u2713':'Entry saved locally (sync pending)','success');
+  } finally {
+    // Always leave the button usable again, even if saveFinance() throws
+    if(saveBtn){ saveBtn.disabled=false; saveBtn.textContent='💾 Save Entry'; }
+  }
 }
 
 function deleteFinEntry(id){
