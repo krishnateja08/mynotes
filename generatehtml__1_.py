@@ -12412,6 +12412,28 @@ async function dashCloseReminder(id){
   await toggleRemDone(id);
 }
 
+// Opens the correct editor for a "Missed & Overdue" dashboard item —
+// reminders/notes open the same edit modal as clicking an Upcoming Reminder,
+// overdue tasks open the Task Notes detail panel.
+function dashOpenMissedItem(type,id){
+  if(type==='task'){
+    showPage('tasknotes',document.getElementById('nav-tasknotes-btn'));
+    setTimeout(()=>tanViewDetail(id),60);
+  } else {
+    editItem(id);
+  }
+}
+
+// Quick "close" action from the Missed & Overdue widget — marks the
+// reminder/task as done without opening its editor.
+async function dashDismissMissedItem(type,id){
+  if(type==='task'){
+    await toggleTanDone(id);
+  } else {
+    await toggleRemDone(id);
+  }
+}
+
 function updateDashboardWidgets(){
   const notes      = DATA.notes||[];
   const reminders  = DATA.reminders||[];
@@ -12552,8 +12574,8 @@ function updateDashboardWidgets(){
       .slice(0,3);
 
     const allOverdue = [
-      ...overdueRems.map(r=>({type:'rem', title:r.title||'Untitled', due:r.due.slice(0,10), cat:r.category||'personal'})),
-      ...overdueTasks.map(t=>({type:'task', title:t.text||'Untitled', due:new Date(t.date).toISOString().slice(0,10), cat:t.category||'personal'}))
+      ...overdueRems.map(r=>({type:'rem', id:r.id, title:r.title||'Untitled', due:r.due.slice(0,10), cat:r.category||'personal'})),
+      ...overdueTasks.map(t=>({type:'task', id:t.id, title:t.text||'Untitled', due:new Date(t.date).toISOString().slice(0,10), cat:t.category||'personal'}))
     ];
 
     if(!allOverdue.length){
@@ -12569,13 +12591,14 @@ function updateDashboardWidgets(){
         const diffDays = Math.round((now-dueDate)/(1000*60*60*24));
         const ageLabel = diffDays<=0?'Today':diffDays===1?'1d ago':diffDays+'d ago';
         const icon = item.type==='task' ? '✍️' : '🔔';
-        return `<div class="mi">
+        return `<div class="mi" style="cursor:pointer" onclick="dashOpenMissedItem('${item.type}','${item.id}')" title="Click to open">
           <div class="mi-icon">${icon}</div>
           <div class="mi-info">
-            <div class="mi-name">${item.title}</div>
-            <div class="mi-meta">Due ${item.due} · ${item.cat}</div>
+            <div class="mi-name">${esc(item.title)}</div>
+            <div class="mi-meta">Due ${item.due} · ${esc(item.cat)}</div>
           </div>
           <span class="mi-age">${ageLabel}</span>
+          <button class="mi-close" onclick="event.stopPropagation();dashDismissMissedItem('${item.type}','${item.id}')" title="Mark as done" style="background:none;border:none;color:var(--muted);font-size:14px;cursor:pointer;padding:2px 6px;line-height:1;flex-shrink:0">✕</button>
         </div>`;
       }).join('');
     }
