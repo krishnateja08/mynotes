@@ -2062,15 +2062,15 @@ body.theme-arctic .notes-list-item.active{background:rgba(56,72,112,.1)}
   flex:1;display:flex;flex-direction:column;overflow-y:auto;padding:28px 40px 20px
 }
 .notes-editor-title-input{
-  font-family:'Inter',sans-serif;font-size:24px;font-weight:700;
+  font-family:'Times New Roman',serif;font-size:24px;font-weight:700;
   color:var(--text);line-height:1.3;width:100%;border:none;outline:none;
   background:transparent;resize:none;padding:0;margin-bottom:16px;
   font-variant-ligatures:none;caret-color:var(--accent)
 }
 .notes-editor-title-input::placeholder{color:var(--border2)}
 .notes-editor-body-input{
-  font-family:'Inter',sans-serif;font-size:16px;
-  color:var(--text2);line-height:1.8;width:100%;
+  font-family:'Times New Roman',serif;font-size:16px;
+  color:var(--text);line-height:1.8;width:100%;
   border:none;outline:none;background:transparent;
   padding:0;flex:1;min-height:300px;overflow-y:auto;
   caret-color:var(--accent);word-break:break-word;
@@ -2388,8 +2388,8 @@ body.theme-arctic .notes-list-item.active{background:rgba(56,72,112,.1)}
 .notes-preview-toggle button.active{background:var(--accent);color:#fff}
 .notes-preview-toggle button:hover:not(.active){background:var(--s2);color:var(--text)}
 .notes-md-preview{
-  font-family:'Inter',sans-serif;font-size:16px;
-  color:var(--text2);line-height:1.8;width:100%;
+  font-family:'Times New Roman',serif;font-size:16px;
+  color:var(--text);line-height:1.8;width:100%;
   flex:1;min-height:300px;display:none;overflow-y:auto
 }
 .notes-md-preview.active{display:block}
@@ -5585,7 +5585,7 @@ body.fontsize-compact .ncard-body{font-size:11px}
                 <select class="md-tb-select" id="editor-font-select" onchange="applyEditorFont(this.value)" title="Font family">
                   <option value="'Inter',sans-serif">Inter</option>
                   <option value="'Georgia',serif">Georgia</option>
-                  <option value="'Times New Roman',serif">Times New Roman</option>
+                  <option value="'Times New Roman',serif" selected>Times New Roman</option>
                   <option value="'Courier New',monospace">Courier New</option>
                   <option value="'Trebuchet MS',sans-serif">Trebuchet</option>
                   <option value="'Arial',sans-serif">Arial</option>
@@ -8834,9 +8834,13 @@ function showNoteEditor(id, focusBody=false){
       window._imgDataStore[token] = dataUrl;
       return `![${alt||'pasted image'}](%%IMGDATA:${token}%%)`;
     });
-    // If content has HTML tags already, set directly; otherwise convert markdown to HTML
+    // If content has HTML tags already, set directly; otherwise convert markdown to HTML.
+    // IMPORTANT: for an empty note, leave the editor truly empty — renderMarkdown('')
+    // returns a "Nothing to preview yet…" placeholder paragraph meant for the
+    // read-only preview pane, not for the editable body (it was leaking into
+    // saved notes as literal text).
     const isHtml = /<[a-z][\s\S]*>/i.test(bodyText);
-    bodyEl.innerHTML = isHtml ? bodyText : renderMarkdown(bodyText);
+    bodyEl.innerHTML = !bodyText ? '' : (isHtml ? bodyText : renderMarkdown(bodyText));
   }
   if(metaEl)  metaEl.textContent = n.updated||n.created||'';
   hideSavedIndicator();
@@ -13342,9 +13346,9 @@ function applyEditorSize(size){
   try{ localStorage.setItem('notes_editor_size', size); }catch(e){}
 }
 function restoreEditorFontSize(){
-  const font = localStorage.getItem('notes_editor_font');
+  const font = localStorage.getItem('notes_editor_font') || "'Times New Roman',serif";
   const size = localStorage.getItem('notes_editor_size');
-  if(font){ applyEditorFont(font); const s=document.getElementById('editor-font-select'); if(s) s.value=font; }
+  applyEditorFont(font); const fs=document.getElementById('editor-font-select'); if(fs) fs.value=font;
   if(size){ applyEditorSize(size); const s=document.getElementById('editor-size-select'); if(s) s.value=size; }
 }
 document.addEventListener('DOMContentLoaded', restoreEditorFontSize);
