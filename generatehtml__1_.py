@@ -12434,6 +12434,15 @@ async function dashDismissMissedItem(type,id){
   }
 }
 
+// Circle-checkbox version used in the "Missed & Overdue" widget — mirrors the
+// fill/checkmark animation used by the Upcoming Reminders circle before the
+// item is marked done and removed from the list.
+async function dashCloseMissedItem(el,type,id){
+  if(el){ el.classList.add('done'); }
+  await new Promise(res=>setTimeout(res,350));
+  await dashDismissMissedItem(type,id);
+}
+
 function updateDashboardWidgets(){
   const notes      = DATA.notes||[];
   const reminders  = DATA.reminders||[];
@@ -12592,13 +12601,13 @@ function updateDashboardWidgets(){
         const ageLabel = diffDays<=0?'Today':diffDays===1?'1d ago':diffDays+'d ago';
         const icon = item.type==='task' ? '✍️' : '🔔';
         return `<div class="mi" style="cursor:pointer" onclick="dashOpenMissedItem('${item.type}','${item.id}')" title="Click to open">
+          <div class="upc-dash-check" onclick="event.stopPropagation();dashCloseMissedItem(this,'${item.type}','${item.id}')" title="Mark as done"></div>
           <div class="mi-icon">${icon}</div>
           <div class="mi-info">
             <div class="mi-name">${esc(item.title)}</div>
             <div class="mi-meta">Due ${item.due} · ${esc(item.cat)}</div>
           </div>
           <span class="mi-age">${ageLabel}</span>
-          <button class="mi-close" onclick="event.stopPropagation();dashDismissMissedItem('${item.type}','${item.id}')" title="Mark as done" style="background:none;border:none;color:var(--muted);font-size:14px;cursor:pointer;padding:2px 6px;line-height:1;flex-shrink:0">✕</button>
         </div>`;
       }).join('');
     }
