@@ -2936,8 +2936,8 @@ body.theme-ember .tt.active{color:#0f0d0b;border-bottom-color:var(--accent)}
 .preview-card.cl-red{border-left:4px solid var(--red)}
 .preview-card.cl-purple{border-left:4px solid #7c3aed}
 .preview-eyebrow{font-size:10px;text-transform:uppercase;letter-spacing:1.2px;color:var(--muted);font-weight:700}
-.preview-title{font-family:'Inter',sans-serif;font-size:15px;font-weight:700;color:var(--text);line-height:1.3;min-height:22px}
-.preview-body{font-family:'Inter',sans-serif;font-size:13px;color:var(--text2);line-height:1.6;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}
+.preview-title{font-family:'Times New Roman',serif;font-size:15px;font-weight:700;color:var(--text);line-height:1.3;min-height:22px}
+.preview-body{font-family:'Times New Roman',serif;font-size:13px;color:var(--text);font-weight:400;line-height:1.6;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}
 .preview-tags{display:flex;gap:5px;flex-wrap:wrap}
 .preview-meta{display:flex;align-items:center;justify-content:space-between;padding-top:8px;border-top:1px solid var(--border);margin-top:auto}
 .preview-date{font-size:10px;color:var(--muted)}
@@ -8148,6 +8148,9 @@ function updatePreview(){
 
   pBody.textContent = body;
   pBody.style.display = body?'':'none';
+  pBody.style.fontStyle = 'normal';
+  pBody.style.color = '';
+  pBody.style.fontWeight = '400';
 
   const tagArr = getTagChips();
   pTags.innerHTML = tagArr.map(t=>`<span class="ctag">#${esc(t)}</span>`).join('');
