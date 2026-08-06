@@ -12441,6 +12441,7 @@ async function dashCloseMissedItem(el,type,id){
   if(el){ el.classList.add('done'); }
   await new Promise(res=>setTimeout(res,350));
   await dashDismissMissedItem(type,id);
+  updateDashboardWidgets(); // refresh so the completed item actually drops off the list
 }
 
 function updateDashboardWidgets(){
