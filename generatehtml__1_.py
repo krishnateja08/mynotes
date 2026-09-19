@@ -12718,12 +12718,18 @@ function checkDueReminders(){
   if(Notification.permission!=='granted') return;
   const now = new Date();
   const notified = JSON.parse(localStorage.getItem('notified_ids')||'[]');
+  // Reminders that fall inside the normal "just became due" window get their own popup.
+  // MISSED_WINDOW_MS is deliberately wide (7 days) so that reopening the app after the
+  // tab/device was asleep for a few days still surfaces things you missed, instead of
+  // silently dropping any reminder older than 24 hours (the old behavior).
+  const MISSED_WINDOW_MS = 7*24*60*60*1000;
+  const missed = [];
   (DATA.reminders||[]).forEach(r=>{
     if(r.sent || notified.includes(r.id)) return;
     try{
       const due = new Date(r.due.replace(' ','T'));
       const diff = due - now;
-      // fire if within next 5 minutes or already overdue today (up to 24hr past)
+      // fire immediately if within next 5 minutes or overdue by up to 24hr
       if(diff <= 5*60*1000 && diff > -24*60*60*1000){
         const n = new Notification('⏰ '+r.title,{
           body: r.body||(r.due?'Due: '+r.due:''),
@@ -12732,9 +12738,26 @@ function checkDueReminders(){
         n.onclick=()=>{ window.focus(); showPage('reminders',document.getElementById('nav-reminders-btn')); };
         notified.push(r.id);
         localStorage.setItem('notified_ids', JSON.stringify(notified));
+      } else if(diff <= -24*60*60*1000 && diff > -MISSED_WINDOW_MS){
+        // Older than 24hr but within the missed-window: collect for a single
+        // catch-up notification instead of silently skipping it forever.
+        missed.push(r);
+        notified.push(r.id);
       }
     }catch{}
   });
+  if(missed.length){
+    localStorage.setItem('notified_ids', JSON.stringify(notified));
+    try{
+      const n = new Notification(missed.length===1 ? '⏰ Missed reminder' : `⏰ ${missed.length} missed reminders`,{
+        body: missed.length===1
+          ? (missed[0].title + (missed[0].due ? ' — was due '+missed[0].due : ''))
+          : missed.slice(0,3).map(r=>r.title).join(', ') + (missed.length>3 ? ', …' : ''),
+        icon: 'data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⏰</text></svg>'
+      });
+      n.onclick=()=>{ window.focus(); showPage('reminders',document.getElementById('nav-reminders-btn')); };
+    }catch(e){}
+  }
   // Refresh badge count after checking reminders
   updateBadge();
 }
@@ -15672,6 +15695,77 @@ window.addEventListener('DOMContentLoaded',()=>{
       renderAll();
     }
   });
+});
+
+/* ============================================================
+   WAKE-UP / RESYNC HANDLER
+   ------------------------------------------------------------
+   Mobile browsers (and desktop tabs left in the background)
+   routinely FREEZE this page's JavaScript entirely — timers stop,
+   and the Firestore realtime listener's connection can go stale —
+   without actually reloading the document. Previously, that meant
+   reopening the app after it had been idle for a while would show
+   old data and a stale "today" until the user did a hard refresh.
+   This listener detects when the tab becomes visible/active again
+   and, if it had been hidden for a while (or was restored from the
+   back/forward cache), forces a full resync instead of waiting for
+   the user to notice and manually reload.
+   ============================================================ */
+let _lastVisibleAt = Date.now();
+const STALE_AFTER_MS = 2*60*1000; // treat >2 minutes hidden as "was asleep"
+
+function _forceResync(reason){
+  console.log('[wake-up] resyncing after', reason);
+  try{
+    // Re-attach a brand-new Firestore listener so we get the current
+    // server state immediately, rather than trusting a connection that
+    // may have gone stale while the tab was frozen.
+    if(fbAuth && fbAuth.currentUser){
+      loadFromFirebase();
+    }
+  }catch(e){ console.warn('resync loadFromFirebase failed', e); }
+  try{
+    // Recompute anything that depends on "now" / "today" that would
+    // otherwise stay frozen at whatever it was when the tab went to sleep.
+    if(typeof renderAll === 'function') renderAll();
+    if(typeof updateBadge === 'function') updateBadge();
+    if(typeof smartGreeting === 'function') smartGreeting();
+    if(typeof cleanNotifiedIds === 'function') cleanNotifiedIds();
+    if(typeof checkDueReminders === 'function' &&
+       typeof Notification !== 'undefined' && Notification.permission==='granted'){
+      checkDueReminders();
+    }
+  }catch(e){ console.warn('resync UI refresh failed', e); }
+}
+
+document.addEventListener('visibilitychange', ()=>{
+  if(document.hidden){
+    _lastVisibleAt = Date.now();
+  } else {
+    const hiddenFor = Date.now() - _lastVisibleAt;
+    if(hiddenFor > STALE_AFTER_MS){
+      _forceResync('tab visible again after ' + Math.round(hiddenFor/1000) + 's hidden');
+    }
+  }
+});
+
+// pageshow with event.persisted=true fires when the browser restores the
+// page from the back/forward cache (bfcache) instead of truly reloading —
+// this is the common "reopened app after a few days" case on mobile.
+window.addEventListener('pageshow', (e)=>{
+  if(e.persisted){
+    _forceResync('page restored from bfcache');
+  }
+});
+
+// Belt-and-suspenders: also catch plain window focus, in case
+// visibilitychange doesn't fire in some embedded/PWA contexts.
+window.addEventListener('focus', ()=>{
+  const hiddenFor = Date.now() - _lastVisibleAt;
+  if(hiddenFor > STALE_AFTER_MS){
+    _forceResync('window focused after ' + Math.round(hiddenFor/1000) + 's');
+  }
+  _lastVisibleAt = Date.now();
 });
 </script>
 
