@@ -23,7 +23,7 @@ HTML = r"""<!DOCTYPE html>
 // once in Settings on a given browser as a per-device override).
 const GH_BACKUP_DEFAULT = {
   owner:  'krishnateja08',
-  repo:   'notes-backup',
+  repo:   'myprivate_Repo',
   branch: 'main',
   path:   'backups',
   token:  'GH_BACKUP_TOKEN_PLACEHOLDER'
@@ -7210,7 +7210,7 @@ body.fontsize-compact .ncard-body{font-size:11px}
   <!-- GITHUB BACKUP -->
   <div class="settings-section-title" style="margin-top:24px">🐙 GitHub Backup</div>
   <p style="font-size:12px;color:var(--muted);margin-bottom:12px;line-height:1.6">
-    Push the daily backup straight to your private <code>krishnateja08/notes-backup</code> repo instead of
+    Push the daily backup straight to your private <code>krishnateja08/myprivate_Repo</code> repo instead of
     downloading it to this device. Use a <strong>fine-grained personal access token</strong> scoped to just
     that one repo, with "Contents: Read and write" permission only — nothing else.
     <a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener" style="color:var(--accent)">Create a token ↗</a>
