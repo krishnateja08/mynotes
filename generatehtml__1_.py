@@ -7604,11 +7604,27 @@ async function firebaseSignIn(){
   }
 }
 // Surface any error from the redirect round-trip (e.g. account-exists-
-// with-different-credential). The actual signed-in user is delivered
-// via the onAuthStateChanged listener below, not this promise.
-fbAuth.getRedirectResult().catch(e=>{
-  if(e && e.code && e.code!=='auth/no-current-user') toast('Sign-in failed: '+e.message,'error');
+// with-different-credential, or — most commonly for a site not hosted
+// on Firebase Hosting — auth/unauthorized-domain). The actual signed-in
+// user is delivered via the onAuthStateChanged listener below, not this
+// promise; this call is purely for diagnostics, always logged so a real
+// failure is never silently swallowed.
+fbAuth.getRedirectResult().then(result=>{
+  console.log('[auth] getRedirectResult resolved:', result && result.user ? result.user.email : '(no user in result)');
+}).catch(e=>{
+  console.error('[auth] getRedirectResult error:', e && e.code, e && e.message);
+  if(e && e.code!=='auth/no-current-user'){
+    toast('Sign-in failed ('+(e.code||'unknown')+'): '+e.message, 'error');
+  }
 });
+// If the domain this page is actually running on isn't in Firebase's
+// Authorized domains list (Console → Authentication → Settings →
+// Authorized domains), redirect sign-in will complete on Google's side
+// and then silently drop back to signed-out once it returns here — no
+// error, just back at the login screen. This warns loudly in the
+// console so that failure mode is easy to recognize instead of looking
+// like a mystery.
+console.log('[auth] running on', location.hostname, '— make sure this exact host is in Firebase Authentication → Settings → Authorized domains.');
 async function firebaseSignOut(){
   if(!confirm('Sign out? Local unsaved changes will be lost.')) return;
   // Stop the real-time listener before signing out
@@ -16140,6 +16156,7 @@ window.addEventListener('DOMContentLoaded',()=>{
   // login screen (#login-gate). Nothing in .layout renders until
   // Firebase confirms a signed-in user.
   fbAuth.onAuthStateChanged(user=>{
+    console.log('[auth] onAuthStateChanged:', user ? ('signed in as '+user.email) : 'signed out');
     updateAuthUI(user);
     if(user){
       document.body.classList.add('authed');
