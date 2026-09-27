@@ -17,6 +17,19 @@ HTML = r"""<!DOCTYPE html>
 <script src="https://accounts.google.com/gsi/client" async defer></script>
 <script>const GOOGLE_CLIENT_ID = 'GOOGLE_CLIENT_ID_PLACEHOLDER';</script>
 <script>
+// GitHub backup target — hardcoded like the repo path in a GitHub Actions
+// workflow file, since none of this is sensitive. Only the token is a
+// secret, injected from an environment variable at build time (or entered
+// once in Settings on a given browser as a per-device override).
+const GH_BACKUP_DEFAULT = {
+  owner:  'krishnateja08',
+  repo:   'notes-backup',
+  branch: 'main',
+  path:   'backups',
+  token:  'GH_BACKUP_TOKEN_PLACEHOLDER'
+};
+</script>
+<script>
 // ── Google Calendar Integration ──────────────────────────────────────────────
 let _gcalToken = null;
 let _gcalTokenExpiry = 0;
@@ -7168,9 +7181,9 @@ body.fontsize-compact .ncard-body{font-size:11px}
   <!-- BACKUP & RESTORE -->
   <div class="settings-section-title" style="margin-top:24px">💾 Backup &amp; Restore</div>
   <p style="font-size:12px;color:var(--muted);margin-bottom:14px;line-height:1.6">
-    Download a full copy of your data as a JSON file. Keep it somewhere safe (e.g. upload it to a private GitHub repo)
-    so you can restore from it if anything ever goes wrong with the cloud sync.
-    A backup is also downloaded automatically once per day when the app loads, as long as you have real data loaded.
+    Download a full copy of your data as a JSON file so you can restore from it if anything ever goes wrong with
+    the cloud sync. If you set up GitHub backup below, the automatic daily backup is pushed straight to your
+    private repo instead of downloading to this device.
   </p>
   <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
     <button class="btn" onclick="downloadDataBackup()" style="display:flex;align-items:center;gap:8px">
@@ -7193,6 +7206,30 @@ body.fontsize-compact .ncard-body{font-size:11px}
     </button>
   </div>
   <div style="font-size:11px;color:var(--muted);margin-top:6px" id="backup-folder-label"></div>
+
+  <!-- GITHUB BACKUP -->
+  <div class="settings-section-title" style="margin-top:24px">🐙 GitHub Backup</div>
+  <p style="font-size:12px;color:var(--muted);margin-bottom:12px;line-height:1.6">
+    Push the daily backup straight to your private <code>krishnateja08/notes-backup</code> repo instead of
+    downloading it to this device. Use a <strong>fine-grained personal access token</strong> scoped to just
+    that one repo, with "Contents: Read and write" permission only — nothing else.
+    <a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener" style="color:var(--accent)">Create a token ↗</a>
+    If this deployment was built with the token baked in (GH_BACKUP_TOKEN), it's already connected on every
+    device automatically — paste one below only if you want to set or override it on this browser.
+  </p>
+  <input type="password" id="gh-token" placeholder="Fine-grained personal access token" class="input" style="width:100%;margin-bottom:10px">
+  <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+    <button class="btn" onclick="ghSaveConfigFromUI()" style="display:flex;align-items:center;gap:8px">
+      <span style="font-size:15px">💾</span> Save Token
+    </button>
+    <button class="btn-ghost" onclick="backupToGithub(false)" style="display:flex;align-items:center;gap:8px">
+      <span style="font-size:15px">🐙</span> Backup to GitHub Now
+    </button>
+    <button class="btn-ghost" onclick="ghClearConfig()" style="display:flex;align-items:center;gap:8px">
+      ✕ Remove Saved Token
+    </button>
+  </div>
+  <div style="font-size:11px;color:var(--muted);margin-top:8px" id="gh-backup-label"></div>
 
   <!-- DAYBOOK PIN -->
 
@@ -7309,6 +7346,7 @@ function openSettings(){
   document.getElementById('settings-panel').classList.add('open');
   if(typeof dbRefreshPinSettingsUI === 'function') dbRefreshPinSettingsUI();
   updateLastBackupLabel();
+  ghLoadConfigToUI();
   // Sync font size slider
   const fs = localStorage.getItem('mynotes_fontsize')||'normal';
   const fsSlider = document.getElementById('font-size-slider');
@@ -7639,8 +7677,10 @@ function updateLastBackupLabel(){
   el.textContent = last ? `Last backup downloaded: ${last}` : 'No backup downloaded yet.';
 }
 
-// Auto-download a backup once per calendar day, but only once we have
-// confirmed, genuinely-loaded data (never backs up an empty/placeholder state).
+// Auto-backup once per calendar day, but only once we have confirmed,
+// genuinely-loaded data (never backs up an empty/placeholder state).
+// Prefers pushing to GitHub if configured; otherwise falls back to the
+// old behavior of downloading a JSON file to this device.
 function maybeAutoBackup(){
   try{
     const _contentKeys = ['notes','reminders','stickies','archived','trades','routines',
@@ -7649,10 +7689,144 @@ function maybeAutoBackup(){
     if(!hasRealData) return; // don't back up an empty state
     const today = new Date().toISOString().slice(0,10);
     const last = localStorage.getItem('last_backup_date');
-    if(last !== today){
+    if(last === today) return;
+
+    if(ghGetConfig()){
+      backupToGithub(true); // silent — pushes to the private repo
+    } else {
       downloadDataBackup(true); // silent — no toast spam on every load
     }
   }catch(e){ console.warn('Auto-backup check failed:', e); }
+}
+
+/* -- GITHUB BACKUP -------------------------------
+   Pushes a dated JSON snapshot of DATA straight to a private GitHub repo
+   using the Contents API, called directly from the browser. Requires a
+   fine-grained personal access token scoped to just that repo with
+   "Contents: Read and write" permission. The token lives only in this
+   browser's localStorage — it is never embedded in the app's own HTML/JS,
+   so it can't leak to anyone else who opens this app. */
+
+function ghGetConfig(){
+  try{
+    // A token saved locally (Settings) always wins; otherwise fall back to
+    // the one baked in via the GH_BACKUP_TOKEN environment variable.
+    // Owner/repo/branch/path are fixed — see GH_BACKUP_DEFAULT above.
+    const token = localStorage.getItem('gh_token') || GH_BACKUP_DEFAULT.token || '';
+    if(!GH_BACKUP_DEFAULT.owner || !GH_BACKUP_DEFAULT.repo || !token) return null;
+    return {
+      owner:  GH_BACKUP_DEFAULT.owner,
+      repo:   GH_BACKUP_DEFAULT.repo,
+      branch: GH_BACKUP_DEFAULT.branch || 'main',
+      path:   (GH_BACKUP_DEFAULT.path || 'backups').replace(/^\/+|\/+$/g,''),
+      token
+    };
+  }catch(e){ return null; }
+}
+
+function ghSaveConfigFromUI(){
+  try{
+    const token = document.getElementById('gh-token').value.trim();
+    if(!token){ toast('Paste a token to save','error'); return; }
+    localStorage.setItem('gh_token', token);
+    document.getElementById('gh-token').value='';
+    updateGithubBackupLabel();
+    toast('✅ GitHub backup token saved','success');
+  }catch(e){ toast('Could not save token: '+e.message,'error'); }
+}
+
+function ghLoadConfigToUI(){
+  // Owner/repo/branch/path are fixed (GH_BACKUP_DEFAULT) — only the token
+  // is ever entered here, and it's never pre-filled into the visible field.
+  updateGithubBackupLabel();
+}
+
+function ghClearConfig(){
+  if(!confirm('Remove the token saved on this browser? If a deployment token is baked in via GH_BACKUP_TOKEN, backups will keep using that one instead.')) return;
+  localStorage.removeItem('gh_token');
+  ghLoadConfigToUI();
+  toast('Local GitHub token removed','success');
+}
+
+function updateGithubBackupLabel(){
+  const el = document.getElementById('gh-backup-label');
+  if(!el) return;
+  const cfg = ghGetConfig();
+  const last = localStorage.getItem('last_gh_backup_at');
+  const usingBuiltInToken = !localStorage.getItem('gh_token') && !!GH_BACKUP_DEFAULT.token;
+  if(!cfg){
+    el.textContent = 'Not connected — daily backups will download to this device instead.';
+  } else {
+    const src = usingBuiltInToken ? ' (using the token built into this deployment — no per-device setup needed)' : ' (using a token saved on this browser)';
+    el.textContent = last
+      ? `Connected to ${cfg.owner}/${cfg.repo}${src}. Last GitHub backup: ${last}`
+      : `Connected to ${cfg.owner}/${cfg.repo}${src}. No GitHub backup yet.`;
+  }
+}
+
+// UTF-8 safe base64 encoding (GitHub's Contents API requires base64 content).
+function _utf8ToB64(str){
+  return btoa(unescape(encodeURIComponent(str)));
+}
+
+async function backupToGithub(silent){
+  const cfg = ghGetConfig();
+  if(!cfg){
+    if(!silent) toast('Set up GitHub backup in Settings first','error');
+    return;
+  }
+  try{
+    const payload = JSON.stringify(DATA, null, 2);
+    const today = new Date().toISOString().slice(0,10);
+    const filePath = `${cfg.path}/mynotes-backup.json`; // fixed name — overwritten every backup, no date in filename
+    const apiUrl = `https://api.github.com/repos/${cfg.owner}/${cfg.repo}/contents/${filePath}`;
+    const headers = {
+      'Authorization': 'Bearer ' + cfg.token,
+      'Accept': 'application/vnd.github+json',
+      'Content-Type': 'application/json'
+    };
+
+    // Look up the existing file's sha (if any) — GitHub requires it to update
+    // rather than create. A fresh repo/day will 404 here, which is expected.
+    let sha = undefined;
+    try{
+      const getRes = await fetch(`${apiUrl}?ref=${encodeURIComponent(cfg.branch)}`, { headers });
+      if(getRes.ok){
+        const getData = await getRes.json();
+        sha = getData.sha;
+      } else if(getRes.status !== 404){
+        const errData = await getRes.json().catch(()=>({}));
+        throw new Error(errData.message || `GET failed with status ${getRes.status}`);
+      }
+    }catch(e){
+      if(!(e instanceof TypeError)) throw e; // rethrow real API errors, ignore network hiccups on the lookup
+    }
+
+    const putRes = await fetch(apiUrl, {
+      method: 'PUT',
+      headers,
+      body: JSON.stringify({
+        message: `Daily backup ${today}`,
+        content: _utf8ToB64(payload),
+        branch: cfg.branch,
+        sha
+      })
+    });
+    const putData = await putRes.json();
+    if(!putRes.ok){
+      throw new Error(putData.message || `PUT failed with status ${putRes.status}`);
+    }
+
+    localStorage.setItem('last_backup_date', today);
+    localStorage.setItem('last_gh_backup_at', new Date().toLocaleString());
+    updateLastBackupLabel();
+    updateGithubBackupLabel();
+    if(!silent) toast(`🐙 Backed up to ${cfg.owner}/${cfg.repo}`,'success');
+  }catch(e){
+    console.warn('GitHub backup failed:', e);
+    if(!silent) toast('GitHub backup failed: '+e.message,'error');
+    else toast('⚠️ Daily GitHub backup failed — check Settings','error');
+  }
 }
 
 // Restore: lets you load a previously-downloaded backup JSON back into the
@@ -15826,6 +16000,10 @@ def main():
         'FIREBASE_MESSAGING_SENDER_ID_PLACEHOLDER':   os.environ.get('FIREBASE_MESSAGING_SENDER_ID', ''),
         'FIREBASE_APP_ID_PLACEHOLDER':                os.environ.get('FIREBASE_APP_ID', ''),
         'GOOGLE_CLIENT_ID_PLACEHOLDER':               os.environ.get('GOOGLE_CLIENT_ID', ''),
+        # Only the token is a secret — owner/repo/branch/path are hardcoded
+        # directly in the HTML/JS above (see GH_BACKUP_DEFAULT), same as a
+        # repo path written straight into a GitHub Actions workflow file.
+        'GH_BACKUP_TOKEN_PLACEHOLDER':            os.environ.get('GH_BACKUP_TOKEN', ''),
     }
     for placeholder, value in firebase_replacements.items():
         html = html.replace(placeholder, value)
