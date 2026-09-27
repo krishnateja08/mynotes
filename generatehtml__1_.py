@@ -7590,13 +7590,25 @@ function updateAuthUI(user){
   }
 }
 async function firebaseSignIn(){
+  // NOTE: signInWithPopup is intentionally NOT used here. Modern Chrome
+  // enforces Cross-Origin-Opener-Policy in a way that blocks Firebase's
+  // popup flow from detecting when the popup closes (window.closed),
+  // so the sign-in silently hangs after the user picks an account.
+  // signInWithRedirect sidesteps that entirely — no popup, no window.closed
+  // polling, just a full navigation to Google and back.
   try{
-    await fbAuth.signInWithPopup(new firebase.auth.GoogleAuthProvider());
+    await fbAuth.signInWithRedirect(new firebase.auth.GoogleAuthProvider());
   }catch(e){
-    if(e.code!=='auth/popup-closed-by-user') toast('Sign-in failed: '+e.message,'error');
+    toast('Sign-in failed: '+e.message,'error');
     throw e;
   }
 }
+// Surface any error from the redirect round-trip (e.g. account-exists-
+// with-different-credential). The actual signed-in user is delivered
+// via the onAuthStateChanged listener below, not this promise.
+fbAuth.getRedirectResult().catch(e=>{
+  if(e && e.code && e.code!=='auth/no-current-user') toast('Sign-in failed: '+e.message,'error');
+});
 async function firebaseSignOut(){
   if(!confirm('Sign out? Local unsaved changes will be lost.')) return;
   // Stop the real-time listener before signing out
