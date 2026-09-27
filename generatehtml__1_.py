@@ -7541,8 +7541,18 @@ let currentType='note';
 /* -- THEME --------------------------------------- */
 const THEMES=['facebook','rose','cream','beige','arctic','ocean','midnight','ember','indigo'];
 
+// Swap ONLY the theme-* class on <body>, leaving every other class
+// (authed, fontsize-*, sidebar-collapsed, etc.) untouched. Do NOT use
+// `document.body.className = 'theme-'+t` anywhere — that overwrites the
+// entire class list and, in particular, silently strips the 'authed'
+// class that gates the whole app vs. the login screen.
+function setBodyTheme(t){
+  THEMES.forEach(k=>document.body.classList.remove('theme-'+k));
+  document.body.classList.add('theme-'+t);
+}
+
 function applyTheme(t){
-  document.body.className='theme-'+t;
+  setBodyTheme(t);
   localStorage.setItem('mynotes_theme',t);
   THEMES.forEach(k=>{
     const el=document.getElementById('theme-btn-'+k);
@@ -16075,17 +16085,13 @@ function updateOverdueBadge(){
     const m = onclick.match(/applyTheme\('([^']+)'\)/);
     if(!m) return;
     if(_origTheme === null) _origTheme = localStorage.getItem('mynotes_theme')||'facebook';
-    document.body.className = 'theme-' + m[1];
-    if(document.body.classList.contains('sidebar-collapsed')) document.body.classList.add('sidebar-collapsed');
-    if(document.body.classList.contains('fontsize-compact')) document.body.classList.add('fontsize-compact');
-    if(document.body.classList.contains('fontsize-large')) document.body.classList.add('fontsize-large');
+    setBodyTheme(m[1]); // swaps only the theme-* class — authed/fontsize/etc. untouched
   });
   document.addEventListener('mouseout', function(e){
     const card = e.target.closest('.theme-card');
     if(!card || e.relatedTarget?.closest('.theme-card')) return;
     if(_origTheme !== null){
-      document.body.className = 'theme-' + _origTheme;
-      if(_sidebarCollapsed) document.body.classList.add('sidebar-collapsed');
+      setBodyTheme(_origTheme);
     }
   });
   // On actual click, commit
