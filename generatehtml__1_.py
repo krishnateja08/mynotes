@@ -5190,9 +5190,277 @@ body.fontsize-large .ncard-body{font-size:14px}
 body.fontsize-compact .ncard-title{font-size:13px}
 body.fontsize-compact .ncard-body{font-size:11px}
 
+/* ============================================================
+   LOGIN GATE — premium standalone auth screen
+   Shown until Firebase confirms a signed-in user; hides the
+   whole app underneath so nothing renders before auth.
+   ============================================================ */
+.layout{display:none}
+body.authed .layout{display:flex}
+body.authed #login-gate{display:none}
+
+#login-gate{
+  position:fixed;inset:0;z-index:9999;display:flex;
+  background:radial-gradient(1200px 800px at 15% 20%,rgba(37,99,235,.16),transparent 60%),
+             radial-gradient(1000px 700px at 85% 80%,rgba(124,58,237,.16),transparent 60%),
+             linear-gradient(160deg,#050816 0%,#0a0e1f 45%,#111827 100%);
+  overflow:hidden;font-family:'Inter',system-ui,sans-serif;color:#e5e9f5;
+}
+#login-gate *{box-sizing:border-box}
+
+/* ambient glow blobs */
+.lg-glow{position:absolute;border-radius:50%;filter:blur(70px);opacity:.55;pointer-events:none;
+  animation:lgPulse 7s ease-in-out infinite;}
+.lg-glow.g1{width:520px;height:520px;background:#2563EB;top:-120px;left:-100px;animation-delay:0s}
+.lg-glow.g2{width:460px;height:460px;background:#7C3AED;bottom:-140px;left:20%;animation-delay:2s}
+.lg-glow.g3{width:380px;height:380px;background:#06B6D4;top:30%;right:-120px;animation-delay:4s}
+@keyframes lgPulse{0%,100%{opacity:.4;transform:scale(1)}50%{opacity:.7;transform:scale(1.12)}}
+
+/* particles */
+#lg-particles{position:absolute;inset:0;pointer-events:none}
+.lg-particle{position:absolute;border-radius:50%;background:rgba(255,255,255,.55);
+  box-shadow:0 0 8px 2px rgba(160,190,255,.5);animation:lgFloat linear infinite}
+@keyframes lgFloat{
+  0%{transform:translateY(0) translateX(0);opacity:0}
+  10%{opacity:.9}
+  90%{opacity:.7}
+  100%{transform:translateY(-120vh) translateX(20px);opacity:0}
+}
+
+/* left showcase panel */
+.lg-showcase{flex:1.3;position:relative;display:flex;align-items:center;justify-content:center;
+  min-width:0;perspective:1400px}
+.lg-orbit-wrap{position:relative;width:560px;height:560px;max-width:88vw;max-height:60vh;
+  transform-style:preserve-3d;animation:lgDrift 9s ease-in-out infinite}
+@keyframes lgDrift{0%,100%{transform:translateY(0) rotateX(2deg)}50%{transform:translateY(-14px) rotateX(-1deg)}}
+
+.lg-sphere{position:absolute;top:50%;left:50%;width:190px;height:190px;border-radius:50%;
+  transform:translate(-50%,-50%);
+  background:radial-gradient(circle at 32% 28%,rgba(255,255,255,.9),rgba(96,150,255,.55) 30%,rgba(37,99,235,.55) 55%,rgba(6,182,212,.35) 75%,transparent 100%);
+  box-shadow:0 0 70px 18px rgba(37,99,235,.45),0 0 140px 40px rgba(124,58,237,.25),inset 0 0 50px rgba(255,255,255,.25);
+  animation:lgSphereGlow 4s ease-in-out infinite}
+@keyframes lgSphereGlow{0%,100%{box-shadow:0 0 70px 18px rgba(37,99,235,.45),0 0 140px 40px rgba(124,58,237,.25),inset 0 0 50px rgba(255,255,255,.25)}
+  50%{box-shadow:0 0 95px 26px rgba(6,182,212,.5),0 0 170px 55px rgba(124,58,237,.35),inset 0 0 60px rgba(255,255,255,.35)}}
+.lg-sphere::before{content:'';position:absolute;inset:14px;border-radius:50%;
+  border:1px solid rgba(255,255,255,.25)}
+.lg-sphere-icon{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  font-size:46px;filter:drop-shadow(0 0 10px rgba(255,255,255,.6))}
+
+.lg-orbit{position:absolute;top:50%;left:50%;border:1px dashed rgba(140,170,255,.18);
+  border-radius:50%;transform:translate(-50%,-50%)}
+.lg-orbit.o1{width:360px;height:360px;animation:lgSpin 26s linear infinite}
+.lg-orbit.o2{width:520px;height:520px;animation:lgSpin 38s linear infinite reverse}
+@keyframes lgSpin{from{transform:translate(-50%,-50%) rotate(0deg)}to{transform:translate(-50%,-50%) rotate(360deg)}}
+
+.lg-card{position:absolute;top:50%;left:50%;display:flex;align-items:center;gap:7px;
+  padding:9px 14px;border-radius:14px;font-size:12.5px;font-weight:600;white-space:nowrap;
+  background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.14);
+  backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+  box-shadow:0 8px 24px rgba(0,0,0,.35);color:#eef1fb;
+  animation:lgCardFloat 5s ease-in-out infinite}
+@keyframes lgCardFloat{0%,100%{transform:translate(-50%,-50%) translate(var(--lx),var(--ly)) translateY(0)}
+  50%{transform:translate(-50%,-50%) translate(var(--lx),var(--ly)) translateY(-8px)}}
+
+.lg-lines{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.lg-lines line{stroke:url(#lgLineGrad);stroke-width:1;opacity:.45;
+  stroke-dasharray:4 6;animation:lgLineFlow 3s linear infinite}
+@keyframes lgLineFlow{to{stroke-dashoffset:-40}}
+
+/* right glass login panel */
+.lg-panel-wrap{width:460px;max-width:92vw;flex-shrink:0;display:flex;align-items:center;
+  justify-content:center;padding:32px 28px;position:relative;z-index:2}
+.lg-panel{width:100%;padding:44px 38px 34px;border-radius:32px;position:relative;
+  background:rgba(20,24,42,.55);border:1px solid rgba(255,255,255,.10);
+  backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);
+  box-shadow:0 24px 70px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.06);
+  animation:lgPanelIn .7s cubic-bezier(.16,1,.3,1)}
+@keyframes lgPanelIn{from{opacity:0;transform:translateY(18px) scale(.98)}to{opacity:1;transform:translateY(0) scale(1)}}
+
+.lg-logo{display:flex;align-items:center;gap:10px;font-size:20px;font-weight:800;
+  letter-spacing:.2px;margin-bottom:26px;background:linear-gradient(120deg,#8fb4ff,#c9a6ff 60%,#7fe3ee);
+  -webkit-background-clip:text;background-clip:text;color:transparent}
+.lg-logo-dot{width:9px;height:9px;border-radius:50%;background:#06B6D4;box-shadow:0 0 12px 3px rgba(6,182,212,.8);
+  -webkit-text-fill-color:initial}
+.lg-headline{font-size:27px;font-weight:800;line-height:1.25;margin:0 0 10px;color:#f4f6ff}
+.lg-subtext{font-size:13.5px;line-height:1.65;color:#a6adc8;margin:0 0 30px;max-width:340px}
+
+.lg-google-btn{width:100%;display:flex;align-items:center;justify-content:center;gap:10px;
+  background:#fff;color:#1f2430;border:none;border-radius:14px;padding:14px 18px;
+  font-size:14.5px;font-weight:600;cursor:pointer;font-family:inherit;
+  box-shadow:0 8px 22px rgba(0,0,0,.28);transition:transform .18s ease,box-shadow .18s ease}
+.lg-google-btn:hover{transform:translateY(-2px);box-shadow:0 12px 30px rgba(0,0,0,.38)}
+.lg-google-btn:active{transform:translateY(0)}
+.lg-google-btn svg{width:19px;height:19px;flex-shrink:0}
+.lg-google-btn.busy{opacity:.7;pointer-events:none}
+
+.lg-features{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:30px 0 26px}
+.lg-feature{display:flex;align-items:center;gap:9px;font-size:11.5px;color:#c4c9e2;
+  background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);
+  border-radius:12px;padding:10px 11px}
+.lg-feature span.ico{font-size:15px}
+
+.lg-bottom{display:flex;flex-direction:column;gap:7px;padding-top:18px;
+  border-top:1px solid rgba(255,255,255,.08)}
+.lg-bottom-row{display:flex;align-items:center;gap:7px;font-size:11px;color:#8891ac}
+.lg-bottom-row svg{width:13px;height:13px;flex-shrink:0;color:#5eead4}
+
+@media (max-width:880px){
+  .lg-showcase{display:none}
+  .lg-panel-wrap{flex:1;width:100%}
+}
 </style>
 </head>
 <body class="theme-rose">
+
+<!-- ============================================================
+     LOGIN GATE
+     ============================================================ -->
+<div id="login-gate">
+  <div class="lg-glow g1"></div>
+  <div class="lg-glow g2"></div>
+  <div class="lg-glow g3"></div>
+  <div id="lg-particles"></div>
+
+  <div class="lg-showcase" id="lg-showcase">
+    <div class="lg-orbit-wrap" id="lg-orbit-wrap">
+      <svg class="lg-lines" id="lg-lines">
+        <defs>
+          <linearGradient id="lgLineGrad" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#2563EB"/>
+            <stop offset="50%" stop-color="#7C3AED"/>
+            <stop offset="100%" stop-color="#06B6D4"/>
+          </linearGradient>
+        </defs>
+      </svg>
+      <div class="lg-orbit o1"></div>
+      <div class="lg-orbit o2"></div>
+      <div class="lg-sphere"><div class="lg-sphere-icon">🧠</div></div>
+      <!-- orbiting category cards -->
+      <div class="lg-card" data-r="1" data-ang="20"  style="animation-delay:0s">📝 Notes</div>
+      <div class="lg-card" data-r="1" data-ang="90"  style="animation-delay:.4s">📌 Sticky Notes</div>
+      <div class="lg-card" data-r="1" data-ang="160" style="animation-delay:.8s">📖 Daybook</div>
+      <div class="lg-card" data-r="1" data-ang="230" style="animation-delay:1.2s">⏰ Reminders</div>
+      <div class="lg-card" data-r="2" data-ang="55"  style="animation-delay:.2s">📈 Trading Journal</div>
+      <div class="lg-card" data-r="2" data-ang="125" style="animation-delay:.6s">💰 Finance Tracker</div>
+      <div class="lg-card" data-r="2" data-ang="195" style="animation-delay:1s">🛒 Shopping</div>
+      <div class="lg-card" data-r="2" data-ang="300" style="animation-delay:1.4s">📊 Investments</div>
+    </div>
+  </div>
+
+  <div class="lg-panel-wrap">
+    <div class="lg-panel">
+      <div class="lg-logo"><span class="lg-logo-dot"></span> MyNotes</div>
+      <h1 class="lg-headline">Your Digital Second Brain</h1>
+      <p class="lg-subtext">Capture, organize, and discover everything that matters in one intelligent workspace.</p>
+
+      <button class="lg-google-btn" id="lg-google-btn" onclick="lgSignIn()">
+        <svg viewBox="0 0 48 48"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3c-1.6 4.7-6.1 8-11.3 8-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.1 8 3l5.7-5.7C34.6 6 29.6 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.7-.4-3.5z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.6 15.1 18.9 12 24 12c3.1 0 5.8 1.1 8 3l5.7-5.7C34.6 6 29.6 4 24 4 16.3 4 9.6 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.5 0 10.4-1.9 14.2-5.1l-6.6-5.4C29.6 35.3 26.9 36 24 36c-5.2 0-9.6-3.3-11.3-8l-6.6 5.1C9.5 39.6 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.3-2.2 4.3-4.1 5.7l6.6 5.4C41.9 35.9 44 30.4 44 24c0-1.3-.1-2.7-.4-3.5z"/></svg>
+        <span id="lg-google-btn-text">Continue with Google</span>
+      </button>
+
+      <div class="lg-features">
+        <div class="lg-feature"><span class="ico">☁️</span> Secure Cloud Sync</div>
+        <div class="lg-feature"><span class="ico">🔔</span> Smart Reminders</div>
+        <div class="lg-feature"><span class="ico">💹</span> Finance Tracking</div>
+        <div class="lg-feature"><span class="ico">🧭</span> Knowledge Management</div>
+      </div>
+
+      <div class="lg-bottom">
+        <div class="lg-bottom-row">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          Privacy protected
+        </div>
+        <div class="lg-bottom-row">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.5 12l1.8 1.8L15 10"/></svg>
+          Google secure authentication
+        </div>
+        <div class="lg-bottom-row">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="10" width="16" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>
+          Encrypted cloud storage
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+// Position orbiting cards around the sphere + draw connecting lines
+(function lgInit(){
+  function place(){
+    const wrap=document.getElementById('lg-orbit-wrap');
+    if(!wrap) return;
+    const cards=wrap.querySelectorAll('.lg-card');
+    const radii={1:180,2:260};
+    const pts=[];
+    cards.forEach(c=>{
+      const r=radii[c.getAttribute('data-r')];
+      const ang=parseFloat(c.getAttribute('data-ang'))*Math.PI/180;
+      const x=Math.cos(ang)*r, y=Math.sin(ang)*r*0.72;
+      c.style.setProperty('--lx',x.toFixed(1)+'px');
+      c.style.setProperty('--ly',y.toFixed(1)+'px');
+      pts.push({x:x+280,y:y+280});
+    });
+    const svg=document.getElementById('lg-lines');
+    if(svg){
+      svg.setAttribute('viewBox','0 0 560 560');
+      [...svg.querySelectorAll('line')].forEach(l=>l.remove());
+      pts.forEach(p=>{
+        const line=document.createElementNS('http://www.w3.org/2000/svg','line');
+        line.setAttribute('x1',280);line.setAttribute('y1',280);
+        line.setAttribute('x2',p.x);line.setAttribute('y2',p.y);
+        svg.appendChild(line);
+      });
+    }
+  }
+  place();
+  window.addEventListener('resize', place);
+
+  // mouse parallax on the showcase
+  const showcase=document.getElementById('lg-showcase');
+  const wrap=document.getElementById('lg-orbit-wrap');
+  if(showcase && wrap){
+    showcase.addEventListener('mousemove', e=>{
+      const r=showcase.getBoundingClientRect();
+      const mx=(e.clientX-r.left)/r.width-0.5;
+      const my=(e.clientY-r.top)/r.height-0.5;
+      wrap.style.transform=`rotateY(${mx*10}deg) rotateX(${-my*10}deg)`;
+    });
+    showcase.addEventListener('mouseleave', ()=>{ wrap.style.transform=''; });
+  }
+
+  // floating particles
+  const field=document.getElementById('lg-particles');
+  if(field){
+    const N=34;
+    for(let i=0;i<N;i++){
+      const p=document.createElement('div');
+      p.className='lg-particle';
+      const size=1+Math.random()*3;
+      p.style.width=size+'px'; p.style.height=size+'px';
+      p.style.left=Math.random()*100+'%';
+      p.style.bottom='-10px';
+      p.style.animationDuration=(9+Math.random()*10)+'s';
+      p.style.animationDelay=(Math.random()*10)+'s';
+      field.appendChild(p);
+    }
+  }
+})();
+
+// Sign-in from the login gate (reuses firebaseSignIn defined later)
+function lgSignIn(){
+  const btn=document.getElementById('lg-google-btn');
+  const txt=document.getElementById('lg-google-btn-text');
+  if(btn) btn.classList.add('busy');
+  if(txt) txt.textContent='Signing in…';
+  const reset=()=>{ if(btn) btn.classList.remove('busy'); if(txt) txt.textContent='Continue with Google'; };
+  if(typeof firebaseSignIn==='function'){
+    firebaseSignIn().then(reset).catch(reset);
+    setTimeout(reset, 15000); // safety net if popup is dismissed silently
+  } else {
+    reset();
+  }
+}
+</script>
+
 <!-- mobile sidebar overlay -->
 <div class="sidebar-overlay" id="sidebar-overlay" onclick="closeSidebar()"></div>
 <div class="layout">
@@ -7326,6 +7594,7 @@ async function firebaseSignIn(){
     await fbAuth.signInWithPopup(new firebase.auth.GoogleAuthProvider());
   }catch(e){
     if(e.code!=='auth/popup-closed-by-user') toast('Sign-in failed: '+e.message,'error');
+    throw e;
   }
 }
 async function firebaseSignOut(){
@@ -15855,17 +16124,20 @@ window.addEventListener('DOMContentLoaded',()=>{
     }, {passive:true});
   }
 
-  // Firebase auth state listener
+  // Firebase auth state listener — gates the whole app behind the
+  // login screen (#login-gate). Nothing in .layout renders until
+  // Firebase confirms a signed-in user.
   fbAuth.onAuthStateChanged(user=>{
     updateAuthUI(user);
     if(user){
+      document.body.classList.add('authed');
       closeSettings();
       loadFromFirebase();
       _gcalAutoSyncOnLoad();
     } else {
+      document.body.classList.remove('authed');
       dataLoaded=true;
       initSticky();
-      openSettings();
       renderAll();
     }
   });
