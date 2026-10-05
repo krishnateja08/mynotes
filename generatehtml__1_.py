@@ -5308,6 +5308,65 @@ body.authed #login-gate{display:none}
   .lg-showcase{display:none}
   .lg-panel-wrap{flex:1;width:100%}
 }
+
+/* ===== CHECKLIST (additive) ===== */
+.chk-layout{display:flex;flex:1;min-height:0;width:100%;overflow:hidden}
+.chk-left{width:280px;flex-shrink:0;border-right:1px solid var(--border);background:var(--sidebar);display:flex;flex-direction:column;min-height:0}
+.chk-left-hdr{display:flex;align-items:center;justify-content:space-between;padding:16px 16px 10px}
+.chk-left-title{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.chk-plus-btn{width:26px;height:26px;border-radius:7px;border:1px solid var(--border2);background:var(--s2);color:var(--text);cursor:pointer;font-size:16px;line-height:1}
+.chk-plus-btn:hover{border-color:var(--accent);color:var(--accent)}
+.chk-list{flex:1;overflow-y:auto;padding:4px 10px 10px}
+.chk-card{padding:10px 12px;border-radius:10px;border:1px solid transparent;cursor:pointer;margin-bottom:6px}
+.chk-card:hover{background:var(--s2)}
+.chk-card.active{background:var(--s2);border-color:var(--accent)}
+.chk-card-top{display:flex;align-items:center;gap:8px}
+.chk-card-icon{font-size:18px}
+.chk-card-name{flex:1;font-size:13.5px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.chk-card-cnt{font-size:11px;color:var(--muted)}
+.chk-mini-track{height:4px;border-radius:4px;background:var(--border);margin-top:8px;overflow:hidden}
+.chk-mini-fill{height:100%;background:var(--green);border-radius:4px;transition:width .3s}
+.chk-left-footer{padding:10px;border-top:1px solid var(--border)}
+.chk-right{flex:1;min-width:0;display:flex;flex-direction:column;min-height:0;overflow-y:auto;padding:22px 28px}
+.chk-hdr{display:flex;align-items:center;gap:14px;margin-bottom:14px}
+.chk-hdr-icon{font-size:30px}
+.chk-hdr-main{flex:1;min-width:0}
+.chk-hdr-name{font-size:21px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.chk-hdr-sub{font-size:12px;color:var(--muted);margin-top:2px}
+.chk-hdr-actions{display:flex;gap:6px;flex-wrap:wrap}
+.chk-progress{display:flex;align-items:center;gap:12px;margin-bottom:16px}
+.chk-prog-track{flex:1;height:8px;border-radius:8px;background:var(--border);overflow:hidden}
+.chk-prog-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--green));border-radius:8px;transition:width .35s}
+.chk-prog-label{font-size:12px;font-weight:600;color:var(--text2);min-width:42px;text-align:right}
+.chk-add-bar{display:flex;gap:8px;margin-bottom:16px}
+.chk-add-input{flex:1;padding:11px 14px;border-radius:10px;border:1px solid var(--border2);background:var(--s2);color:var(--text);font-size:14px;font-family:inherit;outline:none}
+.chk-add-input:focus{border-color:var(--accent)}
+.chk-add-btn{padding:0 18px;border-radius:10px;border:none;background:var(--accent);color:#fff;font-weight:600;cursor:pointer}
+.chk-items{display:flex;flex-direction:column;gap:6px}
+.chk-item{display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:10px;border:1px solid var(--border);background:var(--s2);animation:chk-in .2s ease}
+@keyframes chk-in{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}
+.chk-item.done .chk-text{text-decoration:line-through;color:var(--muted)}
+.chk-box{width:20px;height:20px;border-radius:6px;border:2px solid var(--border2);background:transparent;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;color:#fff;font-size:12px;padding:0}
+.chk-box:hover{border-color:var(--accent)}
+.chk-box.done{background:var(--green);border-color:var(--green)}
+.chk-text{flex:1;min-width:0;font-size:14px;color:var(--text);outline:none;word-break:break-word}
+.chk-del{background:none;border:none;color:var(--muted);cursor:pointer;font-size:14px;opacity:0;padding:2px 6px}
+.chk-item:hover .chk-del{opacity:1}
+.chk-del:hover{color:var(--red)}
+.chk-section-lbl{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:14px 0 6px}
+.chk-empty{text-align:center;color:var(--muted);padding:50px 20px;font-size:14px}
+.chk-empty .chk-empty-ic{font-size:42px;margin-bottom:10px}
+.chk-icon-grid{display:flex;flex-wrap:wrap;gap:6px}
+.chk-icon-opt{width:38px;height:38px;border-radius:9px;border:1px solid var(--border2);background:var(--s2);font-size:19px;cursor:pointer}
+.chk-icon-opt.selected{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent)}
+@media(hover:none){.chk-del{opacity:1}}
+@media(max-width:640px){
+  #page-checklist{height:auto!important}
+  .chk-layout{flex-direction:column;overflow:visible}
+  .chk-left{width:100%;border-right:none;border-bottom:1px solid var(--border)}
+  .chk-list{max-height:220px}
+  .chk-right{padding:16px;overflow:visible}
+}
 </style>
 </head>
 <body class="theme-rose">
@@ -5491,6 +5550,10 @@ function lgSignIn(){
     <span class="nav-icon">📖</span> Daybook
     <span class="nav-count" id="nav-daybook-count">0</span>
   </button>
+  <button class="nav-item" id="nav-checklist-btn" onclick="showPage('checklist',this)">
+    <span class="nav-icon">✅</span> Checklist
+    <span class="nav-count" id="nav-checklist-count">0</span>
+  </button>
 
   <div class="sidebar-section">Execution</div>
   <button class="nav-item" id="nav-reminders-btn" onclick="showPage('reminders',this)">
@@ -5611,6 +5674,10 @@ function lgSignIn(){
         <!-- investments: add asset -->
         <div id="ctx-investments" style="display:none;align-items:center;gap:8px">
           <button class="btn" onclick="invOpenAddRow()">+ Add Asset</button>
+        </div>
+        <!-- checklist: new list -->
+        <div id="ctx-checklist" style="display:none;align-items:center;gap:8px">
+          <button class="btn" onclick="chkOpenModal()">+ New Checklist</button>
         </div>
       </div>
       <!-- Clock -->
@@ -6736,6 +6803,38 @@ function lgSignIn(){
       </div>
     </div>
   </div>
+</div>
+
+<!-- == CHECKLIST PAGE == -->
+<div id="page-checklist" style="display:none;flex-direction:column;width:100%;height:calc(100vh - 58px);background:var(--bg)">
+  <div class="chk-layout">
+    <div class="chk-left">
+      <div class="chk-left-hdr">
+        <span class="chk-left-title">My Checklists</span>
+        <button class="chk-plus-btn" onclick="chkOpenModal()" title="New checklist">+</button>
+      </div>
+      <div class="chk-list" id="chk-list"></div>
+      <div class="chk-left-footer"><button class="btn" style="width:100%" onclick="chkOpenModal()">+ New Checklist</button></div>
+    </div>
+    <div class="chk-right" id="chk-right"></div>
+  </div>
+</div>
+<div class="overlay" id="chk-modal-overlay">
+<div class="modal" style="max-width:460px;display:flex;flex-direction:column;max-height:92vh;overflow-y:auto">
+  <div class="mhead">
+    <h2 id="chk-modal-title">New Checklist</h2>
+    <button class="mclose" onclick="chkCloseModal()">✕</button>
+  </div>
+  <input type="hidden" id="chk-edit-id">
+  <input type="hidden" id="chk-icon-val" value="✅">
+  <div class="frow"><label>Name *</label><input id="chk-name" placeholder="e.g. Packing list, Weekend chores" onkeydown="if(event.key==='Enter')chkSaveModal()"></div>
+  <div class="frow"><label>Icon</label><div class="chk-icon-grid" id="chk-icon-grid"></div></div>
+  <div class="frow" id="chk-bulk-row"><label>Items (optional, one per line)</label><textarea id="chk-bulk" rows="5" placeholder="Passport&#10;Charger&#10;Tickets"></textarea></div>
+  <div class="mfoot">
+    <button class="btn-ghost" onclick="chkCloseModal()">Cancel</button>
+    <button class="btn" onclick="chkSaveModal()">Save</button>
+  </div>
+</div>
 </div>
 
 <!-- == INVESTMENTS PAGE == -->
@@ -15955,6 +16054,134 @@ document.addEventListener('keydown', function(ev){
     if(bd && bd.classList.contains('open')) impCloseModal();
   }
 });
+
+// ══════════ CHECKLIST (additive module) ══════════
+let _chkActiveId=null, _chkHideDone=false;
+const CHK_ICONS=['✅','🛒','🎒','🧳','🏠','💼','🎯','📚','💊','🔧','🎉','✈️'];
+function chkData(){ if(!Array.isArray(DATA.checklists)) DATA.checklists=[]; return DATA.checklists; }
+function chkActive(){ const l=chkData(); return l.find(c=>c.id===_chkActiveId)||null; }
+function chkUpdateCount(){
+  const open=chkData().reduce((n,c)=>n+(c.items||[]).filter(i=>!i.done).length,0);
+  const el=document.getElementById('nav-checklist-count'); if(el) el.textContent=open;
+}
+async function chkPersist(){ try{ await saveToFirebase(); }catch(e){ console.error(e); } }
+function chkRender(){
+  chkUpdateCount();
+  const list=document.getElementById('chk-list'), right=document.getElementById('chk-right');
+  if(!list||!right) return;
+  const all=chkData();
+  if(!all.find(c=>c.id===_chkActiveId)) _chkActiveId=all.length?all[0].id:null;
+  list.innerHTML=all.length?all.map(c=>{
+    const it=c.items||[], d=it.filter(i=>i.done).length, pct=it.length?Math.round(d/it.length*100):0;
+    return `<div class="chk-card${c.id===_chkActiveId?' active':''}" onclick="chkSelect('${c.id}')">
+      <div class="chk-card-top"><span class="chk-card-icon">${esc(c.icon||'✅')}</span><span class="chk-card-name">${esc(c.name)}</span><span class="chk-card-cnt">${d}/${it.length}</span></div>
+      <div class="chk-mini-track"><div class="chk-mini-fill" style="width:${pct}%"></div></div></div>`;
+  }).join(''):'<div class="chk-empty" style="padding:20px">No checklists yet</div>';
+  const c=chkActive();
+  if(!c){
+    right.innerHTML='<div class="chk-empty"><div class="chk-empty-ic">✅</div>Create your first checklist to get started.<br><br><button class="btn" onclick="chkOpenModal()">+ New Checklist</button></div>';
+    return;
+  }
+  const it=c.items||[], d=it.filter(i=>i.done).length, pct=it.length?Math.round(d/it.length*100):0;
+  const row=i=>`<div class="chk-item${i.done?' done':''}">
+    <button class="chk-box${i.done?' done':''}" onclick="chkToggle('${i.id}')">${i.done?'✓':''}</button>
+    <div class="chk-text" contenteditable="true" spellcheck="false" onkeydown="if(event.key==='Enter'){event.preventDefault();this.blur();}" onblur="chkEditItem('${i.id}',this.textContent)">${esc(i.text)}</div>
+    <button class="chk-del" onclick="chkDelItem('${i.id}')" title="Delete">✕</button></div>`;
+  const open=it.filter(i=>!i.done), done=it.filter(i=>i.done);
+  let body='';
+  if(!it.length) body='<div class="chk-empty"><div class="chk-empty-ic">📝</div>No items yet. Add your first one above.</div>';
+  else{
+    body=open.map(row).join('');
+    if(done.length&&!_chkHideDone) body+=`<div class="chk-section-lbl">Completed (${done.length})</div>`+done.map(row).join('');
+  }
+  right.innerHTML=`<div class="chk-hdr"><span class="chk-hdr-icon">${esc(c.icon||'✅')}</span>
+    <div class="chk-hdr-main"><div class="chk-hdr-name">${esc(c.name)}</div><div class="chk-hdr-sub">${d} of ${it.length} done</div></div>
+    <div class="chk-hdr-actions">
+      <button class="btn-ghost" onclick="chkToggleHide()">${_chkHideDone?'Show':'Hide'} completed</button>
+      <button class="btn-ghost" onclick="chkClearDone()">Clear completed</button>
+      <button class="btn-ghost" onclick="chkOpenModal('${c.id}')">Edit</button>
+      <button class="btn-ghost" onclick="chkDeleteList('${c.id}')">Delete</button></div></div>
+    <div class="chk-progress"><div class="chk-prog-track"><div class="chk-prog-fill" style="width:${pct}%"></div></div><span class="chk-prog-label">${pct}%</span></div>
+    <div class="chk-add-bar"><input class="chk-add-input" id="chk-add-input" placeholder="Add an item… (paste multiple lines to add many)" onkeydown="if(event.key==='Enter')chkAddItem()"><button class="chk-add-btn" onclick="chkAddItem()">Add</button></div>
+    <div class="chk-items">${body}</div>`;
+}
+function chkSelect(id){ _chkActiveId=id; chkRender(); }
+async function chkAddItem(){
+  const c=chkActive(), inp=document.getElementById('chk-add-input'); if(!c||!inp) return;
+  const lines=inp.value.split(/\r?\n/).map(x=>x.trim()).filter(Boolean); if(!lines.length) return;
+  c.items=c.items||[]; lines.forEach(t=>c.items.push({id:uid(),text:t,done:false,created:Date.now()}));
+  chkRender(); const n=document.getElementById('chk-add-input'); if(n) n.focus();
+  await chkPersist();
+}
+async function chkToggle(id){ const c=chkActive(); if(!c) return; const i=(c.items||[]).find(x=>x.id===id); if(!i) return; i.done=!i.done; chkRender(); await chkPersist(); }
+async function chkEditItem(id,txt){
+  const c=chkActive(); if(!c) return; const i=(c.items||[]).find(x=>x.id===id); if(!i) return;
+  txt=(txt||'').trim(); if(!txt){ chkRender(); return; } if(txt===i.text) return;
+  i.text=txt; await chkPersist();
+}
+async function chkDelItem(id){ const c=chkActive(); if(!c) return; c.items=(c.items||[]).filter(x=>x.id!==id); chkRender(); await chkPersist(); }
+function chkToggleHide(){ _chkHideDone=!_chkHideDone; chkRender(); }
+async function chkClearDone(){ const c=chkActive(); if(!c) return; c.items=(c.items||[]).filter(x=>!x.done); chkRender(); await chkPersist(); }
+async function chkDeleteList(id){
+  const c=chkData().find(x=>x.id===id); if(!c) return;
+  if(!confirm('Delete checklist "'+c.name+'"?')) return;
+  DATA.checklists=chkData().filter(x=>x.id!==id); chkRender(); await chkPersist();
+}
+function chkPickIcon(ic){
+  document.getElementById('chk-icon-val').value=ic;
+  document.querySelectorAll('#chk-icon-grid .chk-icon-opt').forEach(b=>b.classList.toggle('selected',b.dataset.ic===ic));
+}
+function chkOpenModal(id){
+  const c=id?chkData().find(x=>x.id===id):null;
+  document.getElementById('chk-modal-title').textContent=c?'Edit Checklist':'New Checklist';
+  document.getElementById('chk-edit-id').value=c?c.id:'';
+  document.getElementById('chk-name').value=c?c.name:'';
+  document.getElementById('chk-bulk').value='';
+  document.getElementById('chk-bulk-row').style.display=c?'none':'';
+  document.getElementById('chk-icon-grid').innerHTML=CHK_ICONS.map(ic=>`<button type="button" class="chk-icon-opt" data-ic="${ic}" onclick="chkPickIcon('${ic}')">${ic}</button>`).join('');
+  chkPickIcon(c?(c.icon||'✅'):'✅');
+  document.getElementById('chk-modal-overlay').classList.add('open');
+  setTimeout(()=>document.getElementById('chk-name').focus(),50);
+}
+function chkCloseModal(){ document.getElementById('chk-modal-overlay').classList.remove('open'); }
+async function chkSaveModal(){
+  const name=document.getElementById('chk-name').value.trim();
+  if(!name){ toast('Please enter a name','error'); return; }
+  const icon=document.getElementById('chk-icon-val').value||'✅', eid=document.getElementById('chk-edit-id').value;
+  if(eid){ const c=chkData().find(x=>x.id===eid); if(c){ c.name=name; c.icon=icon; } }
+  else{
+    const items=document.getElementById('chk-bulk').value.split(/\r?\n/).map(x=>x.trim()).filter(Boolean).map(t=>({id:uid(),text:t,done:false,created:Date.now()}));
+    const c={id:uid(),name,icon,items,created:Date.now()}; chkData().push(c); _chkActiveId=c.id;
+  }
+  chkCloseModal(); chkRender(); await chkPersist();
+}
+// Hook into navigation + data refresh without modifying existing functions
+(function(){
+  const _origShowPage=showPage;
+  showPage=function(page,btn){
+    const pc=document.getElementById('page-checklist');
+    if(page!=='checklist'){
+      if(pc) pc.style.display='none';
+      const cx=document.getElementById('ctx-checklist'); if(cx) cx.style.display='none';
+      return _origShowPage.apply(this,arguments);
+    }
+    _origShowPage.call(this,'dashboard',btn);
+    ['dashboard','notes','reminders','sticky','journal','routine','tasknotes','finance','daybook','shopping','investments','impdates'].forEach(p=>{
+      const el=document.getElementById('page-'+p); if(el) el.style.display='none';
+    });
+    document.querySelectorAll('[id^="ctx-"]').forEach(e=>e.style.display='none');
+    const sa=document.getElementById('page-scroll-area'); if(sa) sa.style.display='none';
+    if(pc) pc.style.display='flex';
+    const cx=document.getElementById('ctx-checklist'); if(cx) cx.style.display='flex';
+    document.getElementById('page-title').textContent='✅ Checklist';
+    document.querySelectorAll('.nav-item').forEach(b=>b.classList.remove('active'));
+    if(btn) btn.classList.add('active');
+    window.scrollTo(0,0);
+    chkRender();
+  };
+  const _origRenderAll=renderAll;
+  renderAll=function(){ const r=_origRenderAll.apply(this,arguments); try{ chkRender(); }catch(e){ console.error(e); } return r; };
+})();
 
 // ── Global in-memory store for pasted image data URLs (keyed by short token) ──
 window._imgDataStore = {};
