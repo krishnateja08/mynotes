@@ -5309,6 +5309,80 @@ body.authed #login-gate{display:none}
   .lg-panel-wrap{flex:1;width:100%}
 }
 
+
+/* ===== CHECKLIST MODAL v2 (additive) ===== */
+.chk-ovl.open{backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+.chk-ovl{transition:opacity .18s ease}
+.chk-ovl.closing{opacity:0}
+.chk-modal{width:100%;max-width:660px;max-height:92vh;overflow-y:auto;border-radius:24px;padding:28px 32px 0;background:color-mix(in srgb,var(--sidebar) 92%,transparent);border:1px solid var(--border2);box-shadow:0 2px 4px rgba(0,0,0,.12),0 12px 32px rgba(0,0,0,.25),0 40px 80px rgba(0,0,0,.28);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px)}
+.chk-ovl.open .chk-modal{animation:chk-pop .3s cubic-bezier(.2,.9,.3,1.05)}
+.chk-ovl.closing .chk-modal{animation:chk-out .18s ease forwards}
+@keyframes chk-pop{from{opacity:0;transform:translateY(16px) scale(.96)}to{opacity:1;transform:none}}
+@keyframes chk-out{to{opacity:0;transform:translateY(8px) scale(.97)}}
+.chk-m-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:24px}
+.chk-m-title{font-size:26px;font-weight:700;color:var(--text);letter-spacing:-.02em;margin:0}
+.chk-m-desc{font-size:13.5px;color:var(--muted);margin-top:4px}
+.chk-m-close{width:36px;height:36px;border-radius:50%;border:1px solid var(--border2);background:var(--s2);color:var(--text2);cursor:pointer;font-size:14px;flex-shrink:0;transition:.15s}
+.chk-m-close:hover{background:var(--border);color:var(--text);transform:rotate(90deg)}
+.chk-m-sec{margin-bottom:24px}
+.chk-m-lbl{display:block;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+.chk-m-input{width:100%;height:52px;border-radius:14px;border:1px solid var(--border2);background:var(--s2);color:var(--text);font-size:16px;padding:0 16px;font-family:inherit;outline:none;transition:.15s;box-sizing:border-box}
+.chk-m-input:focus{border-color:#8b5cf6;box-shadow:0 0 0 3px rgba(139,92,246,.2)}
+.chk-pills{display:flex;flex-wrap:wrap;gap:8px}
+.chk-pill{height:34px;padding:0 16px;border-radius:999px;border:1px solid var(--border2);background:var(--s2);color:var(--text2);font-size:13px;font-weight:600;cursor:pointer;transition:.15s;font-family:inherit}
+.chk-pill:hover{border-color:#8b5cf6;color:var(--text)}
+.chk-pill.selected{background:rgba(139,92,246,.16);border-color:#8b5cf6;color:#a78bfa}
+.chk-pill.tpl{border-style:dashed;height:30px;font-size:12px;padding:0 12px}
+.chk-ig{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}
+.chk-ig-opt{display:flex;flex-direction:column;align-items:center;gap:6px;padding:12px 4px 9px;border-radius:14px;border:1px solid var(--border);background:var(--s2);color:var(--text2);cursor:pointer;font-size:11px;font-family:inherit;transition:.18s}
+.chk-ig-opt:hover{transform:translateY(-2px);color:var(--text)}
+.chk-ig-opt.selected{border-color:#8b5cf6;color:#a78bfa;background:rgba(139,92,246,.12);box-shadow:0 0 0 2px #8b5cf6,0 0 18px rgba(139,92,246,.45)}
+.chk-svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
+.chk-hdr-icon .chk-svg{width:32px;height:32px;color:#a78bfa}
+.chk-card-icon .chk-svg{width:18px;height:18px;color:#a78bfa}
+.chk-m-div{height:1px;background:var(--border);margin:0 0 24px}
+.chk-pv{border-radius:18px;border:1px solid var(--border2);background:var(--s2);padding:16px 18px;box-shadow:0 6px 18px rgba(0,0,0,.15)}
+.chk-pv-top{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.chk-pv-top .chk-svg{color:#a78bfa;width:20px;height:20px}
+.chk-pv-name{font-weight:700;font-size:15px;color:var(--text);flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.chk-pv-item{display:flex;align-items:center;gap:10px;font-size:13.5px;color:var(--text2);padding:4px 0}
+.chk-pv-item.done{text-decoration:line-through;color:var(--muted)}
+.chk-pv-dot{width:15px;height:15px;border-radius:50%;border:1.8px solid var(--border2);flex-shrink:0}
+.chk-pv-item.done .chk-pv-dot{background:var(--green);border-color:var(--green)}
+.chk-pv-more,.chk-pv-empty{font-size:12px;color:var(--muted);padding:4px 0}
+.chk-stats{display:flex;gap:8px;margin-top:12px;padding-top:12px;border-top:1px solid var(--border);flex-wrap:wrap}
+.chk-stat{font-size:12px;color:var(--text2);background:var(--bg);border:1px solid var(--border);border-radius:999px;padding:4px 12px}
+.chk-stat b{color:var(--text)}
+.chk-m-itemshead{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.chk-m-itemshead .chk-m-lbl{margin:0}
+.chk-addrow-btn{height:34px;padding:0 14px;border-radius:10px;border:1px dashed #8b5cf6;background:rgba(139,92,246,.08);color:#a78bfa;font-weight:600;font-size:13px;cursor:pointer;font-family:inherit}
+.chk-addrow-btn:hover{background:rgba(139,92,246,.18)}
+.chk-rows{display:flex;flex-direction:column;gap:6px}
+.chk-row{display:flex;align-items:center;gap:10px;padding:6px 8px 6px 6px;border-radius:12px;border:1px solid var(--border);background:var(--s2);animation:chk-in .2s ease;transition:.12s}
+.chk-row:hover{border-color:var(--border2)}
+.chk-row.dragging{opacity:.4}
+.chk-row.dragover{border-color:#8b5cf6;box-shadow:0 -2px 0 #8b5cf6}
+.chk-grip{cursor:grab;color:var(--muted);font-size:14px;padding:0 4px;user-select:none;opacity:.5}
+.chk-row:hover .chk-grip{opacity:1}
+.chk-row-circ{width:16px;height:16px;border-radius:50%;border:1.8px solid var(--border2);flex-shrink:0}
+.chk-row.isdone .chk-row-circ{background:var(--green);border-color:var(--green)}
+.chk-row-in{flex:1;min-width:0;background:transparent;border:none;outline:none;color:var(--text);font-size:14px;font-family:inherit;height:30px}
+.chk-row-del{background:none;border:none;cursor:pointer;color:var(--muted);padding:4px 6px;border-radius:8px;opacity:0;transition:.12s}
+.chk-row:hover .chk-row-del{opacity:1}
+.chk-row-del:hover{color:var(--red);background:var(--bg)}
+.chk-row-del .chk-svg{width:16px;height:16px}
+@media(hover:none){.chk-row-del{opacity:1}}
+.chk-m-foot{position:sticky;bottom:0;display:flex;justify-content:space-between;align-items:center;gap:12px;padding:16px 0 20px;margin-top:8px;background:color-mix(in srgb,var(--sidebar) 96%,transparent);border-top:1px solid var(--border)}
+.chk-m-cancel{height:44px;padding:0 20px;border-radius:12px;border:1px solid var(--border2);background:transparent;color:var(--text2);font-weight:600;cursor:pointer;font-family:inherit}
+.chk-m-cancel:hover{background:var(--s2);color:var(--text)}
+.chk-m-create{height:44px;padding:0 26px;border-radius:12px;border:none;background:linear-gradient(135deg,#8b5cf6,#6d4aff);color:#fff;font-weight:700;cursor:pointer;font-family:inherit;box-shadow:0 6px 18px rgba(124,92,255,.4);transition:.15s}
+.chk-m-create:hover{transform:translateY(-1px);box-shadow:0 8px 22px rgba(124,92,255,.55)}
+@media(max-width:640px){
+  .chk-modal{padding:20px 18px 0;border-radius:20px}
+  .chk-ig{grid-template-columns:repeat(5,1fr);gap:6px}
+  .chk-ig-opt span{display:none}
+  .chk-m-title{font-size:22px}
+}
 /* ===== CHECKLIST (additive) ===== */
 .chk-layout{display:flex;flex:1;min-height:0;width:100%;overflow:hidden}
 .chk-left{width:280px;flex-shrink:0;border-right:1px solid var(--border);background:var(--sidebar);display:flex;flex-direction:column;min-height:0}
@@ -6819,20 +6893,45 @@ function lgSignIn(){
     <div class="chk-right" id="chk-right"></div>
   </div>
 </div>
-<div class="overlay" id="chk-modal-overlay">
-<div class="modal" style="max-width:460px;display:flex;flex-direction:column;max-height:92vh;overflow-y:auto">
-  <div class="mhead">
-    <h2 id="chk-modal-title">New Checklist</h2>
-    <button class="mclose" onclick="chkCloseModal()">✕</button>
+<div class="overlay chk-ovl" id="chk-modal-overlay" onmousedown="if(event.target===this)chkCloseModal()">
+<div class="chk-modal">
+  <div class="chk-m-head">
+    <div>
+      <h2 class="chk-m-title" id="chk-modal-title">New Checklist</h2>
+      <div class="chk-m-desc">Create a reusable checklist to stay organized.</div>
+    </div>
+    <button class="chk-m-close" onclick="chkCloseModal()" aria-label="Close">✕</button>
   </div>
   <input type="hidden" id="chk-edit-id">
-  <input type="hidden" id="chk-icon-val" value="✅">
-  <div class="frow"><label>Name *</label><input id="chk-name" placeholder="e.g. Packing list, Weekend chores" onkeydown="if(event.key==='Enter')chkSaveModal()"></div>
-  <div class="frow"><label>Icon</label><div class="chk-icon-grid" id="chk-icon-grid"></div></div>
-  <div class="frow" id="chk-bulk-row"><label>Items (optional, one per line)</label><textarea id="chk-bulk" rows="5" placeholder="Passport&#10;Charger&#10;Tickets"></textarea></div>
-  <div class="mfoot">
-    <button class="btn-ghost" onclick="chkCloseModal()">Cancel</button>
-    <button class="btn" onclick="chkSaveModal()">Save</button>
+  <div class="chk-m-sec">
+    <label class="chk-m-lbl" for="chk-name">Name</label>
+    <input class="chk-m-input" id="chk-name" maxlength="60" placeholder="Travel Checklist, Shopping List, Morning Routine" oninput="chkDraftName()">
+  </div>
+  <div class="chk-m-sec">
+    <label class="chk-m-lbl">Category</label>
+    <div class="chk-pills" id="chk-cat-pills"></div>
+    <div class="chk-pills" id="chk-tpl-pills" style="margin-top:10px"></div>
+  </div>
+  <div class="chk-m-sec">
+    <label class="chk-m-lbl">Icon</label>
+    <div class="chk-ig" id="chk-icon-grid"></div>
+  </div>
+  <div class="chk-m-div"></div>
+  <div class="chk-m-sec">
+    <label class="chk-m-lbl">Preview</label>
+    <div class="chk-pv" id="chk-preview"></div>
+  </div>
+  <div class="chk-m-div"></div>
+  <div class="chk-m-sec">
+    <div class="chk-m-itemshead">
+      <label class="chk-m-lbl">Checklist Items</label>
+      <button type="button" class="chk-addrow-btn" onclick="chkDraftAddRow()">+ Add Item</button>
+    </div>
+    <div class="chk-rows" id="chk-rows"></div>
+  </div>
+  <div class="chk-m-foot">
+    <button class="chk-m-cancel" onclick="chkCloseModal()">Cancel</button>
+    <button class="chk-m-create" id="chk-save-btn" onclick="chkSaveModal()">Create Checklist</button>
   </div>
 </div>
 </div>
@@ -16074,7 +16173,7 @@ function chkRender(){
   list.innerHTML=all.length?all.map(c=>{
     const it=c.items||[], d=it.filter(i=>i.done).length, pct=it.length?Math.round(d/it.length*100):0;
     return `<div class="chk-card${c.id===_chkActiveId?' active':''}" onclick="chkSelect('${c.id}')">
-      <div class="chk-card-top"><span class="chk-card-icon">${esc(c.icon||'✅')}</span><span class="chk-card-name">${esc(c.name)}</span><span class="chk-card-cnt">${d}/${it.length}</span></div>
+      <div class="chk-card-top"><span class="chk-card-icon">${chkIconHtml(c.icon)}</span><span class="chk-card-name">${esc(c.name)}</span><span class="chk-card-cnt">${d}/${it.length}</span></div>
       <div class="chk-mini-track"><div class="chk-mini-fill" style="width:${pct}%"></div></div></div>`;
   }).join(''):'<div class="chk-empty" style="padding:20px">No checklists yet</div>';
   const c=chkActive();
@@ -16094,7 +16193,7 @@ function chkRender(){
     body=open.map(row).join('');
     if(done.length&&!_chkHideDone) body+=`<div class="chk-section-lbl">Completed (${done.length})</div>`+done.map(row).join('');
   }
-  right.innerHTML=`<div class="chk-hdr"><span class="chk-hdr-icon">${esc(c.icon||'✅')}</span>
+  right.innerHTML=`<div class="chk-hdr"><span class="chk-hdr-icon">${chkIconHtml(c.icon)}</span>
     <div class="chk-hdr-main"><div class="chk-hdr-name">${esc(c.name)}</div><div class="chk-hdr-sub">${d} of ${it.length} done</div></div>
     <div class="chk-hdr-actions">
       <button class="btn-ghost" onclick="chkToggleHide()">${_chkHideDone?'Show':'Hide'} completed</button>
@@ -16127,34 +16226,131 @@ async function chkDeleteList(id){
   if(!confirm('Delete checklist "'+c.name+'"?')) return;
   DATA.checklists=chkData().filter(x=>x.id!==id); chkRender(); await chkPersist();
 }
-function chkPickIcon(ic){
-  document.getElementById('chk-icon-val').value=ic;
-  document.querySelectorAll('#chk-icon-grid .chk-icon-opt').forEach(b=>b.classList.toggle('selected',b.dataset.ic===ic));
+const CHK_SVG={
+ travel:'<path d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2z"/>',
+ shopping:'<circle cx="9" cy="20" r="1.5"/><circle cx="18" cy="20" r="1.5"/><path d="M2 3h2l2.7 12.4a2 2 0 0 0 2 1.6h7.7a2 2 0 0 0 2-1.6L22 7H5.1"/>',
+ work:'<rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>',
+ home:'<path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/>',
+ study:'<path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20V3H6.5A2.5 2.5 0 0 0 4 5.5z"/><path d="M20 17v4H6.5a2.5 2.5 0 0 1 0-4"/>',
+ health:'<path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8l1 1.1L12 21l7.8-7.5 1-1.1a5.5 5.5 0 0 0 0-7.8z"/>',
+ finance:'<circle cx="12" cy="12" r="10"/><path d="M12 6v12M15 9.5c0-1-1.3-1.8-3-1.8s-3 .8-3 2 1.3 1.8 3 2 3 .8 3 2-1.3 2-3 2-3-.8-3-1.8"/>',
+ goals:'<circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/>',
+ tools:'<path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94z"/>',
+ personal:'<circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/>',
+ trash:'<path d="M3 6h18M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6M10 11v6M14 11v6"/>'
+};
+const CHK_ICON_LABELS={travel:'Travel',shopping:'Shopping',work:'Work',home:'Home',study:'Study',health:'Health',finance:'Finance',goals:'Goals',tools:'Tools',personal:'Personal'};
+const CHK_CATS=[['Travel','travel'],['Work','work'],['Home','home'],['Study','study'],['Personal','personal']];
+const CHK_TEMPLATES={
+ 'Travel':{name:'Travel Checklist',icon:'travel',cat:'Travel',items:['Passport','Charger','Tickets','Wallet','Toiletries']},
+ 'Shopping':{name:'Shopping List',icon:'shopping',cat:'Home',items:['Milk','Eggs','Bread','Vegetables','Fruits']},
+ 'Meeting':{name:'Meeting Prep',icon:'work',cat:'Work',items:['Review agenda','Prepare notes','Test audio/video','Share materials','Send follow-up']},
+ 'Study':{name:'Study Plan',icon:'study',cat:'Study',items:['Review notes','Practice problems','Read chapter','Make flashcards']},
+ 'Medicine':{name:'Medicine Checklist',icon:'health',cat:'Personal',items:['Morning dose','Afternoon dose','Night dose','Refill prescription']},
+ 'Weekend Tasks':{name:'Weekend Tasks',icon:'home',cat:'Home',items:['Laundry','Clean room','Grocery run','Meal prep','Call family']}
+};
+function chkIconHtml(v){ return CHK_SVG[v]?`<svg class="chk-svg" viewBox="0 0 24 24" aria-hidden="true">${CHK_SVG[v]}</svg>`:esc(v||'✅'); }
+let _chkDraft={icon:'goals',cat:'',items:[]}, _chkDragId=null, _chkClosing=null;
+function chkDraftName(){ chkRenderPreview(); }
+function chkNewRow(text,done,id){ return {id:id||uid(),text:text||'',done:!!done}; }
+function chkRenderPills(){
+  document.getElementById('chk-cat-pills').innerHTML=CHK_CATS.map(([n,ic])=>`<button type="button" class="chk-pill${_chkDraft.cat===n?' selected':''}" onclick="chkPickCat('${n}','${ic}')">${n}</button>`).join('');
+  document.getElementById('chk-tpl-pills').innerHTML='<span class="chk-m-lbl" style="margin:0 4px 0 0;align-self:center">Quick templates</span>'+Object.keys(CHK_TEMPLATES).map(n=>`<button type="button" class="chk-pill tpl" onclick="chkApplyTemplate('${n}')">${n}</button>`).join('');
+}
+function chkRenderIcons(){
+  document.getElementById('chk-icon-grid').innerHTML=Object.keys(CHK_ICON_LABELS).map(k=>`<button type="button" class="chk-ig-opt${_chkDraft.icon===k?' selected':''}" onclick="chkPickIcon('${k}')" title="${CHK_ICON_LABELS[k]}">${chkIconHtml(k)}<span>${CHK_ICON_LABELS[k]}</span></button>`).join('');
+}
+function chkPickIcon(k){ _chkDraft.icon=k; chkRenderIcons(); chkRenderPreview(); }
+function chkPickCat(n,ic){ _chkDraft.cat=(_chkDraft.cat===n?'':n); if(_chkDraft.cat) _chkDraft.icon=ic; chkRenderPills(); chkRenderIcons(); chkRenderPreview(); }
+function chkApplyTemplate(n){
+  const t=CHK_TEMPLATES[n]; if(!t) return;
+  const nm=document.getElementById('chk-name'); if(!nm.value.trim()||Object.values(CHK_TEMPLATES).some(x=>x.name===nm.value.trim())) nm.value=t.name;
+  _chkDraft.icon=t.icon; _chkDraft.cat=t.cat;
+  const kept=_chkDraft.items.filter(r=>r.text.trim());
+  _chkDraft.items=kept.concat(t.items.filter(x=>!kept.some(r=>r.text.trim().toLowerCase()===x.toLowerCase())).map(x=>chkNewRow(x)));
+  chkRenderPills(); chkRenderIcons(); chkRenderRows(); chkRenderPreview();
+}
+function chkRenderRows(focusId){
+  const box=document.getElementById('chk-rows');
+  box.innerHTML=_chkDraft.items.map(r=>`<div class="chk-row${r.done?' isdone':''}" draggable="true" data-id="${r.id}">
+    <span class="chk-grip" title="Drag to reorder">⋮⋮</span><span class="chk-row-circ"></span>
+    <input class="chk-row-in" data-id="${r.id}" value="${esc(r.text).replace(/"/g,'&quot;')}" placeholder="Item…" maxlength="200">
+    <button type="button" class="chk-row-del" data-del="${r.id}" title="Delete"><svg class="chk-svg" viewBox="0 0 24 24">${CHK_SVG.trash}</svg></button></div>`).join('');
+  if(focusId){ const el=box.querySelector('input[data-id="'+focusId+'"]'); if(el) el.focus(); }
+}
+function chkDraftAddRow(afterId){
+  const r=chkNewRow(''); const i=afterId?_chkDraft.items.findIndex(x=>x.id===afterId):-1;
+  if(i>=0) _chkDraft.items.splice(i+1,0,r); else _chkDraft.items.push(r);
+  chkRenderRows(r.id); chkRenderPreview();
+}
+function chkRenderPreview(){
+  const name=document.getElementById('chk-name').value.trim()||'Travel Checklist';
+  const items=_chkDraft.items.filter(r=>r.text.trim());
+  const demo=!items.length&&!document.getElementById('chk-name').value.trim()&&!document.getElementById('chk-edit-id').value;
+  const list=demo?['Passport','Charger','Tickets'].map(t=>({text:t,done:false})):items;
+  const total=list.length, done=list.filter(r=>r.done).length, pct=total?Math.round(done/total*100):0;
+  const shown=list.slice(0,5).map(r=>`<div class="chk-pv-item${r.done?' done':''}"><span class="chk-pv-dot"></span>${esc(r.text)}</div>`).join('');
+  document.getElementById('chk-preview').innerHTML=`<div class="chk-pv-top">${chkIconHtml(_chkDraft.icon)}<span class="chk-pv-name">${esc(name)}</span></div>`+
+   (shown||'<div class="chk-pv-empty">Add items to see them here</div>')+(total>5?`<div class="chk-pv-more">+ ${total-5} more</div>`:'')+
+   `<div class="chk-stats"><span class="chk-stat"><b>${total}</b> ${total===1?'Item':'Items'}</span><span class="chk-stat"><b>${done}</b> Completed</span><span class="chk-stat"><b>${pct}%</b> Progress</span>${_chkDraft.cat?`<span class="chk-stat">${esc(_chkDraft.cat)}</span>`:''}</div>`;
 }
 function chkOpenModal(id){
   const c=id?chkData().find(x=>x.id===id):null;
+  clearTimeout(_chkClosing);
+  const ov=document.getElementById('chk-modal-overlay'); ov.classList.remove('closing');
   document.getElementById('chk-modal-title').textContent=c?'Edit Checklist':'New Checklist';
+  document.getElementById('chk-save-btn').textContent=c?'Save Changes':'Create Checklist';
   document.getElementById('chk-edit-id').value=c?c.id:'';
   document.getElementById('chk-name').value=c?c.name:'';
-  document.getElementById('chk-bulk').value='';
-  document.getElementById('chk-bulk-row').style.display=c?'none':'';
-  document.getElementById('chk-icon-grid').innerHTML=CHK_ICONS.map(ic=>`<button type="button" class="chk-icon-opt" data-ic="${ic}" onclick="chkPickIcon('${ic}')">${ic}</button>`).join('');
-  chkPickIcon(c?(c.icon||'✅'):'✅');
-  document.getElementById('chk-modal-overlay').classList.add('open');
-  setTimeout(()=>document.getElementById('chk-name').focus(),50);
+  _chkDraft={icon:c?(c.icon||'goals'):'goals',cat:c?(c.category||''):'',items:c?(c.items||[]).map(i=>chkNewRow(i.text,i.done,i.id)):[chkNewRow(''),chkNewRow(''),chkNewRow('')].slice(0,1)};
+  chkRenderPills(); chkRenderIcons(); chkRenderRows(); chkRenderPreview();
+  ov.classList.add('open');
+  setTimeout(()=>document.getElementById('chk-name').focus(),60);
 }
-function chkCloseModal(){ document.getElementById('chk-modal-overlay').classList.remove('open'); }
+function chkCloseModal(){
+  const ov=document.getElementById('chk-modal-overlay'); if(!ov.classList.contains('open')) return;
+  ov.classList.add('closing');
+  _chkClosing=setTimeout(()=>{ ov.classList.remove('open','closing'); },190);
+}
 async function chkSaveModal(){
   const name=document.getElementById('chk-name').value.trim();
-  if(!name){ toast('Please enter a name','error'); return; }
-  const icon=document.getElementById('chk-icon-val').value||'✅', eid=document.getElementById('chk-edit-id').value;
-  if(eid){ const c=chkData().find(x=>x.id===eid); if(c){ c.name=name; c.icon=icon; } }
-  else{
-    const items=document.getElementById('chk-bulk').value.split(/\r?\n/).map(x=>x.trim()).filter(Boolean).map(t=>({id:uid(),text:t,done:false,created:Date.now()}));
-    const c={id:uid(),name,icon,items,created:Date.now()}; chkData().push(c); _chkActiveId=c.id;
+  if(!name){ toast('Please enter a name','error'); document.getElementById('chk-name').focus(); return; }
+  const eid=document.getElementById('chk-edit-id').value;
+  const items=_chkDraft.items.filter(r=>r.text.trim()).map(r=>({id:r.id,text:r.text.trim(),done:!!r.done,created:Date.now()}));
+  if(eid){
+    const c=chkData().find(x=>x.id===eid);
+    if(c){ const old={}; (c.items||[]).forEach(i=>old[i.id]=i); c.name=name; c.icon=_chkDraft.icon; c.category=_chkDraft.cat; c.items=items.map(i=>old[i.id]?Object.assign({},old[i.id],{text:i.text,done:i.done}):i); }
+  } else {
+    const c={id:uid(),name,icon:_chkDraft.icon,category:_chkDraft.cat,items,created:Date.now()}; chkData().push(c); _chkActiveId=c.id;
   }
   chkCloseModal(); chkRender(); await chkPersist();
 }
+(function(){
+  const box=document.getElementById('chk-rows'); if(!box) return;
+  box.addEventListener('input',e=>{ const t=e.target; if(t.matches('.chk-row-in')){ const r=_chkDraft.items.find(x=>x.id===t.dataset.id); if(r){ r.text=t.value; chkRenderPreview(); } } });
+  box.addEventListener('keydown',e=>{
+    const t=e.target; if(!t.matches('.chk-row-in')) return;
+    if(e.key==='Enter'){ e.preventDefault(); chkDraftAddRow(t.dataset.id); }
+    else if(e.key==='Backspace'&&!t.value&&_chkDraft.items.length>1){
+      e.preventDefault(); const i=_chkDraft.items.findIndex(x=>x.id===t.dataset.id); _chkDraft.items.splice(i,1);
+      const prev=_chkDraft.items[Math.max(0,i-1)]; chkRenderRows(prev&&prev.id); chkRenderPreview();
+    }
+  });
+  box.addEventListener('click',e=>{
+    const b=e.target.closest('[data-del]'); if(!b) return;
+    _chkDraft.items=_chkDraft.items.filter(x=>x.id!==b.dataset.del); chkRenderRows(); chkRenderPreview();
+  });
+  box.addEventListener('dragstart',e=>{ const r=e.target.closest&&e.target.closest('.chk-row'); if(!r) return; _chkDragId=r.dataset.id; r.classList.add('dragging'); try{e.dataTransfer.effectAllowed='move';e.dataTransfer.setData('text/plain',_chkDragId);}catch(_){} });
+  box.addEventListener('dragover',e=>{ const r=e.target.closest('.chk-row'); if(!r||!_chkDragId) return; e.preventDefault(); box.querySelectorAll('.dragover').forEach(x=>x.classList.remove('dragover')); if(r.dataset.id!==_chkDragId) r.classList.add('dragover'); });
+  box.addEventListener('drop',e=>{
+    const r=e.target.closest('.chk-row'); if(!r||!_chkDragId) return; e.preventDefault();
+    const from=_chkDraft.items.findIndex(x=>x.id===_chkDragId), to=_chkDraft.items.findIndex(x=>x.id===r.dataset.id);
+    if(from>=0&&to>=0&&from!==to){ const [m]=_chkDraft.items.splice(from,1); _chkDraft.items.splice(to,0,m); }
+    _chkDragId=null; chkRenderRows(); chkRenderPreview();
+  });
+  box.addEventListener('dragend',()=>{ _chkDragId=null; box.querySelectorAll('.dragging,.dragover').forEach(x=>x.classList.remove('dragging','dragover')); });
+  document.addEventListener('keydown',e=>{ if(e.key==='Escape') chkCloseModal(); });
+})();
 // Hook into navigation + data refresh without modifying existing functions
 (function(){
   const _origShowPage=showPage;
